@@ -3,7 +3,7 @@ ChebyshevApprox
 
 Julia code to approximate continuous functions using Chebyshev polynomials.
 
-In many applications it is important to be able to approximate accurately continuous functions of several variables.  This code can approximate functions that depend upon as many as five variables.  Chebyshev nodes in the [1.0, -1.0] interval are computed using the command
+In many applications it is important to be able to approximate accurately continuous functions of several variables.  This code can approximate functions that depend upon as many as six variables.  Chebyshev nodes in the [1.0, -1.0] interval are computed using the command
 
 nodes = chebyshev_nodes(n)
 
@@ -14,7 +14,7 @@ nodes = chebyshev_nodes(n,range)
 where range is a 1-d array with two elements, the first representing the upper bound on the interval and the second the lower bound.
 
 Approximating functions of one variable
----------------------------------------
+=======================================
 
 To approximate a 1-d function using a Chebyshev polynomial one first computes the Chebyshev weights using the command
 
@@ -33,9 +33,9 @@ y_approx = clenshaw_evaluate(w,[x],order,range)
 The latter command evaluates the polynominal using Clenshaw's recursion.  For functions where the domain of x coincides with the [1.0, -1.0] interval the range argument can be omitted. 
 
 Approximating functions of several variables
---------------------------------------------
+============================================
 
-The codes can approximate functions of as many as five variables and the extension from the 1-d case to the higher-dimension cases is straight-forward.  The only real difference is that in the higher dimension cases the codes allow the polynomials to be either tensor products of 1-d polynomials or complete polynomials.  In the tensor-product case, to approximate a function of three variables (say) the relevant commands are
+The codes can approximate functions of as many as six variables and the extension from the 1-d case to the higher-dimension cases is straight-forward.  The only real difference is that in the higher dimension cases the codes allow the polynomials to be either tensor products of 1-d polynomials or complete polynomials.  In the tensor-product case, to approximate a function of three variables (say) the relevant commands are
 
 w = chebyshev_weights(y,nodes_1,nodes_2,nodes_3,order,range)
 
@@ -56,6 +56,6 @@ As with the 1-d case, if the domain of each variable is [1.0, -1.0], then the ra
 Working with complete polynomials rather than tensor-product polynomials often leads to a considerable decrease in computation time with little loss of accuracy.
 
 Summary
--------
+=======
 
 Have fun.
