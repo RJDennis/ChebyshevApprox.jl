@@ -21,4 +21,3 @@ function normalize_node{T<:FloatingPoint}(node::Array{T,1},range::Array{T,1})
   return node
 
 end
-
