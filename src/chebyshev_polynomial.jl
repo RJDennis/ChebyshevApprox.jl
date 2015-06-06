@@ -10,7 +10,7 @@ function chebyshev_polynomial{T<:FloatingPoint,S<:Integer}(order::S,x::T)
 
     elseif i == 2
 
-      polynomial[i] = x[j]
+      polynomial[i] = x
 
     elseif i == 3
 
