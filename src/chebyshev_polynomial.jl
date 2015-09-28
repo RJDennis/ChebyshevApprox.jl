@@ -1,4 +1,4 @@
-function chebyshev_polynomial{T<:FloatingPoint,S<:Integer}(order::S,x::T)
+function chebyshev_polynomial{T<:AbstractFloat,S<:Integer}(order::S,x::T)
 
   polynomial = Array(T,1,order+1)
 
@@ -28,7 +28,7 @@ function chebyshev_polynomial{T<:FloatingPoint,S<:Integer}(order::S,x::T)
 
 end
 
-function chebyshev_polynomial{T<:FloatingPoint,S<:Integer}(order::S,x::Array{T,1})
+function chebyshev_polynomial{T<:AbstractFloat,S<:Integer}(order::S,x::Array{T,1})
 
   polynomial = Array(T,length(x),order+1)
 

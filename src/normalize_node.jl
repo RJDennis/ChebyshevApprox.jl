@@ -1,4 +1,4 @@
-function normalize_node{T<:FloatingPoint}(node::T,range::Array{T,1})
+function normalize_node{T<:AbstractFloat}(node::T,range::Array{T,1})
 
   if range[1] == range[2]
     node = (range[1]+range[2])/2
@@ -10,7 +10,7 @@ function normalize_node{T<:FloatingPoint}(node::T,range::Array{T,1})
 
 end
 
-function normalize_node{T<:FloatingPoint}(node::Array{T,1},range::Array{T,1})
+function normalize_node{T<:AbstractFloat}(node::Array{T,1},range::Array{T,1})
 
   if range[1] == range[2]
     node = ones(T,length(node))*(range[1]+range[2])/2

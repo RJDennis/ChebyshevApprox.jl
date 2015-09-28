@@ -12,7 +12,7 @@ function chebyshev_nodes{S<:Integer}(n::S)
 
 end
 
-function chebyshev_nodes{T<:FloatingPoint,S<:Integer}(n::S,range::Array{T,1})
+function chebyshev_nodes{T<:AbstractFloat,S<:Integer}(n::S,range::Array{T,1})
 
   nodes = Array(T,n)
 
