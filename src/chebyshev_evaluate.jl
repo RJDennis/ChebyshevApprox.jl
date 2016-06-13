@@ -655,3 +655,121 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::
   return evaluated_polynomial
 
 end
+
+# Generated functions for evaluating Chebyshev polynomials
+
+@generated function chebyshev_evaluate{T,N}(weights::Array{T,N},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+
+  chebyshev_polynomials = :( poly = Array{T,2}[];
+                             for i = 1:size(x,1);
+  #                             order = size(weights,i)-1;
+                               xi = x[i];
+
+                               # Normalize nodes to [-1,1]
+
+                               if range[1,i] == range[2,i];
+                                 xi = (range[1,i]+range[2,i])/2;
+                               else;
+                                 xi = 2*(xi-range[2,i])/(range[1,i]-range[2,i])-one(T);
+                               end;
+
+                               polynomial = Array(T,1,order[i]+1);
+                               for j = 1:order[i]+1;
+                                 if j == 1;
+                                   polynomial[j] = one(T);
+                                 elseif j == 2;
+                                   polynomial[j] = xi;
+                                 elseif j == 3;
+                                   polynomial[j] = 2*xi*xi-one(T);
+                                 else;
+                                   polynomial[j] = 2*xi*polynomial[j-1]-polynomial[j-2];
+                                 end;
+                               end;
+                               push!(poly,polynomial);
+                             end
+                             )
+
+  inner = :( evaluated_polynomial += zero(T) )
+  outer = inner
+  for dim = 1:N
+    var = symbol("i$dim")
+    outer = :(
+      for $var = 1:size(weights,$dim)
+        $outer
+      end
+    )
+  end
+
+  inner_prod = "weights["
+  for i = 1:N
+    if i == N
+      inner_prod = string("poly[",i,"][i",i,"]*",inner_prod,"i",i)
+    else
+      inner_prod = string("poly[",i,"][i",i,"]*",inner_prod,"i",i,",")
+    end
+  end
+  inner_prod = string(inner_prod,"]")
+  inner.args[2] = parse(inner_prod)
+
+  final = :( $chebyshev_polynomials;
+             evaluated_polynomial = zero(T);
+             $outer;
+             return evaluated_polynomial
+             )
+
+  return final
+end
+
+@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order:::Array{S,1})
+
+  chebyshev_polynomials = :( poly = Array{T,2}[];
+                             for i = 1:size(x,1);
+  #                             order = size(weights,i)-1;
+                               xi = x[i];
+                               polynomial = Array(T,1,order[i]+1);
+                               for j = 1:order[i]+1;
+                                 if j == 1;
+                                   polynomial[j] = one(T);
+                                 elseif j == 2;
+                                   polynomial[j] = xi;
+                                 elseif j == 3;
+                                   polynomial[j] = 2*xi*xi-one(T);
+                                 else;
+                                   polynomial[j] = 2*xi*polynomial[j-1]-polynomial[j-2];
+                                 end;
+                               end;
+                               push!(poly,polynomial);
+                             end
+                             )
+
+  inner = :( evaluated_polynomial += zero(T) )
+  outer = inner
+  for dim = 1:N
+    var = symbol("i$dim")
+    outer = :(
+      for $var = 1:size(weights,$dim)
+        $outer
+      end
+    )
+  end
+
+  inner_prod = "weights["
+  for i = 1:N
+    if i == N
+      inner_prod = string("poly[",i,"][i",i,"]*",inner_prod,"i",i)
+    else
+      inner_prod = string("poly[",i,"][i",i,"]*",inner_prod,"i",i,",")
+    end
+  end
+  inner_prod = string(inner_prod,"]")
+  inner.args[2] = parse(inner_prod)
+
+  final = :( $chebyshev_polynomials;
+             evaluated_polynomial = zero(T);
+             $outer;
+             return evaluated_polynomial
+             )
+
+  return final
+
+end
