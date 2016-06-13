@@ -720,7 +720,7 @@ end
   return final
 end
 
-@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order:::Array{S,1})
+@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::Array{S,1})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
