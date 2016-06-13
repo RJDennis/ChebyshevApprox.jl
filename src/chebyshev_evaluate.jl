@@ -658,7 +658,7 @@ end
 
 # Generated functions for evaluating Chebyshev polynomials
 
-@generated function chebyshev_evaluate{T,N}(weights::Array{T,N},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::Array{S,1},range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
