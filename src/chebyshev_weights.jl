@@ -500,7 +500,89 @@ end
   end
   initial_weight = parse(string(initial_weight,")"))
 
-    # Put it all together to compute the weights array
+  # Put it all together to compute the weights array
+
+  final = :( $initial_weight;
+             $new_outer;
+             return weights )
+
+  return final
+
+end
+
+@generated function chebyshev_weights_2{T,N,S}(f::Array{T,N},poly::Tuple,order::Array{S,1})
+
+  # Construct numerator term
+
+  inner_prod_numerator = "f["
+  for i = 1:N
+    if i == N
+      inner_prod_numerator = string("poly[",i,"][s",i,",i",i,"]*",inner_prod_numerator,"s",i)
+    else
+      inner_prod_numerator = string("poly[",i,"][s",i,",i",i,"]*",inner_prod_numerator,"s",i,",")
+    end
+  end
+  inner_prod_numerator = string(inner_prod_numerator,"]")
+  numerator_term = parse(inner_prod_numerator)
+
+  # Construct denominator term
+
+  inner_prod_denominator = string("poly[",1,"][s",1,",i",1,"]")
+  for i = 2:N
+    inner_prod_denominator = string("poly[",i,"][s",i,",i",i,"]*",inner_prod_denominator)
+  end
+  inner_prod_denominator = string("(",inner_prod_denominator,")^2.0")
+  denominator_term = parse(inner_prod_denominator)
+
+  # Construct weights term
+
+  weights_term = string("weights[i",1)
+  for i = 2:N
+    weights_term = string(weights_term,",i",i)
+  end
+  weights_term = parse(string(weights_term,"] = numerator/denominator"))
+
+  # Construct the inner loops that compute numerator and denominator
+
+  inner = :( numerator += $numerator_term;
+             denominator += $denominator_term )
+  outer  = inner
+
+  for i = 1:N
+    var = symbol("s$i")
+    outer = :(
+      for $var = 1:size(f,$i)
+        $outer
+      end
+    )
+  end
+
+  # Construct the outer loops that compute the weights
+
+  new_inner = :( numerator = zero(T);
+                 denominator = zero(T);
+                 $outer;
+                 $weights_term )
+  new_outer = new_inner
+
+  for i = 1:N
+    var = symbol("i$i")
+    new_outer = :(
+      for $var = 1:(order[$i]+1)
+        $new_outer
+      end
+    )
+  end
+
+  # Initialize the weight Array
+
+  initial_weight = string("weights = Array(T,order[1]+1,",)
+  for i = 2:N
+    initial_weight = string(initial_weight,"order[",i,"]+1,")
+  end
+  initial_weight = parse(string(initial_weight,")"))
+
+  # Put it all together to compute the weights array
 
   final = :( $initial_weight;
              $new_outer;
