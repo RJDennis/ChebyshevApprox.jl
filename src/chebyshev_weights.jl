@@ -510,7 +510,7 @@ end
 
 end
 
-@generated function chebyshev_weights_2{T,N,S}(f::Array{T,N},poly::Tuple,order::Array{S,1})
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::Tuple,order::Array{S,1})
 
   # Construct numerator term
 
