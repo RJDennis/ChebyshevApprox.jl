@@ -502,8 +502,7 @@ end
 
     # Put it all together to compute the weights array
 
-  final = :( $chebyshev_polynomials;
-             $initial_weight;
+  final = :( $initial_weight;
              $new_outer;
              return weights )
 
