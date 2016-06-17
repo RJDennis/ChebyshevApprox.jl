@@ -755,7 +755,7 @@ end
 
 # Generated function to compute Chebyshev weights using Chebyshev regression
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Union{Array{Array{T,1},1},Tuple{Array{T,1},N}},order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -863,7 +863,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::Union{Array{Array{T,2},1},Tuple{Array{T,2},N}},order::Array{S,1})
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::Array{Array{T,2},1},order::Array{S,1})
 
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
