@@ -378,7 +378,7 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = zeros(T,order+1,",)
+  initial_weight = string("weights = zeros(order+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order+1,")
   end
@@ -478,7 +478,7 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = zeros(T,order+1,",)
+  initial_weight = string("weights = zeros(order+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order+1,")
   end
@@ -558,7 +558,7 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = zeros(T,order+1,",)
+  initial_weight = string("weights = zeros(order+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order+1,")
   end
