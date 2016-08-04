@@ -32,7 +32,7 @@
 
   i_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
+    i_vars[i] = Symbol("i$i")
   end
 
   inner_prod = :( poly[1][i1]*weights[$(i_vars...)] )
@@ -82,7 +82,7 @@ end
 
   i_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
+    i_vars[i] = Symbol("i$i")
   end
 
   inner_prod = :( poly[1][i1]*weights[$(i_vars...)] )
@@ -142,7 +142,7 @@ end
 
   i_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
+    i_vars[i] = Symbol("i$i")
   end
 
   inner_prod = :( poly[1][i1]*weights[$(i_vars...)] )
@@ -194,7 +194,7 @@ end
 
   i_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
+    i_vars[i] = Symbol("i$i")
   end
 
   inner_prod = :( poly[1][i1]*weights[$(i_vars...)] )
