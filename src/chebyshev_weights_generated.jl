@@ -207,9 +207,86 @@ end
 
 end
 
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::Array{Array{T,2},1},order::Array{S,1})
+
+  i_vars = Array(Symbol,N)
+  s_vars = Array(Symbol,N)
+  for i = 1:N
+    i_vars[i] = symbol("i$i")
+    s_vars[i] = symbol("s$i")
+  end
+
+  # Construct denominator term
+
+  inner_prod_denominator = :( poly[1][s1,i1] )
+  for i = 2:N
+    inner_prod_denominator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_denominator )
+  end
+  denominator_term = :( $inner_prod_denominator*$inner_prod_denominator )
+
+  # Construct numerator term
+
+  inner_prod_numerator = :( poly[1][s1,i1]*f[$(s_vars...)] )
+  for i = 2:N
+      inner_prod_numerator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_numerator )
+  end
+  numerator_term = inner_prod_numerator
+
+  # Construct weights term
+
+  weights_term = :( weights[$(i_vars...)] = numerator/denominator )
+
+  # Construct the inner loops that compute numerator and denominator
+
+  inner = :( numerator += $numerator_term;
+             denominator += $denominator_term )
+  outer  = inner
+
+  for i = 1:N
+    outer = :(
+      for $(s_vars[i]) = 1:size(f,$i)
+        $outer
+      end
+    )
+  end
+
+  # Construct the outer loops that compute the weights
+
+  new_inner = :( numerator = zero(T);
+                 denominator = zero(T);
+                 $outer;
+                 $weights_term )
+  new_outer = new_inner
+
+  for i = 1:N
+    new_outer = :(
+      for $(i_vars[i]) = 1:(order[$i]+1)
+        $new_outer
+      end
+    )
+  end
+
+  # Initialize the weight Array
+
+  initial_weight = string("weights = Array(T,order[1]+1,",)
+  for i = 2:N
+    initial_weight = string(initial_weight,"order[",i,"]+1,")
+  end
+  initial_weight = parse(string(initial_weight,")"))
+
+    # Put it all together to compute the weights array
+
+  final = :( $initial_weight;
+             $new_outer;
+             return weights )
+
+  return final
+
+end
+
 # Generated functions for tensor-product polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Tuple,order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -317,7 +394,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Tuple,order::Array{S,1})
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -416,7 +493,84 @@ end
 
 end
 
-# Generated functions for complete polynomials where nodes are in an array or arrays
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1})
+
+  i_vars = Array(Symbol,N)
+  s_vars = Array(Symbol,N)
+  for i = 1:N
+    i_vars[i] = symbol("i$i")
+    s_vars[i] = symbol("s$i")
+  end
+
+  # Construct denominator term
+
+  inner_prod_denominator = :( poly[1][s1,i1] )
+  for i = 2:N
+    inner_prod_denominator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_denominator )
+  end
+  denominator_term = :( $inner_prod_denominator*$inner_prod_denominator )
+
+  # Construct numerator term
+
+  inner_prod_numerator = :( poly[1][s1,i1]*f[$(s_vars...)] )
+  for i = 2:N
+      inner_prod_numerator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_numerator )
+  end
+  numerator_term = inner_prod_numerator
+
+  # Construct weights term
+
+  weights_term = :( weights[$(i_vars...)] = numerator/denominator )
+
+  # Construct the inner loops that compute numerator and denominator
+
+  inner = :( numerator += $numerator_term;
+             denominator += $denominator_term )
+  outer  = inner
+
+  for i = 1:N
+    outer = :(
+      for $(s_vars[i]) = 1:size(f,$i)
+        $outer
+      end
+    )
+  end
+
+  # Construct the outer loops that compute the weights
+
+  new_inner = :( numerator = zero(T);
+                 denominator = zero(T);
+                 $outer;
+                 $weights_term )
+  new_outer = new_inner
+
+  for i = 1:N
+    new_outer = :(
+      for $(i_vars[i]) = 1:(order[$i]+1)
+        $new_outer
+      end
+    )
+  end
+
+  # Initialize the weight Array
+
+  initial_weight = string("weights = Array(T,order[1]+1,",)
+  for i = 2:N
+    initial_weight = string(initial_weight,"order[",i,"]+1,")
+  end
+  initial_weight = parse(string(initial_weight,")"))
+
+    # Put it all together to compute the weights array
+
+  final = :( $initial_weight;
+             $new_outer;
+             return weights )
+
+  return final
+
+end
+
+# Generated functions for complete polynomials where nodes are in an array of arrays
 
 @generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Array{Array{T,1},1},order::S,range::Array{T,2})
 
@@ -627,9 +781,88 @@ end
 
 end
 
-# Generated functions for complete polynomials where nodes are in an array or arrays
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::Array{Array{T,2},1},order::S)
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Tuple,order::S,range::Array{T,2})
+  i_vars = Array(Symbol,N)
+  s_vars = Array(Symbol,N)
+  for i = 1:N
+    i_vars[i] = symbol("i$i")
+    s_vars[i] = symbol("s$i")
+  end
+
+  # Construct denominator term
+
+  inner_prod_denominator = :( poly[1][s1,i1] )
+  for i = 2:N
+    inner_prod_denominator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_denominator )
+  end
+  denominator_term = :( $inner_prod_denominator*$inner_prod_denominator )
+
+  # Construct numerator term
+
+  inner_prod_numerator = :( poly[1][s1,i1]*f[$(s_vars...)] )
+  for i = 2:N
+      inner_prod_numerator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_numerator )
+  end
+  numerator_term = inner_prod_numerator
+
+  # Construct weights term
+
+  weights_term = :( weights[$(i_vars...)] = numerator/denominator )
+
+  # Construct the inner loops that compute numerator and denominator
+
+  inner = :( numerator += $numerator_term;
+             denominator += $denominator_term )
+  outer  = inner
+
+  for i = 1:N
+    outer = :(
+      for $(s_vars[i]) = 1:size(f,$i)
+        $outer
+      end
+    )
+  end
+
+  # Construct the outer loops that compute the weights
+
+  new_inner = :( numerator = zero(T);
+                 denominator = zero(T);
+                 if sum([$(i_vars...)]) <= order+N;
+                   $outer;
+                   $weights_term;
+                 end )
+  new_outer = new_inner
+
+  for i = 1:N
+    new_outer = :(
+      for $(i_vars[i]) = 1:(order+1)
+        $new_outer
+      end
+    )
+  end
+
+  # Initialize the weight Array
+
+  initial_weight = string("weights = zeros(order+1,",)
+  for i = 2:N
+    initial_weight = string(initial_weight,"order+1,")
+  end
+  initial_weight = parse(string(initial_weight,")"))
+
+    # Put it all together to compute the weights array
+
+  final = :( $initial_weight;
+             $new_outer;
+             return weights )
+
+  return final
+
+end
+
+# Generated functions for complete polynomials where nodes are in a tuple
+
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::S,range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -738,7 +971,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Tuple,order::S)
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::S)
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -831,6 +1064,85 @@ end
 
   final = :( $chebyshev_polynomials;
              $initial_weight;
+             $new_outer;
+             return weights )
+
+  return final
+
+end
+
+@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::NTuple{N,Array{T,2}},order::S)
+
+  i_vars = Array(Symbol,N)
+  s_vars = Array(Symbol,N)
+  for i = 1:N
+    i_vars[i] = symbol("i$i")
+    s_vars[i] = symbol("s$i")
+  end
+
+  # Construct denominator term
+
+  inner_prod_denominator = :( poly[1][s1,i1] )
+  for i = 2:N
+    inner_prod_denominator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_denominator )
+  end
+  denominator_term = :( $inner_prod_denominator*$inner_prod_denominator )
+
+  # Construct numerator term
+
+  inner_prod_numerator = :( poly[1][s1,i1]*f[$(s_vars...)] )
+  for i = 2:N
+      inner_prod_numerator = :( poly[$i][$(s_vars[i]),$(i_vars[i])]*$inner_prod_numerator )
+  end
+  numerator_term = inner_prod_numerator
+
+  # Construct weights term
+
+  weights_term = :( weights[$(i_vars...)] = numerator/denominator )
+
+  # Construct the inner loops that compute numerator and denominator
+
+  inner = :( numerator += $numerator_term;
+             denominator += $denominator_term )
+  outer  = inner
+
+  for i = 1:N
+    outer = :(
+      for $(s_vars[i]) = 1:size(f,$i)
+        $outer
+      end
+    )
+  end
+
+  # Construct the outer loops that compute the weights
+
+  new_inner = :( numerator = zero(T);
+                 denominator = zero(T);
+                 if sum([$(i_vars...)]) <= order+N;
+                   $outer;
+                   $weights_term;
+                 end )
+  new_outer = new_inner
+
+  for i = 1:N
+    new_outer = :(
+      for $(i_vars[i]) = 1:(order+1)
+        $new_outer
+      end
+    )
+  end
+
+  # Initialize the weight Array
+
+  initial_weight = string("weights = zeros(order+1,",)
+  for i = 2:N
+    initial_weight = string(initial_weight,"order+1,")
+  end
+  initial_weight = parse(string(initial_weight,")"))
+
+    # Put it all together to compute the weights array
+
+  final = :( $initial_weight;
              $new_outer;
              return weights )
 
