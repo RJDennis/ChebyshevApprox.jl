@@ -212,8 +212,8 @@ end
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
-    s_vars[i] = symbol("s$i")
+    i_vars[i] = Symbol("i$i")
+    s_vars[i] = Symbol("s$i")
   end
 
   # Construct denominator term
@@ -498,8 +498,8 @@ end
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
-    s_vars[i] = symbol("s$i")
+    i_vars[i] = Symbol("i$i")
+    s_vars[i] = Symbol("s$i")
   end
 
   # Construct denominator term
@@ -786,8 +786,8 @@ end
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
-    s_vars[i] = symbol("s$i")
+    i_vars[i] = Symbol("i$i")
+    s_vars[i] = Symbol("s$i")
   end
 
   # Construct denominator term
@@ -1076,8 +1076,8 @@ end
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
   for i = 1:N
-    i_vars[i] = symbol("i$i")
-    s_vars[i] = symbol("s$i")
+    i_vars[i] = Symbol("i$i")
+    s_vars[i] = Symbol("s$i")
   end
 
   # Construct denominator term
