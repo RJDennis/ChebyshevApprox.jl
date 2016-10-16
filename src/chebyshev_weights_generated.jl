@@ -1,6 +1,6 @@
 # Generated functions for tensor-product polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -108,7 +108,7 @@
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Array{Array{T,1},1},order::Array{S,1})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -207,7 +207,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::Array{Array{T,2},1},order::Array{S,1})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1})
 
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
@@ -286,7 +286,7 @@ end
 
 # Generated functions for tensor-product polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -394,7 +394,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -493,7 +493,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1})
 
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
@@ -572,7 +572,7 @@ end
 
 # Generated functions for complete polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Array{Array{T,1},1},order::S,range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -681,7 +681,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::Array{Array{T,1},1},order::S)
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S)
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -781,7 +781,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::Array{Array{T,2},1},order::S)
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S)
 
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
@@ -862,7 +862,7 @@ end
 
 # Generated functions for complete polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::S,range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,range::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -971,7 +971,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},nodes::NTuple{N,Array{T,1}},order::S)
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S)
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -1071,7 +1071,7 @@ end
 
 end
 
-@generated function chebyshev_weights{T,N,S}(f::Array{T,N},poly::NTuple{N,Array{T,2}},order::S)
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S)
 
   i_vars = Array(Symbol,N)
   s_vars = Array(Symbol,N)
