@@ -1,6 +1,6 @@
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1},range::Array{T,1})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1};domain = [1.0; -1.0])
 
-  x1 = normalize_node(x[1],range)
+  x1 = normalize_node(x[1],domain)
 
   polynomial_1 = chebyshev_polynomial(order[1],[x1])
 
@@ -16,10 +16,10 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::Array{S,1};domain = [1.0; -1.0].*ones(2,2))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
 
   polynomial_1 = chebyshev_polynomial(order[1],[x1])
   polynomial_2 = chebyshev_polynomial(order[2],[x2])
@@ -38,11 +38,11 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::Array{S,1};domain = [1.0; -1.0].*ones(2,3))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
 
   polynomial_1 = chebyshev_polynomial(order[1],[x1])
   polynomial_2 = chebyshev_polynomial(order[2],[x2])
@@ -64,12 +64,12 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::Array{S,1};domain = [1.0; -1.0].*ones(2,4))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
 
   polynomial_1 = chebyshev_polynomial(order[1],[x1])
   polynomial_2 = chebyshev_polynomial(order[2],[x2])
@@ -94,13 +94,13 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::Array{S,1};domain = [1.0; -1.0].*ones(2,5))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
 
   polynomial_1 = chebyshev_polynomial(order[1],[x1])
   polynomial_2 = chebyshev_polynomial(order[2],[x2])
@@ -128,14 +128,14 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::Array{S,1};domain = [1.0; -1.0].*ones(2,6))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
-  x6 = normalize_node(x[6],range[:,6])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
+  x6 = normalize_node(x[6],domain[:,6])
 
   polynomial_1 = chebyshev_polynomial(order[1],[x1])
   polynomial_2 = chebyshev_polynomial(order[2],[x2])
@@ -166,9 +166,9 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::S,range::Array{T,1})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::S;domain = [1.0; -1.0])
 
-  x1 = normalize_node(x[1],range)
+  x1 = normalize_node(x[1],domain)
 
   polynomial_1 = chebyshev_polynomial(order,[x1])
 
@@ -184,10 +184,10 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::S,range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::S;domain = [1.0; -1.0].*ones(2,2))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
 
   polynomial_1 = chebyshev_polynomial(order,[x1])
   polynomial_2 = chebyshev_polynomial(order,[x2])
@@ -210,11 +210,11 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::S,range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::S;domain = [1.0; -1.0].*ones(2,3))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
 
   polynomial_1 = chebyshev_polynomial(order,[x1])
   polynomial_2 = chebyshev_polynomial(order,[x2])
@@ -240,12 +240,12 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::S,range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::S;domain = [1.0; -1.0].*ones(2,4))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
 
   polynomial_1 = chebyshev_polynomial(order,[x1])
   polynomial_2 = chebyshev_polynomial(order,[x2])
@@ -274,13 +274,13 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::S,range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::S;domain = [1.0; -1.0].*ones(2,5))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
 
   polynomial_1 = chebyshev_polynomial(order,[x1])
   polynomial_2 = chebyshev_polynomial(order,[x2])
@@ -312,14 +312,14 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::S,range::Array{T,2})
+function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::S;domain = [1.0; -1.0].*ones(2,6))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
-  x6 = normalize_node(x[6],range[:,6])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
+  x6 = normalize_node(x[6],domain[:,6])
 
   polynomial_1 = chebyshev_polynomial(order,[x1])
   polynomial_2 = chebyshev_polynomial(order,[x2])
@@ -353,6 +353,8 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::
   return evaluated_polynomial
 
 end
+
+#=
 
 function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1})
 
@@ -655,3 +657,5 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::
   return evaluated_polynomial
 
 end
+
+=#

@@ -3,9 +3,9 @@ module ChebyshevApprox
 include("chebyshev_nodes.jl")
 include("normalize_node.jl")
 include("chebyshev_polynomial.jl")
-include("chebyshev_weights.jl")
+#include("chebyshev_weights.jl")
 include("chebyshev_weights_generated.jl")
-include("chebyshev_evaluate.jl")
+#include("chebyshev_evaluate.jl")
 include("chebyshev_evaluate_generated.jl")
 include("clenshaw_evaluate.jl")
 

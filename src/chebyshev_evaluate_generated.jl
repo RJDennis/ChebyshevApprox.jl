@@ -1,6 +1,6 @@
 # Generated functions for evaluating Chebyshev polynomials
 
-@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
@@ -8,10 +8,10 @@
 
                                # Normalize nodes to [-1,1]
 
-                               if range[1,i] == range[2,i];
-                                 xi = (range[1,i]+range[2,i])/2;
+                               if domain[1,i] == domain[2,i];
+                                 xi = (domain[1,i]+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-range[2,i])/(range[1,i]-range[2,i])-one(T);
+                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
                                end;
 
                                polynomial = Array(T,1,order[i]+1);
@@ -110,7 +110,7 @@ end
 
 end
 
-@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::S,range::Array{T,2})
+@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::S,domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
@@ -118,10 +118,10 @@ end
 
                                # Normalize nodes to [-1,1]
 
-                               if range[1,i] == range[2,i];
-                                 xi = (range[1,i]+range[2,i])/2;
+                               if domain[1,i] == domain[2,i];
+                                 xi = (domain[1,i]+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-range[2,i])/(range[1,i]-range[2,i])-one(T);
+                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
                                end;
 
                                polynomial = Array(T,1,order+1);

@@ -1,6 +1,6 @@
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1},range::Array{T,1})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1};domain = [1.0; -1.0])
 
-  x1 = normalize_node(x[1],range)
+  x1 = normalize_node(x[1],domain)
 
   z = zeros(T,(order[1]+1)+2)
 
@@ -16,10 +16,10 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::Array{S,1};domain = [1.0;-1.0].*ones(2,2))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
 
   p = zeros(T,order[2]+1)
 
@@ -51,11 +51,11 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::Array{S,1};domain = [1.0;-1.0].*ones(2,3))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
 
 	pp = zeros(T,(order[2]+1),(order[3]+1))
 
@@ -105,12 +105,12 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::Array{S,1};domain = [1.0;-1.0].*ones(2,4))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
 
 	ppp = zeros(T,(order[2]+1),(order[3]+1),(order[4]+1))
 
@@ -180,13 +180,13 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::Array{S,1};domain = [1.0;-1.0].*ones(2,5))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
 
   pppp = zeros(T,(order[2]+1),(order[3]+1),(order[4]+1),(order[5]+1))
 
@@ -278,14 +278,14 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::Array{S,1},range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::Array{S,1};domain = [1.0;-1.0].*ones(2,6))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
-  x6 = normalize_node(x[6],range[:,6])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
+  x6 = normalize_node(x[6],domain[:,6])
 
   ppppp = zeros(T,(order[2]+1),(order[3]+1),(order[4]+1),(order[5]+1),(order[6]+1))
 
@@ -401,9 +401,9 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::S,range::Array{T,1})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::S;domain = [1.0;-1.0])
 
-  x1 = normalize_node(x[1],range)
+  x1 = normalize_node(x[1],domain)
 
   z = zeros(T,(order+1)+2)
 
@@ -419,10 +419,10 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::S,range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::S;domain = [1.0;-1.0].*ones(2,2))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
 
   p = zeros(T,order+1)
 
@@ -454,11 +454,11 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::S,range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::S;domain = [1.0;-1.0].*ones(2,3))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
 
 	pp = zeros(T,(order+1),(order+1))
 
@@ -508,12 +508,12 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::S,range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::S;domain = [1.0;-1.0].*ones(2,4))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
 
 	ppp = zeros(T,(order+1),(order+1),(order+1))
 
@@ -583,13 +583,13 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::S,range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::S;domain = [1.0;-1.0].*ones(2,5))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
 
   pppp = zeros(T,(order+1),(order+1),(order+1),(order+1))
 
@@ -681,14 +681,14 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::S,range::Array{T,2})
+function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::S;domain = [1.0;-1.0].*ones(2,6))
 
-  x1 = normalize_node(x[1],range[:,1])
-  x2 = normalize_node(x[2],range[:,2])
-  x3 = normalize_node(x[3],range[:,3])
-  x4 = normalize_node(x[4],range[:,4])
-  x5 = normalize_node(x[5],range[:,5])
-  x6 = normalize_node(x[6],range[:,6])
+  x1 = normalize_node(x[1],domain[:,1])
+  x2 = normalize_node(x[2],domain[:,2])
+  x3 = normalize_node(x[3],domain[:,3])
+  x4 = normalize_node(x[4],domain[:,4])
+  x5 = normalize_node(x[5],domain[:,5])
+  x6 = normalize_node(x[6],domain[:,6])
 
   ppppp = zeros(T,(order+1),(order+1),(order+1),(order+1),(order+1))
 
@@ -803,6 +803,8 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::A
   return y
 
 end
+
+#=
 
 function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1})
 
@@ -1555,3 +1557,5 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::A
   return y
 
 end
+
+=#

@@ -1,6 +1,8 @@
+#=
+
 # Generated functions for tensor-product polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -9,10 +11,10 @@
 
                                # normalize nodes
 
-                               if range[1,k] == range[2,k];
-                                 fill!(xk,(range[1,k]+range[2,k])/2);
+                               if domain[1,k] == domain[2,k];
+                                 fill!(xk,(domain[1,k]+domain[2,k])/2);
                                else;
-                                 xk = 2*(xk-range[2,k])/(range[1,k]-range[2,k])-one(T);
+                                 xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
                                polynomial = Array(T,length(xk),orderk+1);
@@ -284,9 +286,11 @@ end
 
 end
 
+=#
+
 # Generated functions for tensor-product polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -295,10 +299,10 @@ end
 
                                # normalize nodes
 
-                               if range[1,k] == range[2,k];
-                                 fill!(xk,(range[1,k]+range[2,k])/2);
+                               if domain[1,k] == domain[2,k];
+                                 fill!(xk,(domain[1,k]+domain[2,k])/2);
                                else;
-                                 xk = 2*(xk-range[2,k])/(range[1,k]-range[2,k])-one(T);
+                                 xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
                                polynomial = Array(T,length(xk),orderk+1);
@@ -570,9 +574,11 @@ end
 
 end
 
+#=
+
 # Generated functions for complete polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -580,10 +586,10 @@ end
 
                                # normalize nodes
 
-                               if range[1,k] == range[2,k];
-                                 fill!(xk,(range[1,k]+range[2,k])/2);
+                               if domain[1,k] == domain[2,k];
+                                 fill!(xk,(domain[1,k]+domain[2,k])/2);
                                else;
-                                 xk = 2*(xk-range[2,k])/(range[1,k]-range[2,k])-one(T);
+                                 xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
                                polynomial = Array(T,length(xk),order+1);
@@ -860,9 +866,11 @@ end
 
 end
 
+=#
+
 # Generated functions for complete polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,range::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -870,10 +878,10 @@ end
 
                                # normalize nodes
 
-                               if range[1,k] == range[2,k];
-                                 fill!(xk,(range[1,k]+range[2,k])/2);
+                               if domain[1,k] == domain[2,k];
+                                 fill!(xk,(domain[1,k]+domain[2,k])/2);
                                else;
-                                 xk = 2*(xk-range[2,k])/(range[1,k]-range[2,k])-one(T);
+                                 xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
                                polynomial = Array(T,length(xk),order+1);
