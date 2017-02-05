@@ -28,7 +28,7 @@ w = chebyshev_weights(y,poly,order,domain)
 
 where poly is an array containing a 2D array containing the Chebyshev polynomials evaluated at each node.  Regardless of which command is used, the Chebyshev weights are computed using Chebyshev regression.
 
-Given the Chebyshev weights, the function can be approximated at a given point, x, within range using either
+Given the Chebyshev weights, the function can be approximated at a given point, x, within domain using either
 
 y_approx = chebyshev_evaluate(w,[x],order,domain)
 
