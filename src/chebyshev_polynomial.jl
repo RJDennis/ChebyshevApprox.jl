@@ -1,6 +1,6 @@
 function chebyshev_polynomial{T<:AbstractFloat,S<:Integer}(order::S,x::T)
 
-  polynomial    = Array(T,1,order+1)
+  polynomial    = Array{T}(1,order+1)
   polynomial[1] = one(T)
 
   for i = 2:order+1
@@ -17,7 +17,7 @@ end
 
 function chebyshev_polynomial{T<:AbstractFloat,S<:Integer}(order::S,x::Array{T,1})
 
-  polynomial      = Array(T,length(x),order+1)
+  polynomial      = Array{T}(length(x),order+1)
   polynomial[:,1] = ones(T,length(x))
 
   for i = 2:order+1

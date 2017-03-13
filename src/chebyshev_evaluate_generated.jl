@@ -1,6 +1,6 @@
 # Generated functions for evaluating Chebyshev polynomials
 
-@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain::Array{T,2})
+@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
@@ -14,14 +14,12 @@
                                  xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
                                end;
 
-                               polynomial = Array(T,1,order[i]+1);
+                               polynomial = Array{T}(1,order[i]+1);
                                for j = 1:order[i]+1;
                                  if j == 1;
                                    polynomial[j] = one(T);
                                  elseif j == 2;
                                    polynomial[j] = xi;
-                                 elseif j == 3;
-                                   polynomial[j] = 2*xi*xi-one(T);
                                  else;
                                    polynomial[j] = 2*xi*polynomial[j-1]-polynomial[j-2];
                                  end;
@@ -30,7 +28,7 @@
                              end
                              )
 
-  i_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -59,19 +57,19 @@
   return final
 end
 
+#=
+
 @generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::Array{S,1})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
                                xi = x[i];
-                               polynomial = Array(T,1,order[i]+1);
+                               polynomial = Array{T}(1,order[i]+1);
                                for j = 1:order[i]+1;
                                  if j == 1;
                                    polynomial[j] = one(T);
                                  elseif j == 2;
                                    polynomial[j] = xi;
-                                 elseif j == 3;
-                                   polynomial[j] = 2*xi*xi-one(T);
                                  else;
                                    polynomial[j] = 2*xi*polynomial[j-1]-polynomial[j-2];
                                  end;
@@ -80,7 +78,7 @@ end
                              end
                              )
 
-  i_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -110,7 +108,9 @@ end
 
 end
 
-@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::S,domain::Array{T,2})
+=#
+
+@generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::S,domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
@@ -124,14 +124,12 @@ end
                                  xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
                                end;
 
-                               polynomial = Array(T,1,order+1);
+                               polynomial = Array{T}(1,order+1);
                                for j = 1:order+1;
                                  if j == 1;
                                    polynomial[j] = one(T);
                                  elseif j == 2;
                                    polynomial[j] = xi;
-                                 elseif j == 3;
-                                   polynomial[j] = 2*xi*xi-one(T);
                                  else;
                                    polynomial[j] = 2*xi*polynomial[j-1]-polynomial[j-2];
                                  end;
@@ -140,7 +138,7 @@ end
                              end
                              )
 
-  i_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -170,20 +168,20 @@ end
 
   return final
 end
+
+#=
 
 @generated function chebyshev_evaluate{T,N,S}(weights::Array{T,N},x::Array{T,1},order::S)
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for i = 1:size(x,1);
                                xi = x[i];
-                               polynomial = Array(T,1,order+1);
+                               polynomial = Array{T}(1,order+1);
                                for j = 1:order+1;
                                  if j == 1;
                                    polynomial[j] = one(T);
                                  elseif j == 2;
                                    polynomial[j] = xi;
-                                 elseif j == 3;
-                                   polynomial[j] = 2*xi*xi-one(T);
                                  else;
                                    polynomial[j] = 2*xi*polynomial[j-1]-polynomial[j-2];
                                  end;
@@ -192,7 +190,7 @@ end
                              end
                              )
 
-  i_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -222,3 +220,5 @@ end
 
   return final
 end
+
+=#

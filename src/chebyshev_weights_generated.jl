@@ -2,7 +2,7 @@
 
 # Generated functions for tensor-product polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -17,15 +17,13 @@
                                  xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
-                               polynomial = Array(T,length(xk),orderk+1);
+                               polynomial = Array{T}(length(xk),orderk+1);
                                for i = 1:orderk+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -34,8 +32,8 @@
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -93,13 +91,13 @@
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = Array(T,order[1]+1,",)
+  initial_weight = string("weights = Array{T}(order[1]+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order[",i,"]+1,")
   end
   initial_weight = parse(string(initial_weight,")"))
 
-    # Put it all together to compute the weights array
+  # Put it all together to compute the weights array
 
   final = :( $chebyshev_polynomials;
              $initial_weight;
@@ -116,15 +114,13 @@ end
                              for k = 1:N;
                                orderk = order[k];
                                xk = nodes[k];
-                               polynomial = Array(T,length(xk),orderk+1);
+                               polynomial = Array{T}(length(xk),orderk+1);
                                for i = 1:orderk+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -133,8 +129,8 @@ end
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -192,13 +188,13 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = Array(T,order[1]+1,",)
+  initial_weight = string("weights = Array{T}(order[1]+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order[",i,"]+1,")
   end
   initial_weight = parse(string(initial_weight,")"))
 
-    # Put it all together to compute the weights array
+  # Put it all together to compute the weights array
 
   final = :( $chebyshev_polynomials;
              $initial_weight;
@@ -211,8 +207,8 @@ end
 
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1})
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -270,7 +266,7 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = Array(T,order[1]+1,",)
+  initial_weight = string("weights = Array{T}(order[1]+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order[",i,"]+1,")
   end
@@ -290,7 +286,7 @@ end
 
 # Generated functions for tensor-product polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -305,15 +301,13 @@ end
                                  xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
-                               polynomial = Array(T,length(xk),orderk+1);
+                               polynomial = Array{T}(length(xk),orderk+1);
                                for i = 1:orderk+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -322,8 +316,8 @@ end
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -381,7 +375,7 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = Array(T,order[1]+1,",)
+  initial_weight = string("weights = Array{T}(order[1]+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order[",i,"]+1,")
   end
@@ -397,6 +391,8 @@ end
   return final
 
 end
+
+#=
 
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1})
 
@@ -404,15 +400,13 @@ end
                              for k = 1:N;
                                orderk = order[k];
                                xk = nodes[k];
-                               polynomial = Array(T,length(xk),orderk+1);
+                               polynomial = Array{T}(length(xk),orderk+1);
                                for i = 1:orderk+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -421,8 +415,8 @@ end
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -480,7 +474,7 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = Array(T,order[1]+1,",)
+  initial_weight = string("weights = Array{T}(order[1]+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order[",i,"]+1,")
   end
@@ -497,10 +491,12 @@ end
 
 end
 
+=#
+
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1})
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -558,7 +554,7 @@ end
 
   # Initialize the weight Array
 
-  initial_weight = string("weights = Array(T,order[1]+1,",)
+  initial_weight = string("weights = Array{T}(order[1]+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order[",i,"]+1,")
   end
@@ -578,7 +574,7 @@ end
 
 # Generated functions for complete polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -592,15 +588,13 @@ end
                                  xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
-                               polynomial = Array(T,length(xk),order+1);
+                               polynomial = Array{T}(length(xk),order+1);
                                for i = 1:order+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -609,8 +603,8 @@ end
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -692,15 +686,13 @@ end
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
                                xk = nodes[k];
-                               polynomial = Array(T,length(xk),order+1);
+                               polynomial = Array{T}(length(xk),order+1);
                                for i = 1:order+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -709,8 +701,8 @@ end
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -789,8 +781,8 @@ end
 
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S)
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -870,7 +862,7 @@ end
 
 # Generated functions for complete polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain::Array{T,2})
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -884,15 +876,13 @@ end
                                  xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
                                end;
 
-                               polynomial = Array(T,length(xk),order+1);
+                               polynomial = Array{T}(length(xk),order+1);
                                for i = 1:order+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -901,8 +891,8 @@ end
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -978,21 +968,21 @@ end
   return final
 
 end
+
+#=
 
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S)
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
                                xk = nodes[k];
-                               polynomial = Array(T,length(xk),order+1);
+                               polynomial = Array{T}(length(xk),order+1);
                                for i = 1:order+1;
                                  for j = 1:length(xk);
                                    if i == 1;
                                      polynomial[j,i] = one(T);
                                    elseif i == 2;
                                      polynomial[j,i] = xk[j];
-                                   elseif i == 3;
-                                     polynomial[j,i] = 2*xk[j]*xk[j]-one(T);
                                    else;
                                      polynomial[j,i] = 2*xk[j]*polynomial[j,i-1]-polynomial[j,i-2];
                                    end;
@@ -1001,8 +991,8 @@ end
                                push!(poly,polynomial);
                              end )
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
@@ -1079,10 +1069,12 @@ end
 
 end
 
+=#
+
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S)
 
-  i_vars = Array(Symbol,N)
-  s_vars = Array(Symbol,N)
+  i_vars = Array{Symbol}(N)
+  s_vars = Array{Symbol}(N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
     s_vars[i] = Symbol("s$i")
