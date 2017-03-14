@@ -1,8 +1,6 @@
-#=
-
 # Generated functions for tensor-product polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -282,11 +280,9 @@ end
 
 end
 
-=#
-
 # Generated functions for tensor-product polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -392,8 +388,6 @@ end
 
 end
 
-#=
-
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
@@ -491,8 +485,6 @@ end
 
 end
 
-=#
-
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1})
 
   i_vars = Array{Symbol}(N)
@@ -570,11 +562,9 @@ end
 
 end
 
-#=
-
 # Generated functions for complete polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -858,11 +848,9 @@ end
 
 end
 
-=#
-
 # Generated functions for complete polynomials where nodes are in a tuple
 
-@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain::Array{T,2}=[1.0, -1.0].*ones(2,N))
+@generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain::Array{T,2})
 
   chebyshev_polynomials = :( poly = Array{T,2}[];
                              for k = 1:N;
@@ -968,8 +956,6 @@ end
   return final
 
 end
-
-#=
 
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S)
 
