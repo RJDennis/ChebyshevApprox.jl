@@ -3,9 +3,9 @@
 using ChebyshevApprox
 
 n = 10
-range = [2.0,-3.0]
+dom = [2.0,-3.0]
 
-nodes = chebyshev_nodes(n,range)
+nodes = chebyshev_nodes(n,dom)
 
 y = zeros(n)
 
@@ -17,17 +17,19 @@ end
 
 order = 5
 
-w_tensor   = chebyshev_weights(y,nodes,[order],range)
-w_complete = chebyshev_weights(y,nodes,order,range)
+w_tensor       = chebyshev_weights(y,nodes,[order],dom)
+w_tensor_gen   = chebyshev_weights(y,(nodes,),[order],dom'')
+w_complete     = chebyshev_weights(y,nodes,order,dom)
+w_complete_gen = chebyshev_weights(y,(nodes,),order,dom'')
 
 println(maxabs(w_tensor - w_complete)) # We run this in the 1-d case because the tensor polynomial and the complete polynomial should coincide
 
 point = [1.748]
 
-y_chebyshev_tensor   = chebyshev_evaluate(w_tensor,point,[order],range)
-y_chebyshev_complete = chebyshev_evaluate(w_complete,point,order,range)
-y_clenshaw_tensor    = clenshaw_evaluate(w_tensor,point,[order],range)
-y_clenshaw_complete  = clenshaw_evaluate(w_complete,point,order,range)
+y_chebyshev_tensor   = chebyshev_evaluate(w_tensor,point,[order],dom)
+y_chebyshev_complete = chebyshev_evaluate(w_complete,point,order,dom)
+y_clenshaw_tensor    = clenshaw_evaluate(w_tensor,point,[order],dom)
+y_clenshaw_complete  = clenshaw_evaluate(w_complete,point,order,dom)
 
 y_actual = (point+4.0).^0.5
 

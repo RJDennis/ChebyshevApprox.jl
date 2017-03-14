@@ -42,6 +42,8 @@ order_complete = 6
 
 @time w_tensor   = chebyshev_weights(y,nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,order_tensor,range)
 @time w_complete = chebyshev_weights(y,nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,order_complete,range)
+@time w_tensor_gen   = chebyshev_weights(y,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5),order_tensor,range)
+@time w_complete_gen = chebyshev_weights(y,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5),order_complete,range)
 
 point = [1.748, 0.753, 0.119, -0.947, -0.23]
 
