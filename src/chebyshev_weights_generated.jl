@@ -95,7 +95,7 @@
   end
   initial_weight = parse(string(initial_weight,")"))
 
-  # Put it all together to compute the weights array
+    # Put it all together to compute the weights array
 
   final = :( $chebyshev_polynomials;
              $initial_weight;
@@ -192,7 +192,7 @@ end
   end
   initial_weight = parse(string(initial_weight,")"))
 
-  # Put it all together to compute the weights array
+    # Put it all together to compute the weights array
 
   final = :( $chebyshev_polynomials;
              $initial_weight;

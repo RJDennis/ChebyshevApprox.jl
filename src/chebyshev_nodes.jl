@@ -1,6 +1,6 @@
 function chebyshev_nodes{S<:Integer}(n::S)
 
-  nodes = Array{Float64}(n)
+  nodes = Array{typeof(1.0)}(n)
 
   for i = 1:n
     nodes[i] = -cos((2.0*i-1.0)*pi/(2.0*n))
