@@ -1055,8 +1055,6 @@ end
 
 end
 
-=#
-
 @generated function chebyshev_weights{T,N,S}(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S)
 
   i_vars = Array{Symbol}(N)
