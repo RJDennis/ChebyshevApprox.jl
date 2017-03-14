@@ -1,13 +1,12 @@
 function normalize_node{T<:AbstractFloat}(node::T,domain::Array{T,1})
 
-  normalized_nodes = similar(node)
   if domain[1] == domain[2]
-    normalized_nodes = (domain[1]+domain[2])/2.0
+    normalized_node = (domain[1]+domain[2])/2.0
+    return normalize_node
   else
-    normalized_nodes = 2.0*(node-domain[2])/(domain[1]-domain[2])-1.0
+    normalized_node = 2.0*(node-domain[2])/(domain[1]-domain[2])-1.0
+    return normalize_node
   end
-
-  return normalized_nodes
 
 end
 
