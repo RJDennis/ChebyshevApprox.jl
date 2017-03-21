@@ -144,7 +144,7 @@ end
     inner_prod = :( poly[$i][$(i_vars[i])]*$inner_prod )
   end
 
-  inner = :( if sum([$(i_vars...)]) <= order+N;
+  inner = :( if sum(tuple($(i_vars...))) <= order+N;
                evaluated_polynomial += $inner_prod;
              end )
   outer = inner
@@ -160,7 +160,7 @@ end
              evaluated_polynomial = zero(T);
              $outer;
              return evaluated_polynomial
-             )
+          )
 
   return final
 end
@@ -194,7 +194,7 @@ end
     inner_prod = :( poly[$i][$(i_vars[i])]*$inner_prod )
   end
 
-  inner = :( if sum([$(i_vars...)]) <= order+N;
+  inner = :( if sum(tuple($(i_vars...))) <= order+N;
                evaluated_polynomial += $inner_prod;
              end )
   outer = inner
