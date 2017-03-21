@@ -638,7 +638,7 @@ end
 
   new_inner = :( numerator = zero(T);
                  denominator = zero(T);
-                 if sum([$(i_vars...)]) <= order+N;
+                 if sum(tuple($(i_vars...))) <= order+N;
                    $outer;
                    $weights_term;
                  end )
@@ -736,7 +736,7 @@ end
 
   new_inner = :( numerator = zero(T);
                  denominator = zero(T);
-                 if sum([$(i_vars...)]) <= order+N;
+                 if sum(tuple($(i_vars...))) <= order+N;
                    $outer;
                    $weights_term;
                  end )
@@ -816,7 +816,7 @@ end
 
   new_inner = :( numerator = zero(T);
                  denominator = zero(T);
-                 if sum([$(i_vars...)]) <= order+N;
+                 if sum(tuple($(i_vars...))) <= order+N;
                    $outer;
                    $weights_term;
                  end )
@@ -924,7 +924,7 @@ end
 
   new_inner = :( numerator = zero(T);
                  denominator = zero(T);
-                 if sum([$(i_vars...)]) <= order+N;
+                 if sum(tuple($(i_vars...))) <= order+N;
                    $outer;
                    $weights_term;
                  end )
@@ -1022,7 +1022,7 @@ end
 
   new_inner = :( numerator = zero(T);
                  denominator = zero(T);
-                 if sum([$(i_vars...)]) <= order+N;
+                 if sum(tuple($(i_vars...))) <= order+N;
                    $outer;
                    $weights_term;
                  end )
@@ -1102,7 +1102,7 @@ end
 
   new_inner = :( numerator = zero(T);
                  denominator = zero(T);
-                 if sum([$(i_vars...)]) <= order+N;
+                 if sum(tuple($(i_vars...))) <= order+N;
                    $outer;
                    $weights_term;
                  end )
