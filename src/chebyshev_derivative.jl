@@ -278,9 +278,11 @@ function chebyshev_derivative{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x
 
       if (i+j <= order+2)
 
-      evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*weights[i,j]
-      evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*weights[i,j]
+        evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*weights[i,j]
+        evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*weights[i,j]
 
+      end
+      
     end
   end
 
@@ -314,9 +316,11 @@ function chebyshev_derivative{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x
 
         if (i+j+k <= order+3)
 
-        evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*weights[i,j,k]
-        evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*polynomial_3_data[1,k]*weights[i,j,k]
-        evaluated_derivative[3] += (2.0/(domain[1,3]-domain[2,3]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[2,k]*weights[i,j,k]
+          evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*weights[i,j,k]
+          evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*polynomial_3_data[1,k]*weights[i,j,k]
+          evaluated_derivative[3] += (2.0/(domain[1,3]-domain[2,3]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[2,k]*weights[i,j,k]
+
+        end
 
       end
     end
@@ -358,12 +362,14 @@ function chebyshev_derivative{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x
 
           if (i+j+k+l <= order+4)
 
-          evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*weights[i,j,k,l]
-          evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*polynomial_3_data[2,k]*polynomial_4_data[2,l]*weights[i,j,k,l]
-          evaluated_derivative[3] += (2.0/(domain[1,3]-domain[2,3]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[2,k]*polynomial_4_data[1,l]*weights[i,j,k,l]
-          evaluated_derivative[4] += (2.0/(domain[1,4]-domain[2,4]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[2,l]*weights[i,j,k,l]
+            evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*weights[i,j,k,l]
+            evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*polynomial_3_data[2,k]*polynomial_4_data[2,l]*weights[i,j,k,l]
+            evaluated_derivative[3] += (2.0/(domain[1,3]-domain[2,3]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[2,k]*polynomial_4_data[1,l]*weights[i,j,k,l]
+            evaluated_derivative[4] += (2.0/(domain[1,4]-domain[2,4]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[2,l]*weights[i,j,k,l]
 
-  			 end
+          end
+
+        end
 			end
     end
   end
@@ -410,11 +416,13 @@ function chebyshev_derivative{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x
 
             if (i+j+k+l+m <= order+5)
 
-            evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
-            evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
-            evaluated_derivative[3] += (2.0/(domain[1,3]-domain[2,3]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[2,k]*polynomial_4_data[1,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
-            evaluated_derivative[4] += (2.0/(domain[1,4]-domain[2,4]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[2,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
-            evaluated_derivative[5] += (2.0/(domain[1,5]-domain[2,5]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*polynomial_5_data[2,m]*weights[i,j,k,l,m]
+              evaluated_derivative[1] += (2.0/(domain[1,1]-domain[2,1]))*polynomial_1_data[2,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
+              evaluated_derivative[2] += (2.0/(domain[1,2]-domain[2,2]))*polynomial_1_data[1,i]*polynomial_2_data[2,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
+              evaluated_derivative[3] += (2.0/(domain[1,3]-domain[2,3]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[2,k]*polynomial_4_data[1,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
+              evaluated_derivative[4] += (2.0/(domain[1,4]-domain[2,4]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[2,l]*polynomial_5_data[1,m]*weights[i,j,k,l,m]
+              evaluated_derivative[5] += (2.0/(domain[1,5]-domain[2,5]))*polynomial_1_data[1,i]*polynomial_2_data[1,j]*polynomial_3_data[1,k]*polynomial_4_data[1,l]*polynomial_5_data[2,m]*weights[i,j,k,l,m]
+
+            end
 
 					end
 				end
