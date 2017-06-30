@@ -18,11 +18,11 @@ end
 order = 5
 
 w_tensor       = chebyshev_weights(y,nodes,[order],dom)
-w_tensor_gen   = chebyshev_weights(y,(nodes,),[order],dom'')
+#w_tensor_gen   = chebyshev_weights(y,(nodes,),[order],dom'')
 w_complete     = chebyshev_weights(y,nodes,order,dom)
-w_complete_gen = chebyshev_weights(y,(nodes,),order,dom'')
+#w_complete_gen = chebyshev_weights(y,(nodes,),order,dom'')
 
-println(maxabs(w_tensor - w_complete)) # We run this in the 1-d case because the tensor polynomial and the complete polynomial should coincide
+println(maximum(abs,w_tensor - w_complete)) # We run this in the 1-d case because the tensor polynomial and the complete polynomial should coincide
 
 point = [1.748]
 
