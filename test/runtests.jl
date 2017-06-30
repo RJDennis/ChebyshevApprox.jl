@@ -1,0 +1,5 @@
+include("test_1d.jl")
+include("test_2d.jl")
+include("test_3d.jl")
+include("test_4d.jl")
+include("test_5d.jl")
