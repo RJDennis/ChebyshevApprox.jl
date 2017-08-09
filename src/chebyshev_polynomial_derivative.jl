@@ -1,10 +1,7 @@
-function chebyshev_polynomial_derivative{T<:AbstractFloat,S<:Integer}(order::S,x::T)
+function chebyshev_polynomial_derivative(order::S,x::T) where {T<:AbstractFloat,S<:Integer}
 
-  polynomial    = Array{T}(1,order+1)
-  poly_deriv    = Array{T}(1,order+1)
-
-  polynomial[1] = one(T)
-  poly_deriv[1] = zero(T)
+  polynomial = ones(T,1,order+1)
+  poly_deriv = zeros(T,1,order+1)
 
   for i = 2:order+1
     if i == 2
@@ -20,16 +17,19 @@ function chebyshev_polynomial_derivative{T<:AbstractFloat,S<:Integer}(order::S,x
 
 end
 
-function chebyshev_polynomial_derivative{T<:AbstractFloat,S<:Integer}(order::S,x::Array{T,1})
+function chebyshev_polynomial_derivative(order::S,x::Array{T,1}) where {T<:AbstractFloat,S<:Integer}
 
-  polynomial      = Array{T}(length(x),order+1)
-  poly_deriv      = Array{T}(length(x),order+1)
+  polynomial = ones(T,length(x),order+1)
+  poly_deriv = zeros(T,length(x),order+1)
 
-  polynomial[:,1] = ones(T,length(x))
-  poly_deriv[:,1] = zeros(T,length(x))
+  for i = 1:length(x)
+    poly_deriv[i,:] = chebyshev_polynomial_derivative(order,x[i])
+  end
+
+#=
 
   for i = 2:order+1
-	  for j = 1:length(x)
+	for j = 1:length(x)
       if i == 2
         polynomial[j,i] = x[j]
         poly_deriv[j,i] = 1.0
@@ -39,6 +39,8 @@ function chebyshev_polynomial_derivative{T<:AbstractFloat,S<:Integer}(order::S,x
       end
     end
   end
+
+=#
 
   return poly_deriv
 

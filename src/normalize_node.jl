@@ -1,4 +1,4 @@
-function normalize_node{T<:AbstractFloat}(node::T,domain::Array{T,1})
+function normalize_node(node::T,domain::Array{T,1}) where {T<:AbstractFloat}
 
   if domain[1] == domain[2]
     norm_node = (domain[1]+domain[2])/2.0
@@ -10,7 +10,7 @@ function normalize_node{T<:AbstractFloat}(node::T,domain::Array{T,1})
 
 end
 
-function normalize_node{T<:AbstractFloat}(node::Array{T,1},domain::Array{T,1})
+function normalize_node(node::Array{T,1},domain::Array{T,1}) where {T<:AbstractFloat}
 
   norm_nodes = similar(node)
   for i = 1:length(node)
