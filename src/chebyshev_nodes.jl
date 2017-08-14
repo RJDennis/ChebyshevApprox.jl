@@ -1,4 +1,4 @@
-function chebyshev_nodes{S<:Integer}(n::S)
+function chebyshev_nodes(n::S) where S<:Integer
 
   nodes = Array{typeof(1.0)}(n)
 
@@ -10,7 +10,7 @@ function chebyshev_nodes{S<:Integer}(n::S)
 
 end
 
-function chebyshev_nodes{T<:AbstractFloat,S<:Integer}(n::S,domain::Array{T,1})
+function chebyshev_nodes(n::S,domain::Array{T,1}) where {T<:AbstractFloat,S<:Integer}
 
   nodes = Array{T}(n)
 

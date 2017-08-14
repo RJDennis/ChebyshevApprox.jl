@@ -1,6 +1,6 @@
 # Tensor product polynomials, arbitrary domain
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,1},nodes_1::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)])
+function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain)
 
@@ -28,7 +28,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,1},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::Array{S,1},domain=[ones(1,2);-ones(1,2)])
+function chebyshev_weights(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::Array{S,1},domain=[ones(1,2);-ones(1,2)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -62,7 +62,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,2},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,3},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::Array{S,1},domain=[ones(1,3);-ones(1,3)])
+function chebyshev_weights(f::AbstractArray{T,3},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::Array{S,1},domain=[ones(1,3);-ones(1,3)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -102,7 +102,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,3},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,4},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::Array{S,1},domain=[ones(1,4);-ones(1,4)])
+function chebyshev_weights(f::AbstractArray{T,4},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::Array{S,1},domain=[ones(1,4);-ones(1,4)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -148,7 +148,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,4},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,5},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::Array{S,1},domain=[ones(1,5);-ones(1,5)])
+function chebyshev_weights(f::AbstractArray{T,5},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::Array{S,1},domain=[ones(1,5);-ones(1,5)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -200,7 +200,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,5},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::Array{S,1},domain=[ones(1,6);-ones(1,6)])
+function chebyshev_weights(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::Array{S,1},domain=[ones(1,6);-ones(1,6)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -260,7 +260,7 @@ end
 
 # Complete polynomials, arbitrary domain
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,1},nodes_1::Array{T,1},order::S,domain=[ones(1);-ones(1)])
+function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain)
 
@@ -288,7 +288,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,1},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::S,domain=[ones(1,2);-ones(1,2)])
+function chebyshev_weights(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::S,domain=[ones(1,2);-ones(1,2)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -326,7 +326,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,2},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,3},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::S,domain=[ones(1,3);-ones(1,3)])
+function chebyshev_weights(f::AbstractArray{T,3},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::S,domain=[ones(1,3);-ones(1,3)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -370,7 +370,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,3},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,4},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::S,domain=[ones(1,4);-ones(1,4)])
+function chebyshev_weights(f::AbstractArray{T,4},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::S,domain=[ones(1,4);-ones(1,4)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -420,7 +420,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,4},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,5},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::S,domain=[ones(1,5);-ones(1,5)])
+function chebyshev_weights(f::AbstractArray{T,5},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::S,domain=[ones(1,5);-ones(1,5)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])
@@ -476,7 +476,7 @@ function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,5},no
 
 end
 
-function chebyshev_weights{T<:AbstractFloat,S<:Integer}(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::S,domain=[ones(1,6);-ones(1,6)])
+function chebyshev_weights(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::S,domain=[ones(1,6);-ones(1,6)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(nodes_1,domain[:,1])
   x2 = normalize_node(nodes_2,domain[:,2])

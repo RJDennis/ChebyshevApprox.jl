@@ -1,4 +1,4 @@
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1},domain::Array{T,1})
+function clenshaw_evaluate(weights::Array{T,1},x::Array{T,1},order::Array{S,1},domain::Array{T,1}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain)
 
@@ -16,7 +16,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::Array{S,1},domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,2},x::Array{T,1},order::Array{S,1},domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -51,7 +51,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::Array{S,1},domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,3},x::Array{T,1},order::Array{S,1},domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -105,7 +105,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::Array{S,1},domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,4},x::Array{T,1},order::Array{S,1},domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -180,7 +180,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::Array{S,1},domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,5},x::Array{T,1},order::Array{S,1},domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -278,7 +278,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::Array{S,1},domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,6},x::Array{T,1},order::Array{S,1},domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -401,7 +401,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::S,domain::Array{T,1})
+function clenshaw_evaluate(weights::Array{T,1},x::Array{T,1},order::S,domain::Array{T,1}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain)
 
@@ -419,7 +419,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::S,domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,2},x::Array{T,1},order::S,domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -454,7 +454,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::S,domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,3},x::Array{T,1},order::S,domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -508,7 +508,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::S,domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,4},x::Array{T,1},order::S,domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -583,7 +583,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::S,domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,5},x::Array{T,1},order::S,domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -681,7 +681,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::S,domain::Array{T,2})
+function clenshaw_evaluate(weights::Array{T,6},x::Array{T,1},order::S,domain::Array{T,2}) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -804,7 +804,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1})
+function clenshaw_evaluate(weights::Array{T,1},x::Array{T,1},order::Array{S,1}) where {T<:AbstractFloat,S<:Integer}
 
   z = zeros(T,(order[1]+1)+2)
 
@@ -820,7 +820,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::Array{S,1})
+function clenshaw_evaluate(weights::Array{T,2},x::Array{T,1},order::Array{S,1}) where {T<:AbstractFloat,S<:Integer}
 
   p = zeros(T,order[2]+1)
 
@@ -852,7 +852,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::Array{S,1})
+function clenshaw_evaluate(weights::Array{T,3},x::Array{T,1},order::Array{S,1}) where {T<:AbstractFloat,S<:Integer}
 
 	pp = zeros(T,(order[2]+1),(order[3]+1))
 
@@ -902,7 +902,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::Array{S,1})
+function clenshaw_evaluate(weights::Array{T,4},x::Array{T,1},order::Array{S,1}) where {T<:AbstractFloat,S<:Integer}
 
 	ppp = zeros(T,(order[2]+1),(order[3]+1),(order[4]+1))
 
@@ -972,7 +972,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::Array{S,1})
+function clenshaw_evaluate(weights::Array{T,5},x::Array{T,1},order::Array{S,1}) where {T<:AbstractFloat,S<:Integer}
 
   pppp = zeros(T,(order[2]+1),(order[3]+1),(order[4]+1),(order[5]+1))
 
@@ -1064,7 +1064,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::Array{S,1})
+function clenshaw_evaluate(weights::Array{T,6},x::Array{T,1},order::Array{S,1}) where {T<:AbstractFloat,S<:Integer}
 
   ppppp = zeros(T,(order[2]+1),(order[3]+1),(order[4]+1),(order[5]+1),(order[6]+1))
 
@@ -1180,7 +1180,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::S)
+function clenshaw_evaluate(weights::Array{T,1},x::Array{T,1},order::S) where {T<:AbstractFloat,S<:Integer}
 
   z = zeros(T,(order+1)+2)
 
@@ -1196,7 +1196,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::S)
+function clenshaw_evaluate(weights::Array{T,2},x::Array{T,1},order::S) where {T<:AbstractFloat,S<:Integer}
 
   p = zeros(T,order+1)
 
@@ -1228,7 +1228,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::S)
+function clenshaw_evaluate(weights::Array{T,3},x::Array{T,1},order::S) where {T<:AbstractFloat,S<:Integer}
 
 	pp = zeros(T,(order+1),(order+1))
 
@@ -1278,7 +1278,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::S)
+function clenshaw_evaluate(weights::Array{T,4},x::Array{T,1},order::S) where {T<:AbstractFloat,S<:Integer}
 
 	ppp = zeros(T,(order+1),(order+1),(order+1))
 
@@ -1348,7 +1348,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::S)
+function clenshaw_evaluate(weights::Array{T,5},x::Array{T,1},order::S) where {T<:AbstractFloat,S<:Integer}
 
   pppp = zeros(T,(order+1),(order+1),(order+1),(order+1))
 
@@ -1440,7 +1440,7 @@ function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::A
 
 end
 
-function clenshaw_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::S)
+function clenshaw_evaluate(weights::Array{T,6},x::Array{T,1},order::S) where {T<:AbstractFloat,S<:Integer}
 
   ppppp = zeros(T,(order+1),(order+1),(order+1),(order+1),(order+1))
 
