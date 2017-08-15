@@ -1,4 +1,4 @@
-function chebyshev_polynomial{T<:AbstractFloat,S<:Integer}(order::S,x::T)
+function chebyshev_polynomial(order::S,x::T) where {T<:AbstractFloat,S<:Integer}
 
   polynomial    = Array{T}(1,order+1)
   polynomial[1] = one(T)
@@ -15,7 +15,7 @@ function chebyshev_polynomial{T<:AbstractFloat,S<:Integer}(order::S,x::T)
 
 end
 
-function chebyshev_polynomial{T<:AbstractFloat,S<:Integer}(order::S,x::Array{T,1})
+function chebyshev_polynomial(order::S,x::Array{T,1}) where {T<:AbstractFloat,S<:Integer}
 
   polynomial      = Array{T}(length(x),order+1)
   polynomial[:,1] = ones(T,length(x))

@@ -1,4 +1,4 @@
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)])
+function chebyshev_evaluate(weights::Array{T,1},x::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain)
 
@@ -16,7 +16,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::Array{S,1},domain=[ones(1,2);-ones(1,2)])
+function chebyshev_evaluate(weights::Array{T,2},x::Array{T,1},order::Array{S,1},domain=[ones(1,2);-ones(1,2)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -38,7 +38,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::Array{S,1},domain=[ones(1,3);-ones(1,3)])
+function chebyshev_evaluate(weights::Array{T,3},x::Array{T,1},order::Array{S,1},domain=[ones(1,3);-ones(1,3)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -64,7 +64,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::Array{S,1},domain=[ones(1,4);-ones(1,4)])
+function chebyshev_evaluate(weights::Array{T,4},x::Array{T,1},order::Array{S,1},domain=[ones(1,4);-ones(1,4)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -94,7 +94,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::Array{S,1},domain=[ones(1,5);-ones(1,5)])
+function chebyshev_evaluate(weights::Array{T,5},x::Array{T,1},order::Array{S,1},domain=[ones(1,5);-ones(1,5)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -128,7 +128,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::Array{S,1},domain=[ones(1,6);-ones(1,6)])
+function chebyshev_evaluate(weights::Array{T,6},x::Array{T,1},order::Array{S,1},domain=[ones(1,6);-ones(1,6)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -166,7 +166,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::Array{T,1},order::S,domain=[ones(1);-ones(1)])
+function chebyshev_evaluate(weights::Array{T,1},x::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain)
 
@@ -184,7 +184,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,1},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::Array{T,1},order::S,domain=[ones(1,2);-ones(1,2)])
+function chebyshev_evaluate(weights::Array{T,2},x::Array{T,1},order::S,domain=[ones(1,2);-ones(1,2)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -210,7 +210,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,2},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::Array{T,1},order::S,domain=[ones(1,3);-ones(1,3)])
+function chebyshev_evaluate(weights::Array{T,3},x::Array{T,1},order::S,domain=[ones(1,3);-ones(1,3)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -240,7 +240,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,3},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::Array{T,1},order::S,domain=[ones(1,4);-ones(1,4)])
+function chebyshev_evaluate(weights::Array{T,4},x::Array{T,1},order::S,domain=[ones(1,4);-ones(1,4)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -274,7 +274,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,4},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::Array{T,1},order::S,domain=[ones(1,5);-ones(1,5)])
+function chebyshev_evaluate(weights::Array{T,5},x::Array{T,1},order::S,domain=[ones(1,5);-ones(1,5)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
@@ -312,7 +312,7 @@ function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,5},x::
 
 end
 
-function chebyshev_evaluate{T<:AbstractFloat,S<:Integer}(weights::Array{T,6},x::Array{T,1},order::S,domain=[ones(1,6);-ones(1,6)])
+function chebyshev_evaluate(weights::Array{T,6},x::Array{T,1},order::S,domain=[ones(1,6);-ones(1,6)]) where {T<:AbstractFloat,S<:Integer}
 
   x1 = normalize_node(x[1],domain[:,1])
   x2 = normalize_node(x[2],domain[:,2])
