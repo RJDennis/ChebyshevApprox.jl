@@ -47,10 +47,10 @@ w_complete_gen = chebyshev_weights(y,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5),o
 
 point = [1.748, 0.753, 0.119, -0.947, -0.23]
 
-y_chebyshev_tensor   = chebyshev_evaluate(w_tensor,point,order_tensor,dom)
-y_chebyshev_complete = chebyshev_evaluate(w_complete,point,order_complete,dom)
-y_clenshaw_tensor    = clenshaw_evaluate(w_tensor,point,order_tensor,dom)
-y_clenshaw_complete  = clenshaw_evaluate(w_complete,point,order_complete,dom)
+y_chebyshev_tensor   = chebyshev_evaluate(w_tensor_gen,point,order_tensor,dom)
+y_chebyshev_complete = chebyshev_evaluate(w_complete_gen,point,order_complete,dom)
+y_clenshaw_tensor    = clenshaw_evaluate(w_tensor_gen,point,order_tensor,dom)
+y_clenshaw_complete  = clenshaw_evaluate(w_complete_gen,point,order_complete,dom)
 
 y_actual = (point[1]+4.0)^0.5+point[1]*sqrt(point[2])+exp(point[3])*point[4]-(1.0+point[5])^2
 
