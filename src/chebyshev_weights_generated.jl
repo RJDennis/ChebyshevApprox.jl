@@ -756,7 +756,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::Arra
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2),order,domain)
 
@@ -764,7 +764,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,3},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3),order,domain)
 
@@ -772,7 +772,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,4},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3,nodes_4),order,domain)
 
@@ -780,7 +780,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,5},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5),order,domain)
 
@@ -788,7 +788,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,nodes_6),order,domain)
 
@@ -806,7 +806,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::S,do
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2),order,domain)
 
@@ -814,7 +814,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,3},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3),order,domain)
 
@@ -822,7 +822,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,4},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3,nodes_4),order,domain)
 
@@ -830,7 +830,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,5},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5),order,domain)
 
@@ -838,7 +838,7 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Ar
 
 end
 
-function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_weights(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Array{T,1},nodes_3::Array{T,1},nodes_4::Array{T,1},nodes_5::Array{T,1},nodes_6::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,nodes_6),order,domain)
 
