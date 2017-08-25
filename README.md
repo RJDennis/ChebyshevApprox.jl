@@ -55,17 +55,17 @@ w = chebyshev_weights(y,poly,order,domain)                         --- (3)
 
 where poly is a tuple containing 2D arrays of Chebyshev polynomials evaluated at each node.  To go beyond functions of six variables, commands (2) or (3) can be used, but not (1).
 
-Then to evaluate the polynomial at a point x, the relevant commands are either
+Then to evaluate the polynomial at a point x, the relevant command is
 
 y_approx = chebyshev_evaluate(w,x,order,domain)
 
-or
+where the variable domain is a 2D array (2*3 matrix for the 3-variable case) whose columns summarize the upper- and lower-bound on each variable.
 
-y_approx = clenshaw_evaluate(w,x,order,domain)
+For the case where a complete polynomial rather than a tensor-product polynomial is desired, the command is the same as above, but the order variable is now simply an integer rather than a 1D array of integers.
 
-In each of these commands, the variable domain is a 2D array (2*3 matrix for the 3-variable case) whose columns summarize the upper- and lower-bound on each variable.
+For tensor-product polynomials Clenshaw's method can also be used
 
-For the case where a complete polynomial rather than a tensor-product polynomial is desired, the commands are the same as above, but the order variable is now simply an integer rather than a 1D array of integers.
+y_approx = clenshaw_evaluate(w,x,domain)
 
 As with the 1D case, if the domain of each variable is [1.0, -1.0], then the domain variable can be omitted.
 
