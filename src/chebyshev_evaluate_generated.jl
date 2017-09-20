@@ -40,7 +40,7 @@
 
   inner = :( evaluated_polynomial += $inner_prod )
   outer = inner
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(i_vars[i]) = 1:size(weights,$i)
         $outer
@@ -100,7 +100,7 @@ end
                evaluated_polynomial += $inner_prod;
              end )
   outer = inner
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(i_vars[i]) = 1:size(weights,$i)
         $outer

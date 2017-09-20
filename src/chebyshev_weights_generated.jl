@@ -63,7 +63,7 @@
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -79,7 +79,7 @@
                  $weights_term )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order[$i]+1)
         $new_outer
@@ -141,7 +141,7 @@ end
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -157,7 +157,7 @@ end
                  $weights_term )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order[$i]+1)
         $new_outer
@@ -248,7 +248,7 @@ end
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -264,7 +264,7 @@ end
                  $weights_term )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order[$i]+1)
         $new_outer
@@ -326,7 +326,7 @@ end
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -342,7 +342,7 @@ end
                  $weights_term )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order[$i]+1)
         $new_outer
@@ -432,7 +432,7 @@ end
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -450,7 +450,7 @@ end
                  end )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order+1)
         $new_outer
@@ -512,7 +512,7 @@ end
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -530,7 +530,7 @@ end
                  end )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order+1)
         $new_outer
@@ -620,7 +620,7 @@ end
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -638,7 +638,7 @@ end
                  end )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order+1)
         $new_outer
@@ -700,7 +700,7 @@ end
              denominator += $denominator_term )
   outer  = inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     outer = :(
       for $(s_vars[i]) = 1:size(f,$i)
         $outer
@@ -718,7 +718,7 @@ end
                  end )
   new_outer = new_inner
 
-  for i = 1:N
+  for i = N:-1:1#1:N
     new_outer = :(
       for $(i_vars[i]) = 1:(order+1)
         $new_outer

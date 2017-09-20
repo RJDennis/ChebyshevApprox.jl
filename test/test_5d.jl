@@ -40,8 +40,8 @@ end
 order_tensor = [6, 6, 6, 6, 6]
 order_complete = 6
 
-#w_tensor   = chebyshev_weights(y,nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,order_tensor,dom)
-#w_complete = chebyshev_weights(y,nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,order_complete,dom)
+w_tensor   = chebyshev_weights(y,nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,order_tensor,dom)
+w_complete = chebyshev_weights(y,nodes_1,nodes_2,nodes_3,nodes_4,nodes_5,order_complete,dom)
 w_tensor_gen   = chebyshev_weights(y,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5),order_tensor,dom)
 w_complete_gen = chebyshev_weights(y,(nodes_1,nodes_2,nodes_3,nodes_4,nodes_5),order_complete,dom)
 
