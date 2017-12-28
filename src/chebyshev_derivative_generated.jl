@@ -4,8 +4,8 @@
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{T,2}[];
-                             poly_derivs = Array{T,2}[];
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},2}(N);
+                             poly_derivs = Array{Array{T,2},2}(N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
@@ -28,8 +28,8 @@
                                    poly_deriv[j] = ((j-1)*polynomial[j-1]-(j-1)*xi*polynomial[j])/(1-xi^2)
                                  end;
                                end;
-                               push!(poly,polynomial);
-                               push!(poly_derivs,poly_deriv);
+                               poly[i]        = polynomial;#push!(poly,polynomial);
+                               poly_derivs[i] = poly_deriv;#push!(poly_derivs,poly_deriv);
                              end
                              )
 
@@ -75,8 +75,8 @@ end
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{T,2}[];
-                             poly_derivs = Array{T,2}[];
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},2}(N);
+                             poly_derivs = Array{Array{T,2},2}(N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
@@ -99,8 +99,8 @@ end
                                    poly_deriv[j] = ((j-1)*polynomial[j-1]-(j-1)*xi*polynomial[j])/(1-xi^2)
                                  end;
                                end;
-                               push!(poly,polynomial);
-                               push!(poly_derivs,poly_deriv);
+                               poly[i]        = polynomial;#push!(poly,polynomial);
+                               poly_derivs[i] = poly_deriv;#push!(poly_derivs,poly_deriv);
                              end
                              )
 
@@ -151,8 +151,8 @@ end
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::Array{S,1},pos::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{T,2}[];
-                             poly_derivs = Array{T,2}[];
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},2}(N);
+                             poly_derivs = Array{Array{T,2},2}(N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
@@ -175,8 +175,8 @@ end
                                    poly_deriv[j] = ((j-1)*polynomial[j-1]-(j-1)*xi*polynomial[j])/(1-xi^2)
                                  end;
                                end;
-                               push!(poly,polynomial);
-                               push!(poly_derivs,poly_deriv);
+                               poly[i]        = polynomial;#push!(poly,polynomial);
+                               poly_derivs[i] = poly_deriv;#push!(poly_derivs,poly_deriv);
                              end
                              )
 
@@ -222,8 +222,8 @@ end
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::S,pos::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{T,2}[];
-                             poly_derivs = Array{T,2}[];
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},2}(N);
+                             poly_derivs = Array{Array{T,2},2}(N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
@@ -246,8 +246,8 @@ end
                                    poly_deriv[j] = ((j-1)*polynomial[j-1]-(j-1)*xi*polynomial[j])/(1-xi^2)
                                  end;
                                end;
-                               push!(poly,polynomial);
-                               push!(poly_derivs,poly_deriv);
+                               poly[i]        = polynomial;#push!(poly,polynomial);
+                               poly_derivs[i] = poly_deriv;#push!(poly_derivs,poly_deriv);
                              end
                              )
 
