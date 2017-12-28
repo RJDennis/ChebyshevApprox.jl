@@ -45,3 +45,10 @@ y_clenshaw_complete  = clenshaw_evaluate(w_complete_gen,point,dom)
 y_actual = (point[1]+4.0)^0.5+point[1]*sqrt(point[2])+exp(point[3])
 
 println([y_actual y_chebyshev_tensor y_chebyshev_complete y_clenshaw_tensor y_clenshaw_complete])
+
+y_deriv_tensor   = chebyshev_derivative(w_tensor_gen,point,order_tensor,dom)
+y_deriv_complete = chebyshev_derivative(w_tensor_gen,point,order_complete,dom)
+y_deriv_tensor_1   = chebyshev_derivative(w_tensor_gen,point,order_tensor,[1],dom)
+y_deriv_complete_1 = chebyshev_derivative(w_tensor_gen,point,order_complete,[1],dom)
+
+println(y_deriv_tensor, y_deriv_complete, y_deriv_tensor_1, y_deriv_complete_1)
