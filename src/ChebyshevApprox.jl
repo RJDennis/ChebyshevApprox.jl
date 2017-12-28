@@ -9,8 +9,10 @@ include("chebyshev_weights_generated.jl")
 include("chebyshev_evaluate_generated.jl")
 #include("clenshaw_evaluate.jl")
 include("clenshaw_evaluate_generated.jl")
-include("chebyshev_polynomial_derivative.jl")
-include("chebyshev_derivative.jl")
+#include("chebyshev_polynomial_derivative.jl")
+#include("chebyshev_derivative.jl")
+include("chebyshev_derivative_generated.jl")
+
 
 export chebyshev_nodes,
        chebyshev_polynomial,
