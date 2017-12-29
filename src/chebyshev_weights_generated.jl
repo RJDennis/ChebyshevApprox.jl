@@ -2,7 +2,7 @@
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},2}(N);
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
                              for k = 1:N;
                                orderk = order[k];
                                xk = nodes[k];
@@ -187,7 +187,7 @@ end
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},2}(ndims(f));
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
                              for k = 1:N;
                                orderk = order[k];
                                xk = nodes[k];
@@ -372,7 +372,7 @@ end
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},2}(N);
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
                              for k = 1:N;
                                xk = nodes[k];
 
@@ -560,7 +560,7 @@ end
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},2}(N);
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
                              for k = 1:N;
                                xk = nodes[k];
 

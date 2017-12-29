@@ -2,7 +2,7 @@
 
 @generated function chebyshev_evaluate(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},2}(N);
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
@@ -60,7 +60,7 @@ end
 
 @generated function chebyshev_evaluate(weights::Array{T,N},x::Array{T,1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},2}(N);
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
