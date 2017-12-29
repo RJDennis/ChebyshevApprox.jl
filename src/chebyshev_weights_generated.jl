@@ -212,7 +212,7 @@ end
                                    end;
                                  end;
                                end;
-                               poly[i] = polynomial;#push!(poly,polynomial);
+                               poly[k] = polynomial;#push!(poly,polynomial);
                              end )
 
   i_vars = Array{Symbol}(N)
@@ -396,7 +396,7 @@ end
                                    end;
                                  end;
                                end;
-                               poly[i] = polynomial;#push!(poly,polynomial);
+                               poly[k] = polynomial;#push!(poly,polynomial);
                              end )
 
   i_vars = Array{Symbol}(N)
@@ -584,7 +584,7 @@ end
                                    end;
                                  end;
                                end;
-                               poly[i] = polynomial;#push!(poly,polynomial);
+                               poly[k] = polynomial;#push!(poly,polynomial);
                              end )
 
   i_vars = Array{Symbol}(N)
