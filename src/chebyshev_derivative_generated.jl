@@ -187,12 +187,12 @@ end
 
   j = Symbol("j")
 
-  inner_prod = :( (($j!==1)*poly[1][i1]+($j==1)*poly_derivs[1][i1])*weights[$(i_vars...)] )
+  inner_prod = :( ((pos[$j]!==1)*poly[1][i1]+(pos[$j]==1)*poly_derivs[1][i1])*weights[$(i_vars...)] )
   for i = 2:N
-    inner_prod = :( (($j!==$i)*poly[$i][$(i_vars[i])]+($j==$i)*poly_derivs[$i][$(i_vars[i])])*$inner_prod )
+    inner_prod = :( ((pos[$j]!==$i)*poly[$i][$(i_vars[i])]+(pos[$j]==$i)*poly_derivs[$i][$(i_vars[i])])*$inner_prod )
   end
 
-  inner = :( evaluated_derivatives[$j] += (2.0/(domain[1,$j]-domain[2,$j]))*$inner_prod )
+  inner = :( evaluated_derivatives[pos[$j]] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod )
   outer = inner
   for i = N:-1:1#1:N
     outer = :(
@@ -203,7 +203,7 @@ end
   end
 
   new_outer = :(
-               for j in pos
+               for j = 1:length(pos)
                  $outer
                end
                )
@@ -258,13 +258,13 @@ end
 
   j = Symbol("j")
 
-  inner_prod = :( (($j!==1)*poly[1][i1]+($j==1)*poly_derivs[1][i1])*weights[$(i_vars...)] )
+  inner_prod = :( ((pos[$j]!==1)*poly[1][i1]+(pos[$j]==1)*poly_derivs[1][i1])*weights[$(i_vars...)] )
   for i = 2:N
-    inner_prod = :( (($j!==$i)*poly[$i][$(i_vars[i])]+($j==$i)*poly_derivs[$i][$(i_vars[i])])*$inner_prod )
+    inner_prod = :( ((pos[$j]!==$i)*poly[$i][$(i_vars[i])]+(pos[$j]==$i)*poly_derivs[$i][$(i_vars[i])])*$inner_prod )
   end
 
   inner = :( if sum(tuple($(i_vars...))) <= order+N;
-               evaluated_derivatives[$j] += (2.0/(domain[1,$j]-domain[2,$j]))*$inner_prod;
+               evaluated_derivatives[pos[$j]] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod;
              end )
 
   outer = inner
@@ -277,7 +277,7 @@ end
   end
 
   new_outer = :(
-               for j in pos
+               for j = 1:length(pos)
                  $outer
                end
                )
