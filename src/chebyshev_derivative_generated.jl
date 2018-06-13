@@ -192,7 +192,7 @@ end
     inner_prod = :( ((pos[$j]!==$i)*poly[$i][$(i_vars[i])]+(pos[$j]==$i)*poly_derivs[$i][$(i_vars[i])])*$inner_prod )
   end
 
-  inner = :( evaluated_derivatives[pos[$j]] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod )
+  inner = :( evaluated_derivatives[$j] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod )
   outer = inner
   for i = N:-1:1#1:N
     outer = :(
@@ -264,7 +264,7 @@ end
   end
 
   inner = :( if sum(tuple($(i_vars...))) <= order+N;
-               evaluated_derivatives[pos[$j]] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod;
+               evaluated_derivatives[$j] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod;
              end )
 
   outer = inner
