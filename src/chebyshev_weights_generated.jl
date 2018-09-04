@@ -205,9 +205,9 @@ end
                                # normalize nodes
 
                                if domain[1,k] == domain[2,k];
-                                 fill!(xk,(domain[1,k]+domain[2,k])/2);
+                                 fill!(xk,(domain[1,k].+domain[2,k])/2);
                                else;
-                                 xk = 2*(xk-domain[2,k])/(domain[1,k]-domain[2,k])-one(T);
+                                 xk = 2*(xk.-domain[2,k])/(domain[1,k].-domain[2,k])-one(T);
                                end;
 
                                polynomial = Array{T}(undef,length(xk),orderk+1);
