@@ -2,19 +2,19 @@
 
 @generated function chebyshev_evaluate(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(undef,N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
                                # Normalize nodes to [-1,1]
 
                                if domain[1,i] == domain[2,i];
-                                 xi = (domain[1,i]+domain[2,i])/2;
+                                 xi = (domain[1,i].+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
+                                 xi = 2*(xi.-domain[2,i])/(domain[1,i].-domain[2,i]).-one(T);
                                end;
 
-                               polynomial = Array{T}(1,order[i]+1);
+                               polynomial = Array{T}(undef,1,order[i]+1);
                                for j = 1:order[i]+1;
                                  if j == 1;
                                    polynomial[j] = one(T);
@@ -28,7 +28,7 @@
                              end
                              )
 
-  i_vars = Array{Symbol}(N)
+  i_vars = Array{Symbol}(undef,N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -60,19 +60,19 @@ end
 
 @generated function chebyshev_evaluate(weights::Array{T,N},x::Array{T,1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(N);
+  chebyshev_polynomials = :( poly = Array{Array{T,2},1}(undef,N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
                                # Normalize nodes to [-1,1]
 
                                if domain[1,i] == domain[2,i];
-                                 xi = (domain[1,i]+domain[2,i])/2;
+                                 xi = (domain[1,i].+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
+                                 xi = 2*(xi.-domain[2,i])/(domain[1,i].-domain[2,i]).-one(T);
                                end;
 
-                               polynomial = Array{T}(1,order+1);
+                               polynomial = Array{T}(undef,1,order+1);
                                for j = 1:order+1;
                                  if j == 1;
                                    polynomial[j] = one(T);
@@ -86,7 +86,7 @@ end
                              end
                              )
 
-  i_vars = Array{Symbol}(N)
+  i_vars = Array{Symbol}(undef,N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end

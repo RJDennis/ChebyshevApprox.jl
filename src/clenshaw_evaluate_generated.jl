@@ -2,9 +2,9 @@
 
 @generated function clenshaw_recursion(weights::Array{T,N},x::T) where {T,N}
 
-  first_term = :( p = Array{T}(Base.tail(size(weights))) )
+  first_term = :( p = Array{T}(undef,Base.tail(size(weights))) )
 
-  i_vars = Array{Symbol}(N)
+  i_vars = Array{Symbol}(undef,N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
