@@ -626,21 +626,17 @@ end
 
   # Initialize the weight Array
 
-#=
-
   initial_weight = string("weights = zeros(order+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order+1,")
   end
-  initial_weight = parse(string(initial_weight,")"))
-
-=#
+  initial_weight = Meta.parse(string(initial_weight,")"))
 
   # Put it all together to compute the weights array
 
   final = :( $chebyshev_polynomials;
-             weights = Array{T}(undef,(order.+1)...);
-#             $initial_weight;
+#             weights = Array{T}(undef,(order.+1)...);
+             $initial_weight;
              $new_outer;
              return weights )
 
@@ -711,20 +707,16 @@ end
 
   # Initialize the weight Array
 
-#=
-
   initial_weight = string("weights = zeros(order+1,",)
   for i = 2:N
     initial_weight = string(initial_weight,"order+1,")
   end
-  initial_weight = parse(string(initial_weight,")"))
-
-=#
+  initial_weight = Meta.parse(string(initial_weight,")"))
 
   # Put it all together to compute the weights array
 
-  final = :( weights = Array{T}(undef,(order.+1)...);
-#             $initial_weight;
+  final = :( #weights = Array{T}(undef,(order.+1)...);
+             $initial_weight;
              $new_outer;
              return weights )
 
