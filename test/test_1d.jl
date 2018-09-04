@@ -31,7 +31,7 @@ y_chebyshev_complete = chebyshev_evaluate(w_complete_gen,point,order,reshape(dom
 y_clenshaw_tensor    = clenshaw_evaluate(w_tensor_gen,point,dom)
 y_clenshaw_complete  = clenshaw_evaluate(w_complete_gen,point,dom)
 
-y_actual = (point+4.0).^0.5
+y_actual = (point.+4.0).^0.5
 
 println([y_actual y_chebyshev_tensor y_chebyshev_complete y_clenshaw_tensor y_clenshaw_complete])
 

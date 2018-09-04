@@ -4,17 +4,17 @@
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(N);
-                             poly_derivs = Array{Array{T,2},1}(N);
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(undef,N);
+                             poly_derivs = Array{Array{T,2},1}(undef,N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
                                # Normalize nodes to [-1,1]
 
                                if domain[1,i] == domain[2,i];
-                                 xi = (domain[1,i]+domain[2,i])/2;
+                                 xi = (domain[1,i].+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
+                                 xi = 2*(xi.-domain[2,i])/(domain[1,i].-domain[2,i]).-one(T);
                                end;
 
                                polynomial = ones(T,1,order[i]+1);
@@ -33,7 +33,7 @@
                              end
                              )
 
-  i_vars = Array{Symbol}(N)
+  i_vars = Array{Symbol}(undef,N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -45,7 +45,7 @@
     inner_prod = :( (($j!==$i)*poly[$i][$(i_vars[i])]+($j==$i)*poly_derivs[$i][$(i_vars[i])])*$inner_prod )
   end
 
-  inner = :( evaluated_derivatives[$j] += (2.0/(domain[1,$j]-domain[2,$j]))*$inner_prod )
+  inner = :( evaluated_derivatives[$j] += (2.0/(domain[1,$j].-domain[2,$j]))*$inner_prod )
   outer = inner
   for i = N:-1:1#1:N
     outer = :(
@@ -75,17 +75,17 @@ end
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(N);
-                             poly_derivs = Array{Array{T,2},1}(N);
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(undef,N);
+                             poly_derivs = Array{Array{T,2},1}(undef,N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
                                # Normalize nodes to [-1,1]
 
                                if domain[1,i] == domain[2,i];
-                                 xi = (domain[1,i]+domain[2,i])/2;
+                                 xi = (domain[1,i].+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
+                                 xi = 2*(xi.-domain[2,i])/(domain[1,i].-domain[2,i]).-one(T);
                                end;
 
                                polynomial = ones(T,1,order+1);
@@ -104,7 +104,7 @@ end
                              end
                              )
 
-  i_vars = Array{Symbol}(N)
+  i_vars = Array{Symbol}(undef,N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -117,7 +117,7 @@ end
   end
 
   inner = :( if sum(tuple($(i_vars...))) <= order+N;
-               evaluated_derivatives[$j] += (2.0/(domain[1,$j]-domain[2,$j]))*$inner_prod;
+               evaluated_derivatives[$j] += (2.0/(domain[1,$j].-domain[2,$j]))*$inner_prod;
              end )
 
   outer = inner
@@ -151,17 +151,17 @@ end
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::Array{S,1},pos::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(N);
-                             poly_derivs = Array{Array{T,2},1}(N);
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(undef,N);
+                             poly_derivs = Array{Array{T,2},1}(undef,N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
                                # Normalize nodes to [-1,1]
 
                                if domain[1,i] == domain[2,i];
-                                 xi = (domain[1,i]+domain[2,i])/2;
+                                 xi = (domain[1,i].+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
+                                 xi = 2*(xi.-domain[2,i])/(domain[1,i].-domain[2,i]).-one(T);
                                end;
 
                                polynomial = ones(T,1,order[i]+1);
@@ -180,7 +180,7 @@ end
                              end
                              )
 
-  i_vars = Array{Symbol}(N)
+  i_vars = Array{Symbol}(undef,N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -192,7 +192,7 @@ end
     inner_prod = :( ((pos[$j]!==$i)*poly[$i][$(i_vars[i])]+(pos[$j]==$i)*poly_derivs[$i][$(i_vars[i])])*$inner_prod )
   end
 
-  inner = :( evaluated_derivatives[$j] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod )
+  inner = :( evaluated_derivatives[$j] += (2.0/(domain[1,pos[$j]].-domain[2,pos[$j]]))*$inner_prod )
   outer = inner
   for i = N:-1:1#1:N
     outer = :(
@@ -222,17 +222,17 @@ end
 
 @generated function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},order::S,pos::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
-  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(N);
-                             poly_derivs = Array{Array{T,2},1}(N);
+  chebyshev_polynomials = :( poly        = Array{Array{T,2},1}(undef,N);
+                             poly_derivs = Array{Array{T,2},1}(undef,N);
                              for i = 1:size(x,1);
                                xi = x[i];
 
                                # Normalize nodes to [-1,1]
 
                                if domain[1,i] == domain[2,i];
-                                 xi = (domain[1,i]+domain[2,i])/2;
+                                 xi = (domain[1,i].+domain[2,i])/2;
                                else;
-                                 xi = 2*(xi-domain[2,i])/(domain[1,i]-domain[2,i])-one(T);
+                                 xi = 2*(xi.-domain[2,i])/(domain[1,i].-domain[2,i]).-one(T);
                                end;
 
                                polynomial = ones(T,1,order+1);
@@ -251,7 +251,7 @@ end
                              end
                              )
 
-  i_vars = Array{Symbol}(N)
+  i_vars = Array{Symbol}(undef,N)
   for i = 1:N
     i_vars[i] = Symbol("i$i")
   end
@@ -264,7 +264,7 @@ end
   end
 
   inner = :( if sum(tuple($(i_vars...))) <= order+N;
-               evaluated_derivatives[$j] += (2.0/(domain[1,pos[$j]]-domain[2,pos[$j]]))*$inner_prod;
+               evaluated_derivatives[$j] += (2.0/(domain[1,pos[$j]].-domain[2,pos[$j]]))*$inner_prod;
              end )
 
   outer = inner
