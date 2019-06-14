@@ -1,6 +1,6 @@
 # Generated functions for tensor-product polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
+@generated function chebyshev_weights(f::AbstractArray{T,N},nodes::Union{Array{Array{T,1},1},NTuple{N,Array{T,1}}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
   chebyshev_polynomials = :( poly = Array{Array{T,2},1}(undef,N);
                              for k = 1:N;
@@ -98,7 +98,7 @@
 
 end
 
-@generated function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1}) where {T,N,S}
+@generated function chebyshev_weights(f::AbstractArray{T,N},poly::Union{Array{Array{T,2},1},NTuple{N,Array{T,2}}},order::Array{S,1}) where {T,N,S}
 
   i_vars = Array{Symbol}(undef,N)
   s_vars = Array{Symbol}(undef,N)
@@ -168,6 +168,8 @@ end
 end
 
 # Generated functions for tensor-product polynomials where nodes are in a tuple
+
+#=
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
@@ -336,9 +338,11 @@ end
 
 end
 
+=#
+
 # Generated functions for complete polynomials where nodes are in an array of arrays
 
-@generated function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
+@generated function chebyshev_weights(f::AbstractArray{T,N},nodes::Union{Array{Array{T,1},1},NTuple{N,Array{T,1}}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
   chebyshev_polynomials = :( poly = Array{Array{T,2},1}(undef,N);
                              for k = 1:N;
@@ -450,7 +454,7 @@ end
 
 end
 
-@generated function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S) where {T,N,S}
+@generated function chebyshev_weights(f::AbstractArray{T,N},poly::Union{Array{Array{T,2},1},NTuple{N,Array{T,2}}},order::S) where {T,N,S}
 
   i_vars = Array{Symbol}(undef,N)
   s_vars = Array{Symbol}(undef,N)
@@ -533,6 +537,8 @@ end
   return final
 
 end
+
+#=
 
 # Generated functions for complete polynomials where nodes are in a tuple
 
@@ -723,6 +729,8 @@ end
   return final
 
 end
+
+=#
 
 # Functions to ensure backward compatibility with an older API
 
