@@ -24,10 +24,10 @@ println(maximum(abs,w_tensor - w_complete)) # We run this in the 1-d case becaus
 
 point = [1.748]
 
-y_chebyshev_tensor   = chebyshev_evaluate(w_tensor_gen,point,[order],reshape(dom,2,1))
-y_chebyshev_complete = chebyshev_evaluate(w_complete_gen,point,order,reshape(dom,2,1))
-y_clenshaw_tensor    = clenshaw_evaluate(w_tensor_gen,point,dom)
-y_clenshaw_complete  = clenshaw_evaluate(w_complete_gen,point,dom)
+y_chebyshev_tensor   = chebyshev_evaluate(w_tensor,point,[order],reshape(dom,2,1))
+y_chebyshev_complete = chebyshev_evaluate(w_complete,point,order,reshape(dom,2,1))
+y_clenshaw_tensor    = clenshaw_evaluate(w_tensor,point,dom)
+y_clenshaw_complete  = clenshaw_evaluate(w_complete,point,dom)
 
 y_actual = (point.+4.0).^0.5
 
