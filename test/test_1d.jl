@@ -33,9 +33,9 @@ y_actual = (point.+4.0).^0.5
 
 println([y_actual y_chebyshev_tensor y_chebyshev_complete y_clenshaw_tensor y_clenshaw_complete])
 
-y_deriv_tensor   = chebyshev_derivative(w_tensor_gen,point,[order],dom)
-y_deriv_complete = chebyshev_derivative(w_tensor_gen,point,order,dom)
-y_deriv_tensor_1   = chebyshev_derivative(w_tensor_gen,point,[order],[1],dom)
-y_deriv_complete_1 = chebyshev_derivative(w_tensor_gen,point,order,[1],dom)
+y_deriv_tensor   = chebyshev_derivative(w_tensor,point,[order],dom)
+y_deriv_complete = chebyshev_derivative(w_tensor,point,order,dom)
+y_deriv_tensor_1   = chebyshev_derivative(w_tensor,point,[order],[1],dom)
+y_deriv_complete_1 = chebyshev_derivative(w_tensor,point,order,[1],dom)
 
 println(y_deriv_tensor, y_deriv_complete, y_deriv_tensor_1, y_deriv_complete_1)
