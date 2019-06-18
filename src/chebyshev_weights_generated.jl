@@ -1,3 +1,5 @@
+#=
+
 # Generated functions for tensor-product polynomials where nodes are in an array of arrays
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
@@ -167,6 +169,8 @@ end
 
 end
 
+=#
+
 # Generated functions for tensor-product polynomials where nodes are in a tuple
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
@@ -335,6 +339,8 @@ end
   return final
 
 end
+
+#=
 
 # Generated functions for complete polynomials where nodes are in an array of arrays
 
@@ -534,6 +540,8 @@ end
 
 end
 
+=#
+
 # Generated functions for complete polynomials where nodes are in a tuple
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
@@ -724,9 +732,63 @@ end
 
 end
 
+# Functions that allow the nodes to be in an array of arrays
+
+function chebyshev_weights(y::AbstractArray{T,1},nodes::Array{T,1},order::Array{S,1},dom=[ones(1);-ones(1)]) where {T <: AbstractFloat, S <: Integer}
+
+  w = chebyshev_weights(y,(nodes,),order,reshape(dom,2,1))
+	return w
+
+end
+
+function chebyshev_weights(y::AbstractArray{T,1},nodes::Array{T,1},order::S,dom=[ones(1);-ones(1)]) where {T <: AbstractFloat, S <: Integer}
+
+  w = chebyshev_weights(y,(nodes,),order,reshape(dom,2,1))
+	return w
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
+
+  nodes = Tuple(nodes)
+  weights = chebyshev_weights(f,nodes,order,domain)
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
+
+  nodes = Tuple(nodes)
+  weights = chebyshev_weights(f,nodes,order,domain)
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1}) where {T,N,S}
+
+  poly = Tuple(poly)
+  weights = chebyshev_weights(f,poly,order)
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S) where {T,N,S}
+
+  poly = Tuple(poly)
+  weights = chebyshev_weights(f,poly,order)
+
+  return weights
+
+end
+
 # Functions to ensure backward compatibility with an older API
 
 # Tensor product polynomials
+
+#=
 
 function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
@@ -735,6 +797,8 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::Arra
   return weights
 
 end
+
+=#
 
 function chebyshev_weights(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::Array{S,1},domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
@@ -778,6 +842,8 @@ end
 
 # Complete polynomials
 
+#=
+
 function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
   weights = chebyshev_weights(f,(nodes_1,),order,reshape(domain,2,1))
@@ -785,6 +851,8 @@ function chebyshev_weights(f::AbstractArray{T,1},nodes_1::Array{T,1},order::S,do
   return weights
 
 end
+
+=#
 
 function chebyshev_weights(f::AbstractArray{T,2},nodes_1::Array{T,1},nodes_2::Array{T,1},order::S,domain=[ones(1);-ones(1)]) where {T<:AbstractFloat,S<:Integer}
 
@@ -825,43 +893,3 @@ function chebyshev_weights(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Ar
   return weights
 
 end
-
-#=
-
-function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
-
-  nodes = Tuple(nodes)
-  weights = chebyshev_weights(f,nodes,order,domain)
-
-  return weights
-
-end
-
-function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
-
-  nodes = Tuple(nodes)
-  weights = chebyshev_weights(f,nodes,order,domain)
-
-  return weights
-
-end
-
-function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1}) where {T,N,S}
-
-  poly = Tuple(poly)
-  weights = chebyshev_weights(f,poly,order)
-
-  return weights
-
-end
-
-function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S) where {T,N,S}
-
-  poly = Tuple(poly)
-  weights = chebyshev_weights(f,poly,order)
-
-  return weights
-
-end
-
-=#
