@@ -33,7 +33,7 @@
 
 end
 
-function clenshaw_evaluate(weights::Array{T,N},x::Array{T,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N}
+function clenshaw_evaluate(weights::Array{T,N},x::Array{T,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N}
 
   for i = 1:N
     normalized_x = normalize_node(x[i],domain[:,i])
@@ -41,5 +41,17 @@ function clenshaw_evaluate(weights::Array{T,N},x::Array{T,1},domain=[ones(T,1,N)
   end
 
   return weights[1]
+
+end
+
+function clenshaw_evaluate(weights::Array{T,N},domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N}
+
+  function goo(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return clenshaw_evaluate(weights,x,domain)
+
+  end
+
+  return goo
 
 end

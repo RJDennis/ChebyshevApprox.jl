@@ -291,3 +291,51 @@ end
   return final
 
 end
+
+function chebyshev_derivative(weights::Array{T,N},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N,S <: Integer}
+
+  function goo(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_derivative(weights,x,order,domain)
+
+  end
+
+  return goo
+
+end
+
+function chebyshev_derivative(weights::Array{T,N},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N,S <: Integer}
+
+  function goo(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_derivative(weights,x,order,domain)
+
+  end
+
+  return goo
+
+end
+
+function chebyshev_derivative(weights::Array{T,N},order::Array{S,1},pos::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N,S <: Integer}
+
+  function goo(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_derivative(weights,x,order,pos,domain)
+
+  end
+
+  return goo
+
+end
+
+function chebyshev_derivative(weights::Array{T,N},order::S,pos::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N,S <: Integer}
+
+  function goo(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_derivative(weights,x,order,pos,domain)
+
+  end
+
+  return goo
+
+end
