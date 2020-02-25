@@ -1,7 +1,10 @@
 language: julia
 julia:
-  - 0.7
   - 1.0
+  - 1.1
+  - 1.2
+  - 1.3
+  
 #script:
 #    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 #    - julia -e 'Pkg.clone(pwd()); Pkg.test("ChebyshevApprox", coverage=true)'
