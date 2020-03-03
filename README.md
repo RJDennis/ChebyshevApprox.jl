@@ -5,7 +5,20 @@ Julia code to approximate continuous functions using Chebyshev polynomials.
 
 In many applications it is important to be able to approximate accurately continuous functions of several variables.  This code can approximate functions that depend upon an arbitrary number of variables.
 
-Chebyshev nodes in the `[1.0, -1.0]` interval are computed using the command
+Installation
+------------
+
+To install this package simply type in the REPL:
+
+```
+using Pkg
+Pkg.add("ChebyshevApprox")
+````
+
+Use
+---
+
+Chebyshev nodes in the [1.0, -1.0] interval are computed using the command
 
 ```
 nodes = chebyshev_nodes(n)
@@ -48,7 +61,7 @@ or
 y_approx = clenshaw_evaluate(w,[x],order,domain)
 ```
 
-The latter command evaluates the polynominal using Clenshaw's recursion.  For functions where the domain of `x` coincides with the `[1.0, -1.0]` interval the domain argument can be omitted, both when computing the weights and when evaluating the polynomial.
+The latter command evaluates the polynominal using Clenshaw's recursion.  For functions where the domain of `x` coincides with the [1.0, -1.0] interval the domain argument can be omitted, both when computing the weights and when evaluating the polynomial.
 
 Approximating functions of several variables
 ============================================
@@ -89,7 +102,7 @@ In each of these commands, the variable `domain` is a 2D array (2*3 matrix for t
 
 For the case where a complete polynomial rather than a tensor-product polynomial is desired, the commands are the same as above, but the `order` variable is now simply an integer rather than a 1D array of integers.
 
-As with the 1D case, if the domain of each variable is `[1.0, -1.0]`, then the domain variable can be omitted.
+As with the 1D case, if the domain of each variable is [1.0, -1.0], then the domain variable can be omitted.
 
 Working with complete polynomials rather than tensor-product polynomials often leads to a considerable decrease in computation time with little loss of accuracy.
 
