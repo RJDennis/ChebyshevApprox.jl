@@ -58,7 +58,7 @@ x = chebyshev_nodes(11)
 p = chebyshev_polynomial(order,x)
 ```
 
-then `p` will be a 2D array (11 \times 6) containing the Chebyshev polynomials of order 0---5 evaluated at each element in `x`.
+then `p` will be a 2D array (11 * 6) containing the Chebyshev polynomials of order 0---5 evaluated at each element in `x`.
 
 Weights
 -------
