@@ -1,15 +1,19 @@
 function chebyshev_extrema(n::S,domain = [1.0,-1.0]) where S <: Integer
 
-  # Construct the nodes on the [-1.0,1.0] interval
+  if n <= 0
+    error("The number of nodes must be positive.")
+  end
 
-  nodes = Array{typeof(1.0)}(undef,n)
+  nodes = zeros(n)
 
-  if n == 1
-    nodes[1] = (domain[1]+domain[2])/2.0
-  else
-    for i = 0:(n-1)
-      nodes[i+1] = domain[2] + (1.0 - cos(i*pi/(n-1)))*(domain[1]-domain[2])/2.0
-    end
+  if isodd(n)
+    nodes[Int((n-1)/2)+1] = (domain[1]+domain[2])/2.0
+  end
+
+  for i = 1:div(n,2)
+    x = -cos((i-1)*pi/(n-1))*(domain[1]-domain[2])/2.0
+    nodes[i]       = (domain[1]+domain[2])/2.0  + x
+    nodes[end-i+1] = (domain[1]+domain[2])/2.0  - x
   end
 
   return nodes

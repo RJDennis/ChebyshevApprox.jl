@@ -33,3 +33,24 @@ function chebyshev_polynomial(order::S,x::Array{T,1}) where {T<:AbstractFloat,S<
   return polynomial
 
 end
+
+function derivative_of_chebyshev_polynomial(order::S,x::T) where {T<:AbstractFloat,S<:Integer}
+
+  polynomial    = Array{T}(undef,1,order+1)
+  poly_deriv    = Array{T}(undef,1,order+1)
+  polynomial[1] = one(T)
+  poly_deriv[1] = zero(T)
+
+  for i = 2:order+1
+    if i == 2
+      polynomial[i] = x
+      poly_deriv[i] = one(T)
+    else
+      polynomial[i] = 2*x*polynomial[i-1]-polynomial[i-2]
+      poly_deriv[i] = 2*polynomial[i-1]+2*x*poly_deriv[i-1]-poly_deriv[i-2] 
+    end
+  end
+
+  return poly_deriv
+
+end

@@ -1,7 +1,13 @@
 name = "ChebyshevApprox"
 uuid = "17a596ad-87cd-578c-9b6d-01108c31dc04"
 authors = ["Richard Dennis <richard.dennis@glasgow.ac.uk>"]
-version = "0.1.1"
+version = "0.1.2"
+
+
+[deps]
+ThreadPools = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
 
 [compat]
-julia = "1"
+julia = "^1"
+ThreadPools = "^1.2.1"
+

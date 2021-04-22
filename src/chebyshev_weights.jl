@@ -1,4 +1,460 @@
+function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  poly = Array{Array{T,2},1}(undef,N)
+
+  @inbounds for i = 1:N
+    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+  end
+
+  weights = Array{T,N}(undef,Tuple(order.+1))
+  #n = length.(nodes)
+  
+  @inbounds for i in CartesianIndices(weights)
+
+    numerator   = zero(T)
+    denominator = zero(T)
+
+    @inbounds for s in CartesianIndices(f)
+
+      num = f[s]
+      dom = one(T)
+      @inbounds for j = 1:N
+        num *= poly[j][s[j],i[j]]
+        dom *= poly[j][s[j],i[j]]
+        #if i[j] === 1
+        #  dom *= n[j]
+        #else
+        #  dom *= n[j]/2
+        #end
+      end
+
+      numerator   += num
+      denominator += dom^2
+      #denominator = dom
+
+    end
+
+    weights[i] = numerator/denominator
+
+  end
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = Array{T,N}(undef,Tuple(order.+1))
+  #n = length.(nodes)
+  
+  @inbounds for i in CartesianIndices(weights)
+
+    numerator   = zero(T)
+    denominator = zero(T)
+
+    @inbounds for s in CartesianIndices(f)
+
+      num = f[s]
+      dom = one(T)
+      @inbounds for j = 1:N
+        num *= poly[j][s[j],i[j]]
+        dom *= poly[j][s[j],i[j]]
+        #if i[j] === 1
+        #  dom *= n[j]
+        #else
+        #  dom *= n[j]/2
+        #end
+      end
+
+      numerator   += num
+      denominator += dom^2
+      #denominator = dom
+
+    end
+
+    weights[i] = numerator/denominator
+
+  end
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  poly = Array{Array{T,2},1}(undef,N)
+
+  @inbounds for i = 1:N
+    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+  end
+
+  ord = (order,)
+  for i = 2:N
+    ord = (ord...,order)
+  end
+
+  weights = zeros(ord.+1)
+  #n = length.(nodes)
+
+  @inbounds for i in CartesianIndices(weights)
+    if sum(Tuple(i)) <= order+N
+
+      numerator   = zero(T)
+      denominator = zero(T)
+
+      @inbounds for s in CartesianIndices(f)
+
+        num = f[s]
+        dom = one(T)
+        @inbounds for j = 1:N
+          num *= poly[j][s[j],i[j]]
+          dom *= poly[j][s[j],i[j]]
+          #if i[j] === 1
+          #  dom *= n[j]
+          #else
+          #  dom *= n[j]/2
+          #end
+        end
+
+        numerator   += num
+        denominator += dom^2
+        #denominator = dom
+
+      end
+
+      weights[i] = numerator/denominator
+    
+    end
+
+  end
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  ord = (order,)
+  for i = 2:N
+    ord = (ord...,order)
+  end
+  
+  weights = zeros(Tuple(ord.+1))
+  #n = length.(nodes)
+  
+  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+    if sum(Tuple(i)) <= order+N
+
+      numerator   = zero(T)
+      denominator = zero(T)
+  
+      @inbounds for s in CartesianIndices(f)
+  
+        num = f[s]
+        dom = one(T)
+        @inbounds for j = 1:N
+          num *= poly[j][s[j],i[j]]
+          dom *= poly[j][s[j],i[j]]
+          #if i[j] === 1
+          #  dom *= n[j]
+          #else
+          #  dom *= n[j]/2
+          #end
+        end
+  
+        numerator   += num
+        denominator += dom^2
+        #denominator = dom
+  
+      end
+  
+      weights[i] = numerator/denominator
+      
+    end
+  
+  end
+  
+  return weights
+  
+end
+  
+function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  poly = Array{Array{T,2},1}(undef,N)
+
+  @inbounds for i = 1:N
+    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+  end
+
+  weights = zeros(Tuple(order.+1))
+  #n = length.(nodes)
+  
+  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+
+    numerator   = zero(T)
+    denominator = zero(T)
+
+    @inbounds for s in CartesianIndices(f)
+
+      num = f[s]
+      dom = one(T)
+      @inbounds for j = 1:N
+        num *= poly[j][s[j],i[j]]
+        dom *= poly[j][s[j],i[j]]
+        #if i[j] === 1
+        #  dom *= n[j]
+        #else
+        #  dom *= n[j]/2
+        #end
+      end
+
+      numerator   += num
+      denominator += dom^2
+      #denominator = dom
+
+    end
+
+    weights[i] = numerator/denominator
+
+  end
+
+  return weights
+
+end
+
+function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = Array{T,N}(undef,Tuple(order.+1))
+  #n = length.(nodes)
+  
+  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+
+    numerator   = zero(T)
+    denominator = zero(T)
+
+    @inbounds for s in CartesianIndices(f)
+
+      num = f[s]
+      dom = one(T)
+      @inbounds for j = 1:N
+        num *= poly[j][s[j],i[j]]
+        dom *= poly[j][s[j],i[j]]
+        #if i[j] === 1
+        #  dom *= n[j]
+        #else
+        #  dom *= n[j]/2
+        #end
+      end
+
+      numerator   += num
+      denominator += dom^2
+      #denominator = dom
+
+    end
+
+    weights[i] = numerator/denominator
+
+  end
+
+  return weights
+
+end
+
+function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  poly = Array{Array{T,2},1}(undef,N)
+
+  @inbounds for i = 1:N
+    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+  end
+
+  ord = (order,)
+  for i = 2:N
+    ord = (ord...,order)
+  end
+  
+  weights = zeros(Tuple(ord.+1))
+  #n = length.(nodes)
+  
+  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+    if sum(Tuple(i)) <= order+N
+
+      numerator   = zero(T)
+      denominator = zero(T)
+  
+      @inbounds for s in CartesianIndices(f)
+  
+        num = f[s]
+        dom = one(T)
+        @inbounds for j = 1:N
+          num *= poly[j][s[j],i[j]]
+          dom *= poly[j][s[j],i[j]]
+          #if i[j] === 1
+          #  dom *= n[j]
+          #else
+          #  dom *= n[j]/2
+          #end
+        end
+  
+        numerator   += num
+        denominator += dom^2
+        #denominator = dom
+  
+      end
+  
+      weights[i] = numerator/denominator
+      
+    end
+  
+  end
+  
+  return weights
+  
+end
+  
+function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  ord = (order,)
+  for i = 2:N
+    ord = (ord...,order)
+  end
+    
+  weights = zeros(Tuple(ord.+1))
+  #n = length.(nodes)
+  
+  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+    if sum(Tuple(i)) <= order+N
+
+      numerator   = zero(T)
+      denominator = zero(T)
+  
+      @inbounds for s in CartesianIndices(f)
+  
+        num = f[s]
+        dom = one(T)
+        @inbounds for j = 1:N
+          num *= poly[j][s[j],i[j]]
+          dom *= poly[j][s[j],i[j]]
+          #if i[j] === 1
+          #  dom *= n[j]
+          #else
+          #  dom *= n[j]/2
+          #end
+        end
+  
+        numerator   += num
+        denominator += dom^2
+        #denominator = dom
+  
+      end
+  
+      weights[i] = numerator/denominator
+      
+    end
+  
+  end
+  
+  return weights
+  
+end
+
+# Functions for the one-variable case where the nodes are a vector
+
+function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{T,1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights(f,(nodes,),order,domain)
+  
+  return weights
+  
+end
+  
+function chebyshev_weights(f::AbstractArray{T,N},poly::Array{T,2},order::Array{S,1}) where {T<:AbstractFloat,N,S<:Integer}
+  
+  weights = chebyshev_weights(f,(poly,),order)
+  
+  return weights
+  
+end
+  
+function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{T,1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+  
+  weights = chebyshev_weights(f,(nodes,),order,domain)
+  
+  return weights
+  
+end
+  
+# Functions that allow the nodes to be in an array of arrays
+
+function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights(f,tuple(nodes...),order,domain)
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1}) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights(f,tuple(poly...),order)
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights(f,tuple(nodes...),order,domain)
+
+  return weights
+
+end
+
+function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights(f,tuple(poly...),order)
+
+  return weights
+
+end
+
+function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights_threaded(f,tuple(nodes...),order,domain)
+
+  return weights
+
+end
+
+function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1}) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights_threaded(f,tuple(poly...),order)
+
+  return weights
+
+end
+
+function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights_threaded(f,tuple(nodes...),order,domain)
+
+  return weights
+
+end
+
+function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S) where {T<:AbstractFloat,N,S<:Integer}
+
+  weights = chebyshev_weights_threaded(f,tuple(poly...),order)
+
+  return weights
+
+end
+
+###############################################################################
+
 # Generated functions for tensor-product polynomials where nodes are in a tuple
+
+#=
 
 @generated function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
 
@@ -10,7 +466,7 @@
                                # normalize nodes
 
                                if domain[1,k] == domain[2,k];
-                                 fill!(xk,(domain[1,k].+domain[2,k])/2);
+                                 fill!(xk,0.0);
                                else;
                                  xk = 2*(xk.-domain[2,k])/(domain[1,k].-domain[2,k]).-one(T);
                                end;
@@ -27,7 +483,7 @@
                                    end;
                                  end;
                                end;
-                               poly[k] = polynomial;#push!(poly,polynomial);
+                               poly[k] = polynomial;
                              end )
 
   i_vars = Array{Symbol}(undef,N)
@@ -357,58 +813,6 @@ end
 
 end
 
-# Functions that allow the nodes to be in an array of arrays
-
-function chebyshev_weights(y::AbstractArray{T,1},nodes::Array{T,1},order::Array{S,1},dom=[ones(1);-ones(1)]) where {T <: AbstractFloat, S <: Integer}
-
-  w = chebyshev_weights(y,(nodes,),order,reshape(dom,2,1))
-	return w
-
-end
-
-function chebyshev_weights(y::AbstractArray{T,1},nodes::Array{T,1},order::S,dom=[ones(1);-ones(1)]) where {T <: AbstractFloat, S <: Integer}
-
-  w = chebyshev_weights(y,(nodes,),order,reshape(dom,2,1))
-	return w
-
-end
-
-function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
-
-  nodes = Tuple(nodes)
-  weights = chebyshev_weights(f,nodes,order,domain)
-
-  return weights
-
-end
-
-function chebyshev_weights(f::AbstractArray{T,N},nodes::Array{Array{T,1},1},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T,N,S}
-
-  nodes = Tuple(nodes)
-  weights = chebyshev_weights(f,nodes,order,domain)
-
-  return weights
-
-end
-
-function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::Array{S,1}) where {T,N,S}
-
-  poly = Tuple(poly)
-  weights = chebyshev_weights(f,poly,order)
-
-  return weights
-
-end
-
-function chebyshev_weights(f::AbstractArray{T,N},poly::Array{Array{T,2},1},order::S) where {T,N,S}
-
-  poly = Tuple(poly)
-  weights = chebyshev_weights(f,poly,order)
-
-  return weights
-
-end
-
 # Functions to ensure backward compatibility with an older API
 
 # Tensor product polynomials, one varible case is treated above
@@ -494,3 +898,5 @@ function chebyshev_weights(f::AbstractArray{T,6},nodes_1::Array{T,1},nodes_2::Ar
   return weights
 
 end
+
+=#

@@ -1,9 +1,19 @@
 function chebyshev_nodes(n::S,domain = [1.0,-1.0]) where {S <: Integer}
 
-  nodes = Array{typeof(1.0)}(undef,n)
+  if n <= 0
+    error("The number of nodes must be positive.")
+  end
 
-  for i = 1:n
-    nodes[i] = domain[2] + ( 1.0 - cos((2.0*i-1.0)*pi/(2.0*n)) )*(domain[1]-domain[2])/2.0
+  nodes = zeros(n)
+
+  if isodd(n)
+    nodes[Int((n-1)/2)+1] = (domain[1]+domain[2])/2.0
+  end
+
+  for i = 1:div(n,2)
+    x = -cos((2.0*i-1.0)*pi/(2.0*n))*(domain[1]-domain[2])/2.0
+    nodes[i]       = (domain[1]+domain[2])/2.0 + x
+    nodes[end-i+1] = (domain[1]+domain[2])/2.0 - x
   end
 
   return nodes
