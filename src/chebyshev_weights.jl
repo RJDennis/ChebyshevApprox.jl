@@ -85,7 +85,7 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
-    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+    poly[i] = chebyshev_polynomial(order,normalize_node(nodes[i],domain[:,i]))
   end
 
   ord = (order,)
