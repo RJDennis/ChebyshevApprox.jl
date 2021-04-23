@@ -1,7 +1,7 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials rather than tensor-product polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
+ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
 
 Installation
 ------------
@@ -58,7 +58,7 @@ x = chebyshev_nodes(11)
 p = chebyshev_polynomial(order,x)
 ```
 
-then `p` will be a 2D array (11 * 6) containing the Chebyshev polynomials of order 0---5 evaluated at each element in `x`.
+then `p` will be a 2D array (11*6) containing the Chebyshev polynomials of order 0---5 evaluated at each element in `x`.
 
 Weights
 -------
@@ -87,7 +87,7 @@ domain = [domain_x1 domain_x2]
 w = chebyshev_weights(y,nodes,order,domain)
 ```
 
-would compute the weights, `w`, (a 2D array in this example) in a tensor-product polynomial.  The domain-argument is optional, needed only if one or more variable does not have domain [1.0,-1.0].  The nodes-argument can be an array-of-array (instead of a tuple).  Alternatively, the polynominals can be computed and entered directly into the chebyshev_weights() function:
+would compute the weights, `w`, (a 2D array in this example) in a tensor-product polynomial.  The domain-argument is optional, needed only if one or more variable does not have domain [1.0,-1.0].  The nodes-argument can be an array-of-arrays (instead of a tuple).  Alternatively, the polynominals can be computed and entered directly into the chebyshev_weights() function:
 
 ```
 p1   = chebyshev_polynomial(order_x1,nodes_x1)
@@ -102,7 +102,7 @@ The poly-argument can be an array-of-arrays (instead of a tuple).
 Structures
 ----------
 
-ChebyshevApprox contains two structures.  The first contains the nformation needed to evaluate a tenser-product polynomial at a point the second contains the information needed to evaluate a complete polynomial at a point.  For the former:
+ChebyshevApprox contains two structures.  The first contains the information needed to evaluate a tensor-product polynomial at a point the second contains the information needed to evaluate a complete polynomial at a point.  For the former:
 
 ```
 chebpoly = ChebyshevPolyTensor(w,order,domain)
@@ -150,7 +150,7 @@ allowing polynomials to be easily evaluated at point `x`.
 Derivatives
 -----------
 
-The chebyshev_derivative() function can be used to approximate the derivative for a function with respect to a designated variable.  For example, the partial derivative with respect to the 3'rd variable evaluated at point `x` can be computed by:
+The chebyshev_derivative() function can be used to approximate the partial derivative of a function with respect to a designated variable.  For example, the partial derivative with respect to the 3'rd variable evaluated at point `x` can be computed by:
 
 ```
 deriv = chebyshev_derivative(w,x,3,order,domain)
@@ -162,12 +162,12 @@ or
 deriv = chebyshev_derivative(chebpoly,x,3)
 ```
 
-`deriv` is a floating point number.
+where `deriv` is a floating point number.
 
 Gradients
 ---------
 
-Gradients are computed using the chebushev_gradient() function.
+Gradients are computed using the chebyshev_gradient() function.
 
 ```
 grad = chebyshev_gradient(w,x,order,domain)
@@ -179,12 +179,12 @@ or
 grad = chebyshev_gradient(chebpoly,x)
 ```
 
-`grad` is a 2D array with one row.
+where `grad` is a 2D array with one row.
 
 Multi-threading
 ---------------
 
-Computing the weights in a multivariate Chebyshev polynomial can be time-consuming for functions whose dimensions are large, or where the number of nodes and/or the order of the polynomals are large.  For this reason, multi-threaded functions for computing the weights are provided:
+Computing the weights in a multivariate Chebyshev polynomial can be time-consuming for functions whose dimensions are large, or where the number of nodes and/or the order of the polynomals is large.  For this reason, multi-threaded functions for computing the weights are provided:
 
 ```
 w = chebyshev_weights_threaded(y,nodes,order,domain)
@@ -196,7 +196,7 @@ and
 w = chebyshev_weights_threaded(y,poly,order)
 ```
 
-As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.
+As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials, with the  weights returned, `w`, in the form of a multi-dimensional array.
 
 Summary
 -------
