@@ -31,9 +31,9 @@ function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},pos::S,order::S,
   poly = Array{Array{T,2},1}(undef,N)
   @inbounds for i = 1:N
     if i === pos
-      poly[i] = derivative_of_chebyshev_polynomial(order[i],normalize_node(x[i],domain[:,i]))
+      poly[i] = derivative_of_chebyshev_polynomial(order,normalize_node(x[i],domain[:,i]))
     else
-      poly[i] = chebyshev_polynomial(order[i],normalize_node(x[i],domain[:,i]))
+      poly[i] = chebyshev_polynomial(order,normalize_node(x[i],domain[:,i]))
     end
   end
 
