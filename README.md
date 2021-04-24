@@ -80,13 +80,13 @@ where `order` would be an integer.
 The third and fourth structures are interpolation objects for tensor-product polynomials and complete polynomials.  These two structures are created as follows:
 
 ```
-cheb = ChebInterpTensor(y,nodes,order,domain)
+cheby = ChebInterpTensor(y,nodes,order,domain)
 ```
 
 where `y` is an n-D array, `nodes` is a tuple, and `order` would be a 1D array of integers, and:
 
 ```
-cheb = ChebInterpComplete(y,nodes,order,domain)
+cheby = ChebInterpComplete(y,nodes,order,domain)
 ```
 
 where `order` would be an integer.
@@ -154,7 +154,7 @@ yhat = chebyshev_evaluate(chebpoly,x)
 or
 
 ```
-yhat = chebyshev_evaluate(cheb,x)
+yhat = chebyshev_evaluate(cheby,x)
 ```
 
 are equivalent.  For the case where a complete polynomial rather than a tensor-product polynomial is to be evaluated, the commands are the same as above, but the `order` variable is now simply an integer rather than a 1D array of integers.
@@ -174,7 +174,7 @@ cheb = chebyshev_evaluate(chebpoly)
 or
 
 ```
-cheb = cheb_interp(cheb)
+cheb = cheb_interp(cheby)
 ```
 
 followed by
@@ -203,7 +203,7 @@ deriv = chebyshev_derivative(chebpoly,x,3)
 or
 
 ```
-deriv = chebyshev_derivative(cheb,x,3)
+deriv = chebyshev_derivative(cheby,x,3)
 ```
 
 where `deriv` that is returned is a floating point number.
@@ -226,7 +226,7 @@ grad = chebyshev_gradient(chebpoly,x)
 or
 
 ```
-grad = chebyshev_gradient(cheb,x)
+grad = chebyshev_gradient(cheby,x)
 ```
 
 where `grad` that is returned is a 2D array with one row.
@@ -249,7 +249,7 @@ w = chebyshev_weights_threaded(y,poly,order)
 and
 
 ```
-w = chebyshev_weights_threaded(cheb)
+w = chebyshev_weights_threaded(cheby)
 ```
 
 As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.
