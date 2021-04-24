@@ -83,7 +83,7 @@ The third and fourth structures are interpolation objects for tensor-product pol
 cheb = ChebInterpTensor(y,nodes,order,domain)
 ```
 
-where `y` is an n-D array, `nodes` is a tuple, and 'order' would be a 1D array of integers, and:
+where `y` is an n-D array, `nodes` is a tuple, and `order` would be a 1D array of integers, and:
 
 ```
 cheb = ChebInterpComplete(y,nodes,order,domain)
@@ -134,7 +134,7 @@ The poly-argument can be an array-of-arrays (instead of a tuple).  Further, usin
 w = chebyshev_weights(cheb)
 ```
 
-For all of these functions the `weights` are returned in a (nulti-dimensional) array.
+For all of these functions the `weights` are returned in a (multi-dimensional) array.
 
 Function evaluation
 -------------------
@@ -180,7 +180,7 @@ cheb = cheb_interp(cheb)
 followed by
 
 ```
-cheb(x)
+yhat = cheb(x)
 ```
 
 allowing polynomials to be easily evaluated at point `x`.
