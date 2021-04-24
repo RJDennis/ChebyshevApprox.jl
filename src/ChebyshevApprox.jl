@@ -12,16 +12,19 @@ include("chebyshev_evaluate.jl")
 include("clenshaw_evaluate_generated.jl")
 include("chebyshev_derivative.jl")
 
-export ChebyshevPolyTensor,
-       ChebyshevPolyComplete
+export ChebPolyTensor,
+       ChebPolyComplete
+       ChebInterpTensor,
+       ChebInterpComplete
 
 export chebyshev_nodes,
        chebyshev_extrema,
        chebyshev_polynomial,
        chebyshev_weights,
        chebyshev_evaluate,
-       clenshaw_evaluate,
+       cheb_interp,
        chebyshev_derivative,
-       chebyshev_gradient
+       chebyshev_gradient,
+       clenshaw_evaluate
 
 end

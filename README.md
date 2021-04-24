@@ -60,6 +60,37 @@ p = chebyshev_polynomial(order,x)
 
 then `p` will be a 2D array (11*6) containing the Chebyshev polynomials of order 0---5 evaluated at each element in `x`.
 
+Structures
+----------
+
+ChebyshevApprox contains four structures that can make your life easier.  The first contains the nformation needed to evaluate a tenser-product polynomial at a point the second contains the information needed to evaluate a complete polynomial at a point.  For the former:
+
+```
+chebpoly = ChebPolyTensor(w,order,domain)
+```
+
+where order would be a 1D array of integers.  For the latter:
+
+```
+chebpoly = ChebPolyComplete(w,order,domain)
+```
+
+where `order` would be an integer.
+
+The third and fourth structures are interpolation objects for tensor-product polynomials and complete polynomials.  These two structures are created as follows:
+
+```
+cheb = ChebInterpTensor(y,nodes,order,domain)
+```
+
+where `y` is an n-D array, `nodes` is a tuple, and 'order' would be a 1D array of integers, and:
+
+```
+cheb = ChebInterpComplete(y,nodes,order,domain)
+```
+
+where `order` would be an integer.
+
 Weights
 -------
 
@@ -97,24 +128,13 @@ poly = (p1,p2)
 w = chebyshev_weights(y,poly,order)
 ```
 
-The poly-argument can be an array-of-arrays (instead of a tuple).
-
-Structures
-----------
-
-ChebyshevApprox contains two structures.  The first contains the information needed to evaluate a tensor-product polynomial at a point the second contains the information needed to evaluate a complete polynomial at a point.  For the former:
+The poly-argument can be an array-of-arrays (instead of a tuple).  Further, using the ChebInterp structure:
 
 ```
-chebpoly = ChebyshevPolyTensor(w,order,domain)
+w = chebyshev_weights(cheb)
 ```
 
-where order would be a 1D array of integers.  For the latter:
-
-```
-chebpoly = ChebyshevPolyComplete(w,order,domain)
-```
-
-where `order` would be an integer.
+For all of these functions the `weights` are returned in a (nulti-dimensional) array.
 
 Function evaluation
 -------------------
@@ -122,13 +142,19 @@ Function evaluation
 ChebyshevApprox uses the chebyshev_evaluate() function, which accommodates several methods, to evaluate Chebyshev polynomials.  If `x` is a 1D array representing the point at which the polynomial is to be evaluated, then:
 
 ```
-y_approx = chebyshev_evaluate(w,x,order,domain)
+yhat = chebyshev_evaluate(w,x,order,domain)
 ```
 
 or
 
 ```
-y_approx = chebyshev_evaluate(chebpoly,x)
+yhat = chebyshev_evaluate(chebpoly,x)
+```
+
+or
+
+```
+yhat = chebyshev_evaluate(cheb,x)
 ```
 
 are equivalent.  For the case where a complete polynomial rather than a tensor-product polynomial is to be evaluated, the commands are the same as above, but the `order` variable is now simply an integer rather than a 1D array of integers.
@@ -136,13 +162,25 @@ are equivalent.  For the case where a complete polynomial rather than a tensor-p
 ChebyshevApprox also allows the following:
 
 ```
-cheb(x) = chebyshev_evaluate(w,order,domain)
+cheb = chebyshev_evaluate(w,order,domain)
 ```
 
 or
 
 ```
-cheb(x) = chebyshev_evaluate(chebpoly)
+cheb = chebyshev_evaluate(chebpoly)
+```
+
+or
+
+```
+cheb = cheb_interp(cheb)
+```
+
+followed by
+
+```
+cheb(x)
 ```
 
 allowing polynomials to be easily evaluated at point `x`.
@@ -162,7 +200,13 @@ or
 deriv = chebyshev_derivative(chebpoly,x,3)
 ```
 
-where `deriv` is a floating point number.
+or
+
+```
+deriv = chebyshev_derivative(cheb,x,3)
+```
+
+where `deriv` that is returned is a floating point number.
 
 Gradients
 ---------
@@ -179,7 +223,13 @@ or
 grad = chebyshev_gradient(chebpoly,x)
 ```
 
-where `grad` is a 2D array with one row.
+or
+
+```
+grad = chebyshev_gradient(cheb,x)
+```
+
+where `grad` that is returned is a 2D array with one row.
 
 Multi-threading
 ---------------
@@ -196,7 +246,13 @@ and
 w = chebyshev_weights_threaded(y,poly,order)
 ```
 
-As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials, with the  weights returned, `w`, in the form of a multi-dimensional array.
+and
+
+```
+w = chebyshev_weights_threaded(cheb)
+```
+
+As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.
 
 Summary
 -------
