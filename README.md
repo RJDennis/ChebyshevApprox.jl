@@ -1,7 +1,7 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
+ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind) or the extrema (points of the second kind).  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
 
 Installation
 ------------
@@ -50,7 +50,7 @@ x = 0.5
 p = chebyshev_polynomial(order,x)
 ```
 
-will return a 2D array containing the Chebyshev polynomials of order 0---5 evaluated at the point `x`.  If `x` is a 1D array of points, as in:
+will return a 2D array containing the Chebyshev polynomials of orders 0---5 evaluated at the point `x`.  If `x` is a 1D array of points, as in:
 
 ```
 order = 5
@@ -58,41 +58,37 @@ x = chebyshev_nodes(11)
 p = chebyshev_polynomial(order,x)
 ```
 
-then `p` will be a 2D array (11*6) containing the Chebyshev polynomials of order 0---5 evaluated at each element in `x`.
+then `p` will be a 2D array (11*6) containing the Chebyshev polynomials of orders 0---5 evaluated at each element in `x`.
 
 Structures
 ----------
 
-ChebyshevApprox contains four structures that can make your life easier.  The first contains the nformation needed to evaluate a tenser-product polynomial at a point the second contains the information needed to evaluate a complete polynomial at a point.  For the former:
+ChebyshevApprox contains three structures that can make your life easier.  The first contains the information needed to evaluate a polynomial at a point.  I.e.:
 
 ```
-chebpoly = ChebPolyTensor(w,order,domain)
+chebpoly = ChebPoly(w,order,domain)
 ```
 
-where order would be a 1D array of integers.  For the latter:
+where `order` would be an integer or a 1D array of integers.
+
+The second and third structures are interpolation objects, which are created as follows:
 
 ```
-chebpoly = ChebPolyComplete(w,order,domain)
+cheby = ChebInterpRoots(y,nodes,order,domain)
 ```
 
-where `order` would be an integer.
-
-The third and fourth structures are interpolation objects for tensor-product polynomials and complete polynomials.  These two structures are created as follows:
+and
 
 ```
-cheby = ChebInterpTensor(y,nodes,order,domain)
+cheby = ChebInterpExtrema(y,nodes,order,domain)
 ```
 
-where `y` is an n-D array, `nodes` is a tuple, and `order` would be a 1D array of integers, and:
-
-```
-cheby = ChebInterpComplete(y,nodes,order,domain)
-```
-
-where `order` would be an integer.
+where `y` is an n-D array, `nodes` is a tuple, `order` would be an integer or a 1D array of integers, and `nodes` would be Chebyshev-roots in the former and Chebyshev-extrema in the latter.
 
 Weights
 -------
+
+We focus here on the case where the solution nodes are Chebyshev-roots and cover the case where they are Chebyshev-extrema subsequently.
 
 ChebyshevApprox uses Chebyshev regression to compute the weights in the Chebyshev polynomial.  The central function for computing Chebyshev weights is the following:
 
@@ -100,7 +96,7 @@ ChebyshevApprox uses Chebyshev regression to compute the weights in the Chebyshe
 w = chebyshev_weights(y,nodes,order,domain)
 ```
 
-where `y` is a n-D array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing nodes, 'order' is a 1D array (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
+where `y` is a n-D array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing Chebyshev-roots, 'order' is a 1D array (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
 
 ```
 order_x1  = 5
@@ -111,7 +107,7 @@ order_x2  = 7
 nodes_x2  = chebyshev_nodes(15)
 domain_x2 = [1.7,-0.3]
 
-order  = [order_x1, order_x2]
+order  = [order_x1,order_x2]
 nodes  = (nodes_x1,nodes_x2)
 domain = [domain_x1 domain_x2]
 
@@ -135,6 +131,24 @@ w = chebyshev_weights(cheb)
 ```
 
 For all of these functions the `weights` are returned in a (multi-dimensional) array.
+
+If the solution nodes are instead the Chebyshev-extrema, then the analogue to the above is the use the chebyshev_weights_extreme() function.  For example,
+
+```
+order_x1  = 5
+nodes_x1  = chebyshev_extrema(11)
+domain_x1 = [3.5,0.5]
+
+order_x2  = 7
+nodes_x2  = chebyshev_extrema(15)
+domain_x2 = [1.7,-0.3]
+
+order  = [order_x1,order_x2]
+nodes  = (nodes_x1,nodes_x2)
+domain = [domain_x1 domain_x2]
+
+w = chebyshev_weights_extrema(y,nodes,order,domain)
+```
 
 Function evaluation
 -------------------
@@ -234,7 +248,7 @@ where `grad` that is returned is a 2D array with one row.
 Multi-threading
 ---------------
 
-Computing the weights in a multivariate Chebyshev polynomial can be time-consuming for functions whose dimensions are large, or where the number of nodes and/or the order of the polynomals is large.  For this reason, multi-threaded functions for computing the weights are provided:
+Computing the weights in a multivariate Chebyshev polynomial can be time-consuming for functions whose dimensions are large, or where the number of nodes and/or the order of the polynomals is large.  For this reason, multi-threaded functions for computing the weights are provided.  If the nodes are Chebyshev-roots:
 
 ```
 w = chebyshev_weights_threaded(y,nodes,order,domain)
@@ -252,7 +266,11 @@ and
 w = chebyshev_weights_threaded(cheby)
 ```
 
-As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.
+As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.  Threaded versions are also provided for the case where the nodes are Chebyshev-extrema, such as:
+
+```
+w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+```
 
 Summary
 -------

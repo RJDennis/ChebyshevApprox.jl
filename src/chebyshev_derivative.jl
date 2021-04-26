@@ -52,7 +52,7 @@ function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},pos::S,order::S,
 
 end
 
-function chebyshev_derivative(cheb_poly::ChebPolynomial,x::Array{T,1},pos::S) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_derivative(cheb_poly::ChebPoly,x::Array{T,1},pos::S) where {T<:AbstractFloat,S<:Integer}
 
   derivative = chebyshev_derivative(cheb_poly.weights,x,pos,cheb_poly.order,cheb_poly.domain) 
     
@@ -60,9 +60,18 @@ function chebyshev_derivative(cheb_poly::ChebPolynomial,x::Array{T,1},pos::S) wh
 
 end
 
-function chebyshev_derivative(cheb::ChebInterp,x::Array{T,1},pos::S) where {T<:AbstractFloat,S<:Integer}
+function chebyshev_derivative(cheb::ChebInterpRoots,x::Array{T,1},pos::S) where {T<:AbstractFloat,S<:Integer}
 
   weights    = chebyshev_weights_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  derivative = chebyshev_derivative(weights,x,pos,cheb.order,cheb.domain) 
+    
+  return derivative
+
+end
+
+function chebyshev_derivative(cheb::ChebInterpExtrema,x::Array{T,1},pos::S) where {T<:AbstractFloat,S<:Integer}
+
+  weights    = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
   derivative = chebyshev_derivative(weights,x,pos,cheb.order,cheb.domain) 
     
   return derivative
@@ -95,7 +104,7 @@ function chebyshev_gradient(weights::Array{T,N},x::Array{T,1},order::S,domain=[o
 
 end
 
-function chebyshev_gradient(cheb_poly::ChebPolynomial,x::Array{T,1}) where {T<:AbstractFloat}
+function chebyshev_gradient(cheb_poly::ChebPoly,x::Array{T,1}) where {T<:AbstractFloat}
 
   gradient = chebyshev_gradient(cheb_poly.weights,x,cheb_poly.order,cheb_poly.domain) 
     
@@ -103,9 +112,18 @@ function chebyshev_gradient(cheb_poly::ChebPolynomial,x::Array{T,1}) where {T<:A
 
 end
 
-function chebyshev_gradient(cheb::ChebInterp,x::Array{T,1}) where {T<:AbstractFloat}
+function chebyshev_gradient(cheb::ChebInterpRoots,x::Array{T,1}) where {T<:AbstractFloat}
 
   weights  = chebyshev_weights_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  gradient = chebyshev_gradient(weights,x,cheb.order,cheb.domain) 
+    
+  return gradient
+
+end
+
+function chebyshev_gradient(cheb::ChebInterpExtrema,x::Array{T,1}) where {T<:AbstractFloat}
+
+  weights  = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
   gradient = chebyshev_gradient(weights,x,cheb.order,cheb.domain) 
     
   return gradient
@@ -136,7 +154,7 @@ function chebyshev_derivative(weights::Array{T,N},pos::S,order::S,domain=[ones(T
 
 end
 
-function chebyshev_derivative(cheb_poly::ChebPolynomial,pos::S) where {S <: Integer}
+function chebyshev_derivative(cheb_poly::ChebPoly,pos::S) where {S <: Integer}
 
   function chebderiv(x::Array{T,1}) where {T <: AbstractFloat}
 
@@ -148,9 +166,23 @@ function chebyshev_derivative(cheb_poly::ChebPolynomial,pos::S) where {S <: Inte
 
 end
 
-function chebyshev_derivative(cheb::ChebInterp,pos::S) where {S <: Integer}
+function chebyshev_derivative(cheb::ChebInterpRoots,pos::S) where {S <: Integer}
 
   weights = chebyshev_weights_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+
+  function chebderiv(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_derivative(weights,x,pos,cheb.order,cheb.domain)
+
+  end
+
+  return chebderiv
+
+end
+
+function chebyshev_derivative(cheb::ChebInterpExtrema,pos::S) where {S <: Integer}
+
+  weights = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
 
   function chebderiv(x::Array{T,1}) where {T <: AbstractFloat}
 
@@ -186,7 +218,7 @@ function chebyshev_gradient(weights::Array{T,N},order::S,domain=[ones(T,1,N);-on
 
 end
 
-function chebyshev_gradient(cheb_poly::ChebPolynomial) where {S <: Integer}
+function chebyshev_gradient(cheb_poly::ChebPoly) where {S <: Integer}
 
   function chebgrad(x::Array{T,1}) where {T <: AbstractFloat}
 
@@ -198,7 +230,7 @@ function chebyshev_gradient(cheb_poly::ChebPolynomial) where {S <: Integer}
 
 end
 
-function chebyshev_gradient(cheb::ChebInterp) where {S <: Integer}
+function chebyshev_gradient(cheb::ChebInterpRoots) where {S <: Integer}
 
   weights = chebyshev_weights_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
 
@@ -212,3 +244,16 @@ function chebyshev_gradient(cheb::ChebInterp) where {S <: Integer}
 
 end
 
+function chebyshev_gradient(cheb::ChebInterpExtrema) where {S <: Integer}
+
+  weights = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+
+  function chebgrad(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_gradient(weights,x,cheb.order,cheb.domain)
+
+  end
+
+  return chebgrad
+
+end

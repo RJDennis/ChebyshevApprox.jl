@@ -11,7 +11,7 @@ function chebyshev_nodes(n::S,domain = [1.0,-1.0]) where {S <: Integer}
   end
 
   for i = 1:div(n,2)
-    x = -cos((2.0*i-1.0)*pi/(2.0*n))*(domain[1]-domain[2])/2.0
+    x = -cos((i-0.5)*pi/n)*(domain[1]-domain[2])/2.0
     nodes[i]       = (domain[1]+domain[2])/2.0 + x
     nodes[end-i+1] = (domain[1]+domain[2])/2.0 - x
   end

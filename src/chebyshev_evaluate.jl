@@ -42,7 +42,7 @@ function chebyshev_evaluate(weights::Array{T,N},x::Array{T,1},order::S,domain=[o
 
 end
 
-function chebyshev_evaluate(cheb_poly::ChebPolynomial,x::Array{T,1}) where {T<:AbstractFloat}
+function chebyshev_evaluate(cheb_poly::ChebPoly,x::Array{T,1}) where {T<:AbstractFloat}
 
   yhat = chebyshev_evaluate(cheb_poly.weights,x,cheb_poly.order,cheb_poly.domain) 
     
@@ -50,9 +50,18 @@ function chebyshev_evaluate(cheb_poly::ChebPolynomial,x::Array{T,1}) where {T<:A
   
 end
 
-function cheb_interp(cheb::ChebInterp,x::Array{T,1}) where {T<:AbstractFloat}
+function cheb_interp(cheb::ChebInterpRoots,x::Array{T,1}) where {T<:AbstractFloat}
 
   weights = chebyshev_weights_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  yhat    = chebyshev_evaluate(weights,x,cheb.order,cheb.domain) 
+    
+  return yhat
+  
+end
+
+function cheb_interp(cheb::ChebInterpExtrema,x::Array{T,1}) where {T<:AbstractFloat}
+
+  weights = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
   yhat    = chebyshev_evaluate(weights,x,cheb.order,cheb.domain) 
     
   return yhat
@@ -83,7 +92,7 @@ function chebyshev_evaluate(weights::Array{T,N},order::S,domain=[ones(T,1,N);-on
 
 end
 
-function chebyshev_evaluate(cheb_poly::ChebPolynomial)
+function chebyshev_evaluate(cheb_poly::ChebPoly)
 
   function chebeval(x::Array{T,1}) where {T <: AbstractFloat}
 
@@ -95,7 +104,7 @@ function chebyshev_evaluate(cheb_poly::ChebPolynomial)
 
 end
 
-function cheb_interp(cheb::ChebInterp)
+function cheb_interp(cheb::ChebInterpRoots)
 
   weights = chebyshev_weights_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
   
@@ -109,3 +118,16 @@ function cheb_interp(cheb::ChebInterp)
 
 end
 
+function cheb_interp(cheb::ChebInterpExtrema)
+
+  weights = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  
+  function chebeval(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_evaluate(weights,x,cheb.order,cheb.domain)
+
+  end
+
+  return chebeval
+
+end
