@@ -39,7 +39,7 @@ point = [1.748, 0.753]
 yr_tensor    = chebyshev_evaluate(wr_tensor,point,order_tensor,dom)
 yr_complete  = chebyshev_evaluate(wr_complete,point,order_complete,dom)
 ye_tensor    = chebyshev_evaluate(we_tensor,point,order_tensor,dom)
-ye_complete  = chebyshev_evaluate(we_complete,point,order_tensor,dom)
+ye_complete  = chebyshev_evaluate(we_complete,point,order_complete,dom)
 
 y_actual = (point[1]+4.0)^0.5+point[1]*sqrt(point[2])
 
