@@ -132,7 +132,7 @@ w = chebyshev_weights(cheb)
 
 For all of these functions the `weights` are returned in a (multi-dimensional) array.
 
-If the solution nodes are instead the Chebyshev-extrema, then the analogue to the above is the use the chebyshev_weights_extreme() function.  For example,
+If the solution nodes are instead the Chebyshev-extrema, then the analogue to the above is the use the chebyshev_weights_extrema() function.  For example,
 
 ```
 order_x1  = 5
