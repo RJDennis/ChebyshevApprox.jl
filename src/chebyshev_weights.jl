@@ -186,7 +186,7 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
       weights[i] = numerator/denominator
     
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
 
   end
@@ -240,7 +240,7 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T
       weights[i] = numerator/denominator
       
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
   
   end
@@ -281,7 +281,7 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
       weights[i] = numerator/denominator
       
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
   
   end
@@ -329,7 +329,7 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,
       weights[i] = numerator/denominator
       
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
   
   end
@@ -526,7 +526,7 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
       weights[i] = numerator/denominator
       
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
   
   end
@@ -580,7 +580,7 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{
       weights[i] = numerator/denominator
       
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
   
   end
@@ -621,7 +621,7 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
       weights[i] = numerator/denominator
       
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
   
   end
@@ -669,7 +669,7 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N
       weights[i] = numerator/denominator
       
     else
-      weights[i] = 0.0
+      weights[i] = zero(T)
     end
   
   end
