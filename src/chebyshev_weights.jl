@@ -16,14 +16,14 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
         num *= poly[j][s[j],i[j]]
-        dom *= poly[j][s[j],i[j]]
+        den *= poly[j][s[j],i[j]]
       end
 
       numerator   += num
-      denominator += dom^2
+      denominator += den^2
 
     end
 
@@ -36,6 +36,8 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
 end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  n = size(f)
 
   poly = Array{Array{T,2},1}(undef,N)
 
@@ -53,15 +55,19 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
-        pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-        num *= poly[j][s[j],i[j]]/(2^pow)
-        dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
+        scale = 1.0
+        if s[j] == 1 || s[j] == n[j]
+          scale *= 0.5  
+        end
+        temp = poly[j][s[j],i[j]]
+        num *= temp*scale
+        den *= (temp^2)*scale
       end
 
       numerator   += num
-      denominator += dom
+      denominator += den
 
     end
 
@@ -85,14 +91,14 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
         num *= poly[j][s[j],i[j]]
-        dom *= poly[j][s[j],i[j]]
+        den *= poly[j][s[j],i[j]]
       end
 
       numerator   += num
-      denominator += dom^2
+      denominator += den^2
 
     end
 
@@ -106,6 +112,8 @@ end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1}) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   weights = Array{T,N}(undef,Tuple(order.+1))
   
   @inbounds for i in CartesianIndices(weights)
@@ -116,15 +124,19 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
-        pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-        num *= poly[j][s[j],i[j]]/(2^pow)
-        dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
-      end
+        scale = 1.0
+        if s[j] == 1 || s[j] == n[j]
+          scale *= 0.5  
+        end
+        temp = poly[j][s[j],i[j]]
+        num *= temp*scale
+        den *= (temp^2)*scale
+    end
 
       numerator   += num
-      denominator += dom
+      denominator += den
 
     end
 
@@ -149,7 +161,7 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
     ord = (ord...,order)
   end
 
-  weights = zeros(ord.+1)
+  weights = Array{T,N}(undef,ord.+1)
 
   @inbounds for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
@@ -160,19 +172,21 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
       @inbounds for s in CartesianIndices(f)
 
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
           num *= poly[j][s[j],i[j]]
-          dom *= poly[j][s[j],i[j]]
+          den *= poly[j][s[j],i[j]]
         end
 
         numerator   += num
-        denominator += dom^2
+        denominator += den^2
 
       end
 
       weights[i] = numerator/denominator
     
+    else
+      weights[i] = 0.0
     end
 
   end
@@ -183,10 +197,12 @@ end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
-    poly[i] = chebyshev_polynomial(order,normalize_node(nodes[i],domain[:,i]))
+    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
   end
 
   ord = (order,)
@@ -194,37 +210,43 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T
     ord = (ord...,order)
   end
 
-  weights = zeros(ord.+1)
-
+  weights = Array{T,N}(undef,ord.+1)
+  
   @inbounds for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
 
       numerator   = zero(T)
       denominator = zero(T)
-
+  
       @inbounds for s in CartesianIndices(f)
-
+  
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
-          pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-          num *= poly[j][s[j],i[j]]/(2^pow)
-          dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
+          scale = 1.0
+          if s[j] == 1 || s[j] == n[j]
+            scale *= 0.5  
+          end
+          temp = poly[j][s[j],i[j]]
+          num *= temp*scale
+          den *= (temp^2)*scale
         end
-
+  
         numerator   += num
-        denominator += dom
-
+        denominator += den
+  
       end
-
+  
       weights[i] = numerator/denominator
-    
+      
+    else
+      weights[i] = 0.0
     end
-
+  
   end
-
+  
   return weights
-
+  
 end
 
 function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S) where {T<:AbstractFloat,N,S<:Integer}
@@ -234,7 +256,7 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
     ord = (ord...,order)
   end
   
-  weights = zeros(Tuple(ord.+1))
+  weights = Array{T,N}(undef,ord.+1)
   
   @inbounds @sync @qthreads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
@@ -245,19 +267,21 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
       @inbounds for s in CartesianIndices(f)
   
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
           num *= poly[j][s[j],i[j]]
-          dom *= poly[j][s[j],i[j]]
+          den *= poly[j][s[j],i[j]]
         end
   
         numerator   += num
-        denominator += dom^2
+        denominator += den^2
   
       end
   
       weights[i] = numerator/denominator
       
+    else
+      weights[i] = 0.0
     end
   
   end
@@ -268,14 +292,16 @@ end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   ord = (order,)
   for i = 2:N
     ord = (ord...,order)
   end
   
-  weights = zeros(Tuple(ord.+1))
+  weights = Array{T,N}(undef,ord.+1)
   
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
 
       numerator   = zero(T)
@@ -284,20 +310,26 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,
       @inbounds for s in CartesianIndices(f)
   
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
-          pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-          num *= poly[j][s[j],i[j]]/(2^pow)
-          dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
+          scale = 1.0
+          if s[j] == 1 || s[j] == n[j]
+            scale *= 0.5  
+          end
+          temp = poly[j][s[j],i[j]]
+          num *= temp*scale
+          den *= (temp^2)*scale
         end
   
         numerator   += num
-        denominator += dom
+        denominator += den
   
       end
   
       weights[i] = numerator/denominator
       
+    else
+      weights[i] = 0.0
     end
   
   end
@@ -324,14 +356,14 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
         num *= poly[j][s[j],i[j]]
-        dom *= poly[j][s[j],i[j]]
+        den *= poly[j][s[j],i[j]]
       end
 
       numerator   += num
-      denominator += dom^2
+      denominator += den^2
 
     end
 
@@ -344,6 +376,8 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
 end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  n = size(f)
 
   poly = Array{Array{T,2},1}(undef,N)
 
@@ -361,15 +395,19 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
-        pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-        num *= poly[j][s[j],i[j]]/(2^pow)
-        dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
+        scale = 1.0
+        if s[j] == 1 || s[j] == n[j]
+          scale *= 0.5  
+        end
+        temp = poly[j][s[j],i[j]]
+        num *= temp*scale
+        den *= (temp^2)*scale
       end
 
       numerator   += num
-      denominator += dom
+      denominator += den
 
     end
 
@@ -393,14 +431,14 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
         num *= poly[j][s[j],i[j]]
-        dom *= poly[j][s[j],i[j]]
+        den *= poly[j][s[j],i[j]]
       end
 
       numerator   += num
-      denominator += dom^2
+      denominator += den^2
 
     end
 
@@ -414,6 +452,8 @@ end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1}) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   weights = Array{T,N}(undef,Tuple(order.+1))
   
   @inbounds @sync @qthreads for i in CartesianIndices(weights)
@@ -424,15 +464,19 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N
     @inbounds for s in CartesianIndices(f)
 
       num = f[s]
-      dom = one(T)
+      den = one(T)
       @inbounds for j = 1:N
-        pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-        num *= poly[j][s[j],i[j]]/(2^pow)
-        dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
+        scale = 1.0
+        if s[j] == 1 || s[j] == n[j]
+          scale *= 0.5  
+        end
+        temp = poly[j][s[j],i[j]]
+        num *= temp*scale
+        den *= (temp^2)*scale
       end
 
       numerator   += num
-      denominator += dom
+      denominator += den
 
     end
 
@@ -457,7 +501,7 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
     ord = (ord...,order)
   end
   
-  weights = zeros(Tuple(ord.+1))
+  weights = Array{T,N}(undef,ord.+1)
   
   @inbounds @sync @qthreads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
@@ -468,19 +512,21 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
       @inbounds for s in CartesianIndices(f)
   
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
           num *= poly[j][s[j],i[j]]
-          dom *= poly[j][s[j],i[j]]
+          den *= poly[j][s[j],i[j]]
         end
   
         numerator   += num
-        denominator += dom^2
+        denominator += den^2
   
       end
   
       weights[i] = numerator/denominator
       
+    else
+      weights[i] = 0.0
     end
   
   end
@@ -490,6 +536,8 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
 end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  n = size(f)
 
   poly = Array{Array{T,2},1}(undef,N)
 
@@ -502,7 +550,7 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{
     ord = (ord...,order)
   end
   
-  weights = zeros(Tuple(ord.+1))
+  weights = Array{T,N}(undef,ord.+1)
   
   @inbounds @sync @qthreads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
@@ -513,20 +561,26 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{
       @inbounds for s in CartesianIndices(f)
   
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
-          pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-          num *= poly[j][s[j],i[j]]/(2^pow)
-          dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
+          scale = 1.0
+          if s[j] == 1 || s[j] == n[j]
+            scale *= 0.5  
+          end
+          temp = poly[j][s[j],i[j]]
+          num *= temp*scale
+          den *= (temp^2)*scale
         end
   
         numerator   += num
-        denominator += dom
+        denominator += den
   
       end
   
       weights[i] = numerator/denominator
       
+    else
+      weights[i] = 0.0
     end
   
   end
@@ -542,7 +596,7 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
     ord = (ord...,order)
   end
     
-  weights = zeros(Tuple(ord.+1))
+  weights = Array{T,N}(undef,ord.+1)
   
   @inbounds @sync @qthreads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
@@ -553,19 +607,21 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
       @inbounds for s in CartesianIndices(f)
   
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
           num *= poly[j][s[j],i[j]]
-          dom *= poly[j][s[j],i[j]]
+          den *= poly[j][s[j],i[j]]
         end
   
         numerator   += num
-        denominator += dom^2
+        denominator += den^2
   
       end
   
       weights[i] = numerator/denominator
       
+    else
+      weights[i] = 0.0
     end
   
   end
@@ -576,12 +632,14 @@ end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   ord = (order,)
   for i = 2:N
     ord = (ord...,order)
   end
     
-  weights = zeros(Tuple(ord.+1))
+  weights = Array{T,N}(undef,ord.+1)
   
   @inbounds @sync @qthreads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
@@ -592,20 +650,26 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N
       @inbounds for s in CartesianIndices(f)
   
         num = f[s]
-        dom = one(T)
+        den = one(T)
         @inbounds for j = 1:N
-          pow = (sum(s[j]==1)+sum(s[j]==length(nodes[j])))
-          num *= poly[j][s[j],i[j]]/(2^pow)
-          dom *= poly[j][s[j],i[j]]*poly[j][s[j],i[j]]/(2^pow)
+          scale = 1.0
+          if s[j] == 1 || s[j] == n[j]
+            scale *= 0.5  
+          end
+          temp = poly[j][s[j],i[j]]
+          num *= temp*scale
+          den *= (temp^2)*scale
         end
   
         numerator   += num
-        denominator += dom
+        denominator += den
   
       end
   
       weights[i] = numerator/denominator
       
+    else
+      weights[i] = 0.0
     end
   
   end
