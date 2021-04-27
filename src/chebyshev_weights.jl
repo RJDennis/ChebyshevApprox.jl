@@ -202,7 +202,7 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
-    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+    poly[i] = chebyshev_polynomial(order,normalize_node(nodes[i],domain[:,i]))
   end
 
   ord = (order,)
@@ -493,7 +493,7 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
-    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+    poly[i] = chebyshev_polynomial(order,normalize_node(nodes[i],domain[:,i]))
   end
 
   ord = (order,)
@@ -542,7 +542,7 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
-    poly[i] = chebyshev_polynomial(order[i],normalize_node(nodes[i],domain[:,i]))
+    poly[i] = chebyshev_polynomial(order,normalize_node(nodes[i],domain[:,i]))
   end
 
   ord = (order,)
