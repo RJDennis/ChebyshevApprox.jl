@@ -7,7 +7,7 @@ function chebyshev_evaluate(weights::Array{T,N},x::Array{T,1},order::Array{S,1},
     poly[i] = chebyshev_polynomial(order[i],normalize_node(x[i],domain[:,i]))
   end
 
-  yhat = 0.0
+  yhat = zero(T)
   @inbounds for i in CartesianIndices(weights)
     poly_product = poly[1][i[1]]
     @inbounds for j = 2:N
@@ -27,7 +27,7 @@ function chebyshev_evaluate(weights::Array{T,N},x::Array{T,1},order::S,domain=[o
     poly[i] = chebyshev_polynomial(order,normalize_node(x[i],domain[:,i]))
   end
 
-  yhat = 0.0
+  yhat = zero(T)
   @inbounds for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
       poly_product = poly[1][i[1]]

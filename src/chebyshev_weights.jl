@@ -15,15 +15,13 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
 
     @inbounds for s in CartesianIndices(f)
 
-      num = f[s]
-      den = one(T)
+      product = one(T)
       @inbounds for j = 1:N
-        num *= poly[j][s[j],i[j]]
-        den *= poly[j][s[j],i[j]]
+        product *= poly[j][s[j],i[j]]
       end
 
-      numerator   += num
-      denominator += den^2
+      numerator   += f[s]*product
+      denominator += product^2
 
     end
 
@@ -57,9 +55,10 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T
       num = f[s]
       den = one(T)
       @inbounds for j = 1:N
-        scale = 1.0
-        if s[j] == 1 || s[j] == n[j]
-          scale *= 0.5  
+        if s[j] === 1 || s[j] === n[j]
+          scale = 0.5  
+        else
+          scale = 1.0
         end
         temp = poly[j][s[j],i[j]]
         num *= temp*scale
@@ -90,15 +89,13 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
 
     @inbounds for s in CartesianIndices(f)
 
-      num = f[s]
-      den = one(T)
+      product = one(T)
       @inbounds for j = 1:N
-        num *= poly[j][s[j],i[j]]
-        den *= poly[j][s[j],i[j]]
+        product *= poly[j][s[j],i[j]]
       end
 
-      numerator   += num
-      denominator += den^2
+      numerator   += f[s]*product
+      denominator += product^2
 
     end
 
@@ -126,9 +123,10 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,
       num = f[s]
       den = one(T)
       @inbounds for j = 1:N
-        scale = 1.0
         if s[j] == 1 || s[j] == n[j]
-          scale *= 0.5  
+          scale = 0.5  
+        else
+          scale = 1.0
         end
         temp = poly[j][s[j],i[j]]
         num *= temp*scale
@@ -171,16 +169,14 @@ function chebyshev_weights(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},ord
 
       @inbounds for s in CartesianIndices(f)
 
-        num = f[s]
-        den = one(T)
+        product = one(T)
         @inbounds for j = 1:N
-          num *= poly[j][s[j],i[j]]
-          den *= poly[j][s[j],i[j]]
+          product *= poly[j][s[j],i[j]]
         end
-
-        numerator   += num
-        denominator += den^2
-
+  
+        numerator   += f[s]*product
+        denominator += product^2
+  
       end
 
       weights[i] = numerator/denominator
@@ -223,9 +219,10 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T
         num = f[s]
         den = one(T)
         @inbounds for j = 1:N
-          scale = 1.0
           if s[j] == 1 || s[j] == n[j]
-            scale *= 0.5  
+            scale = 0.5  
+          else
+            scale = 1.0
           end
           temp = poly[j][s[j],i[j]]
           num *= temp*scale
@@ -258,7 +255,7 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
   
   weights = Array{T,N}(undef,ord.+1)
   
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
 
       numerator   = zero(T)
@@ -266,16 +263,14 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
   
       @inbounds for s in CartesianIndices(f)
   
-        num = f[s]
-        den = one(T)
+        product = one(T)
         @inbounds for j = 1:N
-          num *= poly[j][s[j],i[j]]
-          den *= poly[j][s[j],i[j]]
+          product *= poly[j][s[j],i[j]]
         end
   
-        numerator   += num
-        denominator += den^2
-  
+        numerator   += f[s]*product
+        denominator += product^2
+    
       end
   
       weights[i] = numerator/denominator
@@ -312,9 +307,10 @@ function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,
         num = f[s]
         den = one(T)
         @inbounds for j = 1:N
-          scale = 1.0
           if s[j] == 1 || s[j] == n[j]
-            scale *= 0.5  
+            scale = 0.5  
+          else
+            scale = 1.0
           end
           temp = poly[j][s[j],i[j]]
           num *= temp*scale
@@ -355,15 +351,13 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
 
     @inbounds for s in CartesianIndices(f)
 
-      num = f[s]
-      den = one(T)
+      product = one(T)
       @inbounds for j = 1:N
-        num *= poly[j][s[j],i[j]]
-        den *= poly[j][s[j],i[j]]
+        product *= poly[j][s[j],i[j]]
       end
 
-      numerator   += num
-      denominator += den^2
+      numerator   += f[s]*product
+      denominator += product^2
 
     end
 
@@ -397,9 +391,10 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{
       num = f[s]
       den = one(T)
       @inbounds for j = 1:N
-        scale = 1.0
         if s[j] == 1 || s[j] == n[j]
-          scale *= 0.5  
+          scale = 0.5  
+        else
+          scale = 1.0
         end
         temp = poly[j][s[j],i[j]]
         num *= temp*scale
@@ -430,15 +425,13 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
 
     @inbounds for s in CartesianIndices(f)
 
-      num = f[s]
-      den = one(T)
+      product = one(T)
       @inbounds for j = 1:N
-        num *= poly[j][s[j],i[j]]
-        den *= poly[j][s[j],i[j]]
+        product *= poly[j][s[j],i[j]]
       end
 
-      numerator   += num
-      denominator += den^2
+      numerator   += f[s]*product
+      denominator += product^2
 
     end
 
@@ -466,9 +459,10 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N
       num = f[s]
       den = one(T)
       @inbounds for j = 1:N
-        scale = 1.0
         if s[j] == 1 || s[j] == n[j]
-          scale *= 0.5  
+          scale = 0.5  
+        else
+          scale = 1.0
         end
         temp = poly[j][s[j],i[j]]
         num *= temp*scale
@@ -511,16 +505,14 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
   
       @inbounds for s in CartesianIndices(f)
   
-        num = f[s]
-        den = one(T)
+        product = one(T)
         @inbounds for j = 1:N
-          num *= poly[j][s[j],i[j]]
-          den *= poly[j][s[j],i[j]]
+          product *= poly[j][s[j],i[j]]
         end
   
-        numerator   += num
-        denominator += den^2
-  
+        numerator   += f[s]*product
+        denominator += product^2
+    
       end
   
       weights[i] = numerator/denominator
@@ -563,9 +555,10 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{
         num = f[s]
         den = one(T)
         @inbounds for j = 1:N
-          scale = 1.0
           if s[j] == 1 || s[j] == n[j]
-            scale *= 0.5  
+            scale = 0.5  
+          else
+            scale = 1.0
           end
           temp = poly[j][s[j],i[j]]
           num *= temp*scale
@@ -606,16 +599,14 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
   
       @inbounds for s in CartesianIndices(f)
   
-        num = f[s]
-        den = one(T)
+        product = one(T)
         @inbounds for j = 1:N
-          num *= poly[j][s[j],i[j]]
-          den *= poly[j][s[j],i[j]]
+          product *= poly[j][s[j],i[j]]
         end
   
-        numerator   += num
-        denominator += den^2
-  
+        numerator   += f[s]*product
+        denominator += product^2
+    
       end
   
       weights[i] = numerator/denominator
@@ -652,9 +643,10 @@ function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N
         num = f[s]
         den = one(T)
         @inbounds for j = 1:N
-          scale = 1.0
           if s[j] == 1 || s[j] == n[j]
-            scale *= 0.5  
+            scale = 0.5  
+          else
+            scale = 1.0
           end
           temp = poly[j][s[j],i[j]]
           num *= temp*scale

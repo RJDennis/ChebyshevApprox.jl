@@ -13,7 +13,7 @@ function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},pos::S,order::Ar
     end
   end
 
-  derivative = 0.0
+  derivative = zero(T)
   @inbounds for i in CartesianIndices(weights)
     poly_product = poly[1][i[1]]
     @inbounds for j = 2:N
@@ -37,7 +37,7 @@ function chebyshev_derivative(weights::Array{T,N},x::Array{T,1},pos::S,order::S,
     end
   end
 
-  derivative = 0.0
+  derivative = zero(T)
   @inbounds for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order+N
       poly_product = poly[1][i[1]]
