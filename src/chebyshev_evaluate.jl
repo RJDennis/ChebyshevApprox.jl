@@ -68,6 +68,15 @@ function cheb_interp(cheb::ChebInterpExtrema,x::Array{T,1}) where {T<:AbstractFl
   
 end
 
+function cheb_interp(cheb::ChebInterpExtended,x::Array{T,1}) where {T<:AbstractFloat}
+
+  weights = chebyshev_weights_extended_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  yhat    = chebyshev_evaluate(weights,x,cheb.order,cheb.domain) 
+    
+  return yhat
+  
+end
+
 function chebyshev_evaluate(weights::Array{T,N},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N,S <: Integer}
 
   function chebeval(x::Array{T,1}) where {T <: AbstractFloat}
@@ -121,6 +130,20 @@ end
 function cheb_interp(cheb::ChebInterpExtrema)
 
   weights = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  
+  function chebeval(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_evaluate(weights,x,cheb.order,cheb.domain)
+
+  end
+
+  return chebeval
+
+end
+
+function cheb_interp(cheb::ChebInterpExtended)
+
+  weights = chebyshev_weights_extended_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
   
   function chebeval(x::Array{T,1}) where {T <: AbstractFloat}
 

@@ -78,6 +78,15 @@ function chebyshev_derivative(cheb::ChebInterpExtrema,x::Array{T,1},pos::S) wher
 
 end
 
+function chebyshev_derivative(cheb::ChebInterpExtended,x::Array{T,1},pos::S) where {T<:AbstractFloat,S<:Integer}
+
+  weights    = chebyshev_weights_extended_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  derivative = chebyshev_derivative(weights,x,pos,cheb.order,cheb.domain) 
+    
+  return derivative
+
+end
+
 # Regular functions for gradients
 
 function chebyshev_gradient(weights::Array{T,N},x::Array{T,1},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
@@ -124,6 +133,15 @@ end
 function chebyshev_gradient(cheb::ChebInterpExtrema,x::Array{T,1}) where {T<:AbstractFloat}
 
   weights  = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  gradient = chebyshev_gradient(weights,x,cheb.order,cheb.domain) 
+    
+  return gradient
+
+end
+
+function chebyshev_gradient(cheb::ChebInterpExtended,x::Array{T,1}) where {T<:AbstractFloat}
+
+  weights  = chebyshev_weights_extended_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
   gradient = chebyshev_gradient(weights,x,cheb.order,cheb.domain) 
     
   return gradient
@@ -194,6 +212,20 @@ function chebyshev_derivative(cheb::ChebInterpExtrema,pos::S) where {S <: Intege
 
 end
 
+function chebyshev_derivative(cheb::ChebInterpExtended,pos::S) where {S <: Integer}
+
+  weights = chebyshev_weights_extended_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+
+  function chebderiv(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_derivative(weights,x,pos,cheb.order,cheb.domain)
+
+  end
+
+  return chebderiv
+
+end
+
 function chebyshev_gradient(weights::Array{T,N},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T <: AbstractFloat,N,S <: Integer}
 
   function chebgrad(x::Array{T,1}) where {T <: AbstractFloat}
@@ -247,6 +279,20 @@ end
 function chebyshev_gradient(cheb::ChebInterpExtrema) where {S <: Integer}
 
   weights = chebyshev_weights_extrema_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+
+  function chebgrad(x::Array{T,1}) where {T <: AbstractFloat}
+
+    return chebyshev_gradient(weights,x,cheb.order,cheb.domain)
+
+  end
+
+  return chebgrad
+
+end
+
+function chebyshev_gradient(cheb::ChebInterpExtended) where {S <: Integer}
+
+  weights = chebyshev_weights_extended_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
 
   function chebgrad(x::Array{T,1}) where {T <: AbstractFloat}
 

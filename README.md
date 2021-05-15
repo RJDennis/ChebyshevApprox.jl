@@ -1,7 +1,7 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind) or the extrema (points of the second kind).  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
+ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), or the extended roots (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0).  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
 
 Installation
 ------------
@@ -30,7 +30,13 @@ where `n`, an integer, is the number of nodes.  Similarly, to compute the Chebys
 nodes = chebyshev_extrema(n)
 ```
 
-To compute nodes over bounded domains other than the [1.0,-1.0] interval, both functions accept a second argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
+The extended nodes over the [1.0,-1.0] interval are obtained from:
+
+```
+nodes = chebyshev_extended(n)
+```
+
+To compute nodes over bounded domains other than the [1.0,-1.0] interval, all three functions accept a second argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
 
 ```
 domain = [3.5,0.5]
@@ -63,7 +69,7 @@ then `p` will be a 2D array (11*6) containing the Chebyshev polynomials of order
 Structures
 ----------
 
-ChebyshevApprox contains three structures that can make your life easier.  The first contains the information needed to evaluate a polynomial at a point.  I.e.:
+ChebyshevApprox contains four structures that can make your life easier.  The first contains the information needed to evaluate a polynomial at a point.  I.e.:
 
 ```
 chebpoly = ChebPoly(w,order,domain)
@@ -71,24 +77,20 @@ chebpoly = ChebPoly(w,order,domain)
 
 where `order` would be an integer or a 1D array of integers.
 
-The second and third structures are interpolation objects, which are created as follows:
+The remaining three structures are interpolation objects, which are created as follows:
 
 ```
 cheby = ChebInterpRoots(y,nodes,order,domain)
-```
-
-and
-
-```
 cheby = ChebInterpExtrema(y,nodes,order,domain)
+cheby = ChebInterpExtended(y,nodes,order,domain)
 ```
 
-where `y` is an n-D array, `nodes` is a tuple, `order` would be an integer or a 1D array of integers, and `nodes` would be Chebyshev-roots in the former and Chebyshev-extrema in the latter.
+where `y` is an n-D array, `nodes` is a tuple, `order` would be an integer or a 1D array of integers, and `nodes` would be Chebyshev-roots in the first, Chebyshev-extrema in the second, and Chebyshev-extended-roots in the third.
 
 Weights
 -------
 
-We focus here on the case where the solution nodes are Chebyshev-roots and cover the case where they are Chebyshev-extrema subsequently.
+We focus here on the case where the solution nodes are Chebyshev-roots and cover the cases where they are Chebyshev-extrema and Chebyshev-extended-roots subsequently.
 
 ChebyshevApprox uses Chebyshev regression to compute the weights in the Chebyshev polynomial.  The central function for computing Chebyshev weights is the following:
 
@@ -148,6 +150,24 @@ nodes  = (nodes_x1,nodes_x2)
 domain = [domain_x1 domain_x2]
 
 w = chebyshev_weights_extrema(y,nodes,order,domain)
+```
+
+Finally, if the solution nodes are the Chebyshev-extended-roots, then use the chebyshev_weights_extended() function, as per:
+
+```
+order_x1  = 5
+nodes_x1  = chebyshev_extended(11)
+domain_x1 = [3.5,0.5]
+
+order_x2  = 7
+nodes_x2  = chebyshev_extended(15)
+domain_x2 = [1.7,-0.3]
+
+order  = [order_x1,order_x2]
+nodes  = (nodes_x1,nodes_x2)
+domain = [domain_x1 domain_x2]
+
+w = chebyshev_weights_extended(y,nodes,order,domain)
 ```
 
 Function evaluation
@@ -266,10 +286,11 @@ and
 w = chebyshev_weights_threaded(cheby)
 ```
 
-As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.  Threaded versions are also provided for the case where the nodes are Chebyshev-extrema, such as:
+As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.  Threaded versions are also provided for the cases where the nodes are Chebyshev-extrema and Chebyshev-extended-roots, such as:
 
 ```
 w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
 ```
 
 Summary
