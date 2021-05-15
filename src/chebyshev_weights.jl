@@ -35,6 +35,8 @@ end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
@@ -146,6 +148,8 @@ function chebyshev_weights(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},orde
 end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1}) where {T<:AbstractFloat,N,S<:Integer}
+
+  n = size(f)
 
   weights = Array{T,N}(undef,Tuple(order.+1))
   
@@ -267,6 +271,8 @@ end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+  
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
@@ -409,6 +415,8 @@ end
 
 function chebyshev_weights_extrema(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   ord = (order,)
   for i = 2:N
     ord = (ord...,order)
@@ -538,6 +546,8 @@ end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::Array{S,1},domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
 
+  n = size(f)
+
   poly = Array{Array{T,2},1}(undef,N)
 
   @inbounds for i = 1:N
@@ -649,6 +659,8 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
 end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::Array{S,1}) where {T<:AbstractFloat,N,S<:Integer}
+
+  n = size(f)
 
   weights = Array{T,N}(undef,Tuple(order.+1))
   
@@ -768,6 +780,8 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{
 end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},nodes::NTuple{N,Array{T,1}},order::S,domain=[ones(T,1,N);-ones(T,1,N)]) where {T<:AbstractFloat,N,S<:Integer}
+
+  n = size(f)
 
   poly = Array{Array{T,2},1}(undef,N)
 
@@ -910,6 +924,8 @@ function chebyshev_weights_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T
 end
 
 function chebyshev_weights_extrema_threaded(f::AbstractArray{T,N},poly::NTuple{N,Array{T,2}},order::S) where {T<:AbstractFloat,N,S<:Integer}
+
+  n = size(f)
 
   ord = (order,)
   for i = 2:N
