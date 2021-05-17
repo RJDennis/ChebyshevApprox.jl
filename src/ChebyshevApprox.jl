@@ -1,5 +1,6 @@
 module ChebyshevApprox
 
+using LinearAlgebra
 using ThreadPools
 
 include("structures.jl")
