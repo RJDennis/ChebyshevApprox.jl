@@ -1043,6 +1043,14 @@ function chebyshev_weights(cheb::ChebInterpExtended)
 
 end
 
+function chebyshev_weights(cheb::ChebInterpVertesi)
+  
+  weights = chebyshev_weights_vertesi_threaded(cheb.data,cheb.nodes,cheb.order,cheb.domain)
+  
+  return weights
+  
+end
+
 # Functions for the one-variable case where the nodes are a vector
 
 function chebyshev_weights(f::AbstractArray{T,1},nodes::Array{T,1},order::Union{S,Array{S,1}},domain=[one(T);-one(T)]) where {T<:AbstractFloat,S<:Integer}
@@ -1288,3 +1296,6 @@ function chebyshev_weights_extended_threaded(f::AbstractArray{T,N},poly::Array{A
   return weights
 
 end
+
+const chebyshev_weights_vertesi          = chebyshev_weights_extended
+const chebyshev_weights_vertesi_threaded = chebyshev_weights_extended_threaded
