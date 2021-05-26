@@ -86,7 +86,7 @@ The remaining four structures are interpolation objects, which are created as fo
 cheby = ChebInterpRoots(y,nodes,order,domain)
 cheby = ChebInterpExtrema(y,nodes,order,domain)
 cheby = ChebInterpExtended(y,nodes,order,domain)
-cheby = ChebInterpVertsi(y,nodes,order,domain)
+cheby = ChebInterpVertesi(y,nodes,order,domain)
 ```
 
 where `y` is an n-D array containing function-values evaluated at the nodes, `nodes` is a tuple, `order` would be an integer or a 1D array of integers, and `nodes` would be Chebyshev-roots in the first, Chebyshev-extrema in the second, Chebyshev-extended-roots in the third, and Chebyshev-Vertesi points in the fourth.
