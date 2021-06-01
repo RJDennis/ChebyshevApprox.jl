@@ -7,7 +7,7 @@ include("structures.jl")
 include("chebyshev_nodes.jl")
 include("chebyshev_extrema.jl")
 include("chebyshev_extended.jl")
-include("chebyshev_vertesi.jl")
+include("vertesi_nodes.jl")
 include("normalize_node.jl")
 include("chebyshev_polynomial.jl")
 include("chebyshev_weights.jl")
@@ -24,7 +24,7 @@ export ChebPoly,
 export chebyshev_nodes,
        chebyshev_extrema,
        chebyshev_extended,
-       chebyshev_vertesi,
+       vertesi_nodes,
        chebyshev_polynomial,
        chebyshev_weights,
        chebyshev_weights_extrema,

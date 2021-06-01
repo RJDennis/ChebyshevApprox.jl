@@ -1,4 +1,4 @@
-function chebyshev_vertesi(n::S,domain = [1.0,-1.0]) where {S <: Integer}
+function vertesi_nodes(n::S,domain = [1.0,-1.0]) where {S <: Integer}
 
   if n <= 0
     error("The number of nodes must be positive.")

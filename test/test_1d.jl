@@ -8,7 +8,7 @@ dom = [2.0,-3.0]
 nodesr  = chebyshev_nodes(n,dom)
 nodese  = chebyshev_extrema(n,dom)
 nodesex = chebyshev_extended(n,dom)
-nodesv  = chebyshev_vertesi(n,dom)
+nodesv  = vertesi_nodes(n,dom)
 
 yr  = zeros(n)
 ye  = zeros(n)
