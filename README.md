@@ -1,7 +1,7 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), or the Chebyshev-Vertesi points.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
+ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), or the Vertesi nodes.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
 
 Installation
 ------------
@@ -30,11 +30,11 @@ where `n`, an integer, is the number of nodes.  Similarly, to compute the Chebys
 nodes = chebyshev_extrema(n)
 ```
 
-The extended nodes and the Chebyshev-Vertesi nodes over the [1.0,-1.0] interval are obtained from:
+The extended nodes and the Vertesi nodes over the [1.0,-1.0] interval are obtained from:
 
 ```
 nodes = chebyshev_extended(n)
-nodes = chebyshev_vertesi(n)
+nodes = vertesi_nodes(n)
 ```
 
 respectively.
@@ -89,12 +89,12 @@ cheby = ChebInterpExtended(y,nodes,order,domain)
 cheby = ChebInterpVertesi(y,nodes,order,domain)
 ```
 
-where `y` is an n-D array containing function-values evaluated at the nodes, `nodes` is a tuple, `order` would be an integer or a 1D array of integers, and `nodes` would be Chebyshev-roots in the first, Chebyshev-extrema in the second, Chebyshev-extended-roots in the third, and Chebyshev-Vertesi points in the fourth.
+where `y` is an n-D array containing function-values evaluated at the nodes, `nodes` is a tuple, `order` would be an integer or a 1D array of integers, and `nodes` would be Chebyshev-roots in the first, Chebyshev-extrema in the second, Chebyshev-extended-roots in the third, and Vertesi nodes in the fourth.
 
 Weights
 -------
 
-We focus here on the case where the solution nodes are Chebyshev-roots and cover the cases where they are Chebyshev-extrema, Chebyshev-extended-roots, and Chebyshev-Vertesi-points subsequently.
+We focus here on the case where the solution nodes are Chebyshev-roots and cover the cases where they are Chebyshev-extrema, Chebyshev-extended-roots, and Vertesi-nodes subsequently.
 
 ChebyshevApprox uses Chebyshev regression to compute the weights in the Chebyshev polynomial.  The central function for computing Chebyshev weights is the following:
 
@@ -174,15 +174,15 @@ domain = [domain_x1 domain_x2]
 w = chebyshev_weights_extended(y,nodes,order,domain)
 ```
 
-Finally, if the solution nodes are the Chebyshev-Vertesi-points, then use the chebyshev_weights_vertesi() function:
+Finally, if the solution nodes are the Vertesi-nodes, then use the chebyshev_weights_vertesi() function:
 
 ```
 order_x1  = 5
-nodes_x1  = chebyshev_vertesi(11)
+nodes_x1  = vertesi_nodes(11)
 domain_x1 = [3.5,0.5]
 
 order_x2  = 7
-nodes_x2  = chebyshev_vertesi(15)
+nodes_x2  = vertesi_nodes(15)
 domain_x2 = [1.7,-0.3]
 
 order  = [order_x1,order_x2]
@@ -319,9 +319,4 @@ w = chebyshev_weights_vertesi_threaded(y,nodes,order,domain)
 What if I want to use my own set of nodes?
 ------------------------------------------
 
-You can.  The routines used for Chebyshev-extended-nodes and Cheyshev-Vertesi-points are general, so applying the functions for these cases to your own set of nodes should work.
-
-Summary
--------
-
-Have fun.
+You can.  The routines used for Chebyshev-extended-nodes and Vertesi-nodes are general, so applying the functions for these node-cases to your own set of nodes should work.
