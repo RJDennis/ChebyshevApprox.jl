@@ -39,7 +39,7 @@ nodes = vertesi_nodes(n)
 
 respectively.
 
-To compute nodes over bounded domains other than the [1.0,-1.0] interval, all three functions accept a second argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
+To compute nodes over bounded domains other than the [1.0,-1.0] interval, all four functions accept a second argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
 
 ```julia
 domain = [3.5,0.5]
