@@ -21,7 +21,7 @@ function chebyshev_polynomial(order::S,x::AbstractArray{T,1}) where {T<:Number,S
   polynomial[:,1] = ones(T,length(x))
   
   for i = 2:order+1
-    for j = 1:length(x)
+    for j in eachindex(x)
       if i == 2
         polynomial[j,i] = x[j]
       else
