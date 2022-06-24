@@ -3,17 +3,7 @@ module ChebyshevApprox
 using LinearAlgebra
 using ThreadPools
 
-include("structures.jl")
-include("chebyshev_nodes.jl")
-include("chebyshev_extrema.jl")
-include("chebyshev_extended.jl")
-include("vertesi_nodes.jl")
-include("chebyshev_quadrature.jl")
-include("normalize_node.jl")
-include("chebyshev_polynomial.jl")
-include("chebyshev_weights.jl")
-include("chebyshev_evaluate.jl")
-include("chebyshev_derivative.jl")
+include("chebyshev_approx_functions")
 include("clenshaw_evaluate_generated.jl")
 
 export ChebPoly,

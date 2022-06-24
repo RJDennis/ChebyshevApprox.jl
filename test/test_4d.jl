@@ -38,7 +38,7 @@ for i = 1:n1
   end
 end
 
-order_tensor = (7, 6, 6, 6)
+order_tensor = [7, 6, 6, 6]
 order_complete = 6
 
 wr_tensor   = chebyshev_weights(yr,[nodesr_1,nodesr_2,nodesr_3,nodesr_4],order_tensor,dom)

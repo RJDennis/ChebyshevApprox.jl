@@ -58,7 +58,7 @@ for i = 1:n1
   end
 end
 
-order_tensor = (6, 6, 6, 6, 6)
+order_tensor = [6, 6, 6, 6, 6]
 order_complete = 6
 
 wr_tensor    = chebyshev_weights_threaded(yr,[nodesr_1,nodesr_2,nodesr_3,nodesr_4,nodesr_5],order_tensor,dom)

@@ -78,7 +78,7 @@ ChebyshevApprox contains five structures that can make your life easier.  The fi
 chebpoly = ChebPoly(w,order,domain)
 ```
 
-where `order` would be an integer (complete polynomial) or a tuple of integers (tensor-product polynomial).
+where `order` would be an integer (complete polynomial) or a 1d array of integers (tensor-product polynomial).
 
 The remaining four structures are interpolation objects, which are created as follows:
 
@@ -89,7 +89,7 @@ cheby = ChebInterpExtended(y,nodes,order,domain)
 cheby = ChebInterpVertesi(y,nodes,order,domain)
 ```
 
-where `y` is an n-D array containing function-values evaluated at the nodes, `nodes` is a tuple, `order` would be an integer or a tuple of integers, and `nodes` would be Chebyshev-roots in the first, Chebyshev-extrema in the second, Chebyshev-extended-roots in the third, and Vertesi nodes in the fourth.
+where `y` is an n-D array containing function-values evaluated at the nodes, `nodes` is a tuple, `order` would be an integer or an array of integers, and `nodes` would be Chebyshev-roots in the first, Chebyshev-extrema in the second, Chebyshev-extended-roots in the third, and Vertesi nodes in the fourth.
 
 Weights
 -------
@@ -102,7 +102,7 @@ ChebyshevApprox uses Chebyshev regression to compute the weights in the Chebyshe
 w = chebyshev_weights(y,nodes,order,domain)
 ```
 
-where `y` is a n-D array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing Chebyshev-roots, 'order' is a tuple (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
+where `y` is a n-D array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing Chebyshev-roots, 'order' is a 1d array (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
 
 ```julia
 order_x1  = 5
@@ -213,7 +213,7 @@ or
 yhat = chebyshev_evaluate(cheby,x)
 ```
 
-are equivalent.  For the case where a complete polynomial rather than a tensor-product polynomial is to be evaluated, the commands are the same as above, but the `order` variable is now simply an integer rather than a tuple of integers.
+are equivalent.  For the case where a complete polynomial rather than a tensor-product polynomial is to be evaluated, the commands are the same as above, but the `order` variable is now simply an integer rather than a 1d array of integers.
 
 ChebyshevApprox also allows the following:
 
