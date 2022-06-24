@@ -3,7 +3,7 @@ module ChebyshevApprox
 using LinearAlgebra
 using ThreadPools
 
-include("chebyshev_approx_functions")
+include("chebyshev_approx_functions.jl")
 include("clenshaw_evaluate_generated.jl")
 
 export ChebPoly,
