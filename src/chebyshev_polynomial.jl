@@ -1,56 +1,79 @@
-function chebyshev_polynomial(order::S,x::T) where {T<:Number,S<:Integer}
+function chebyshev_polynomial(order::S,x::T) where {S<:Integer,T<:Number}
 
   polynomial    = Array{T}(undef,1,order+1)
   polynomial[1] = one(T)
-  
+
   for i = 2:order+1
-    if i == 2
-      polynomial[i] = x
-    else
-      polynomial[i] = 2*x*polynomial[i-1]-polynomial[i-2]
-    end
+      if i == 2
+          polynomial[i] = x
+      else
+          polynomial[i] = 2*x*polynomial[i-1]-polynomial[i-2]
+      end
   end
-  
+
   return polynomial
-  
+
 end
-  
-function chebyshev_polynomial(order::S,x::AbstractArray{T,1}) where {T<:Number,S<:Integer}
-  
+
+function chebyshev_polynomial(order::S,x::Array{T,1}) where {S<:Integer,T<:Number}
+
   polynomial      = Array{T}(undef,length(x),order+1)
   polynomial[:,1] = ones(T,length(x))
-  
+
   for i = 2:order+1
-    for j in eachindex(x)
-      if i == 2
-        polynomial[j,i] = x[j]
-      else
-        polynomial[j,i] = 2*x[j]*polynomial[j,i-1]-polynomial[j,i-2]
+      for j in eachindex(x)
+          if i == 2
+              polynomial[j,i] = x[j]
+          else
+              polynomial[j,i] = 2*x[j]*polynomial[j,i-1]-polynomial[j,i-2]
+          end
       end
-    end
   end
-  
+
   return polynomial
-  
+
 end
-  
-function derivative_of_chebyshev_polynomial(order::S,x::T) where {T<:Number,S<:Integer}
-  
+
+function derivative_of_chebyshev_polynomial(order::S,x::T) where {S<:Integer,T<:Number}
+
   polynomial    = Array{T}(undef,1,order+1)
   poly_deriv    = Array{T}(undef,1,order+1)
   polynomial[1] = one(T)
   poly_deriv[1] = zero(T)
-  
+
   for i = 2:order+1
-    if i == 2
-      polynomial[i] = x
-      poly_deriv[i] = one(T)
-    else
-      polynomial[i] = 2*x*polynomial[i-1]-polynomial[i-2]
-      poly_deriv[i] = 2*polynomial[i-1]+2*x*poly_deriv[i-1]-poly_deriv[i-2] 
-    end
+      if i == 2
+          polynomial[i] = x
+          poly_deriv[i] = one(T)
+      else
+          polynomial[i] = 2*x*polynomial[i-1]-polynomial[i-2]
+          poly_deriv[i] = 2*polynomial[i-1]+2*x*poly_deriv[i-1]-poly_deriv[i-2] 
+      end
   end
-  
+
   return poly_deriv
-  
+
+end
+
+function derivative_of_chebyshev_polynomial(order::S,x::Array{T,1}) where {S<:Integer,T<:Number}
+
+  polynomial    = Array{T}(undef,length(x),order+1)
+  poly_deriv    = Array{T}(undef,length(x),order+1)
+  polynomial[:,1] = one(T,length(x))
+  poly_deriv[:,1] = zero(T,length(x))
+
+  for i = 2:order+1
+      for j in eachindex(x)
+          if i == 2
+              polynomial[j,i] = x[j]
+              poly_deriv[j,i] = one(T)
+          else
+              polynomial[j,i] = 2*x[j]*polynomial[j,i-1]-polynomial[j,i-2]
+              poly_deriv[j,i] = 2*polynomial[j,i-1]+2*x[j]*poly_deriv[j,i-1]-poly_deriv[j,i-2] 
+          end
+      end
+  end
+
+  return poly_deriv
+
 end

@@ -316,7 +316,19 @@ w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
 w = chebyshev_weights_vertesi_threaded(y,nodes,order,domain)
 ```
 
-What if I want to use my own set of nodes?
-------------------------------------------
+Related packages
+----------------
 
-You can.  The routines used for Chebyshev-extended-nodes and Vertesi-nodes are general, so applying the functions for these node-cases to your own set of nodes should work.
+If you are looking to approximate a function of one variable, then there is:
+
+- ApproxFun.jl
+
+For multivariate functions, there is:
+
+- SmolyakApprox.jl
+- HyperbolicCrossApprox.jl
+- PiecewiseLinearApprox.jl
+
+Finally, if you are approximating complex-valued multivariate functions, then a package insipired by ChebyshevApprox.jl and offering similar functionality is:
+
+- FastChebInterp.jl
