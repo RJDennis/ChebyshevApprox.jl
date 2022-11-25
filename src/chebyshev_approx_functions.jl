@@ -106,7 +106,7 @@ function chebyshev_extended(n::S,domain = [1.0,-1.0]) where {S <: Integer}
     nodes[end-i+1] = -x
   end
   
-  return (domain[1]+domain[2])*0.5 .+ nodes*((domain[1]-domain[2])*0.5)/cos(π/(2N))
+  return (domain[1]+domain[2])*0.5 .+ nodes*((domain[1]-domain[2])*0.5)/cos(π/(2n))
   
 end
 
