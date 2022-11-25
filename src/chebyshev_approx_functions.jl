@@ -97,16 +97,16 @@ function chebyshev_extended(n::S,domain = [1.0,-1.0]) where {S <: Integer}
   nodes = zeros(n)
   
   if isodd(n)
-    nodes[div(n-1,2)+1] = (domain[1]+domain[2])/2.0
+    nodes[div(n-1,2)+1] = 0.0
   end
   
   for i = 1:div(n,2)
-    x = -cos((i-0.5)*pi/n)*(domain[1]-domain[2])/2.0
-    nodes[i]       = (domain[1]+domain[2])/2.0  + x
-    nodes[end-i+1] = (domain[1]+domain[2])/2.0  - x
+    x = -cos((i-0.5)*pi/n)
+    nodes[i]       = x
+    nodes[end-i+1] = -x
   end
   
-  return nodes/(cos(pi/(2n)))
+  return (domain[1]+domain[2])*0.5 .+ nodes*((domain[1]-domain[2])*0.5)/cos(π/(2N))
   
 end
 
@@ -148,6 +148,49 @@ function vertesi_nodes(n::S,domain = [1.0,-1.0]) where {S <: Integer}
       
   end
       
+end
+
+function legendre_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
+
+  points = Array{Float64,1}(undef, N)
+  update = Array{Float64,1}(undef, N)
+
+  p = zeros(N, N)
+
+  if isodd(N)
+    points[div(N - 1, 2)+1] = 0.0
+  end
+
+  if N == 1
+    point[1] = (domain[1] + domain[2]) * 0.5
+    return points
+  else
+    points[begin] = -1.0
+    points[end] = 1.0
+
+    @inbounds for i = 2:div((N - 1), 2)
+      points[i] = -cos(π * (i - 1) / (N - 1))
+      points[end-i+1] = cos(π * (i - 1) / (N - 1))
+    end
+
+    p[:, 1] .= 1.0
+
+    len = Inf
+    @views while len > eps(1.0)
+      p[:, 2] .= points
+      @inbounds for i = 2:(N-1)
+        p[:, i+1] .= ((2i - 1) * points .* p[:, i] .- (i - 1) * p[:, i-1]) / i
+      end
+      update .= (points .* p[:, end] .- p[:, end-1]) ./ (N * p[:, end])
+      points .-= update
+      len = maximum(abs, update)
+    end
+
+    points .= (domain[1] + domain[2]) * 0.5 .+ points * ((domain[1] - domain[2]) * 0.5)
+
+    return points
+  end
+
 end
 
 function chebyshev_quadrature(node_type::Function,n::S,domain = [1.0,-1.0]) where {S <: Integer}
@@ -277,8 +320,8 @@ function derivative_of_chebyshev_polynomial(order::S,x::AbstractArray{T,1}) wher
 
   polynomial    = Array{T}(undef,length(x),order+1)
   poly_deriv    = Array{T}(undef,length(x),order+1)
-  polynomial[:,1] = one(T,length(x))
-  poly_deriv[:,1] = zero(T,length(x))
+  polynomial[:,1] = ones(T,length(x))
+  poly_deriv[:,1] = zeros(T,length(x))
 
   for i = 2:order+1
       for j in eachindex(x)
