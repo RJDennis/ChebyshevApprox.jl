@@ -4,6 +4,8 @@
 
 ##################################
 
+using ChebyshevApprox
+
 # Test the construction of nodes
 
 nodes(111, :chebyshev_nodes)
