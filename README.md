@@ -1,4 +1,4 @@
-ChebyshevApprox
+**ChebyshevApprox**
 ===============
 
 ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), or the Vertesi nodes.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
