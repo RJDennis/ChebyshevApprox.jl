@@ -1,57 +1,113 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), or the Vertesi nodes.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives and gradients.
+ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), the Vertesi nodes, or the Legendre nodes.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives, gradients, and hessians.
 
 Installation
 ------------
 
-ChebyshevApprox is a registered package.  To install it simply type in the REPL:
+ChebyshevApprox.jl is a registered package.  To install it simply type in the REPL:
 
 ```julia
 using Pkg
 Pkg.add("ChebyshevApprox")
-````
+```
 
 Nodes
 -----
 
-The package contains functions for computing both the roots of the Chebyshev polynomial and the extrema of the Chebyshev polynominal.  Depending of the application, you may wish to use one or the other.
+The package contains functions for computing servel different types of approximating points.  Which points you use may depend on your application.
 
 To compute the Chebyshev roots within the [1.0, -1.0] interval use:
 
 ```julia
-nodes = chebyshev_nodes(n)
+n = 11
+points = nodes(n,:chebyshev_nodes)
 ```
 
-where `n`, an integer, is the number of nodes.  Similarly, to compute the Chebyshev extrema within the [1.0,-1.0] interval use:
+where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol indicated the type of nodes to be produced.  Alternatives to `:chebyshev_nodes` are: `chebyshev_extrema`, `:chebyshev_extended`, `:vertesi_nodes`, and `:legendre_nodes`. 
 
-```julia
-nodes = chebyshev_extrema(n)
-```
-
-The extended nodes and the Vertesi nodes over the [1.0,-1.0] interval are obtained from:
-
-```julia
-nodes = chebyshev_extended(n)
-nodes = vertesi_nodes(n)
-```
-
-respectively.
-
-To compute nodes over bounded domains other than the [1.0,-1.0] interval, all four functions accept a second argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
+To compute nodes over bounded domains other than the [1.0,-1.0] interval, the `nodes` function accepts an optional third argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
 
 ```julia
 domain = [3.5,0.5]
-nodes = chebyshev_nodes(n,domain)
+points = nodes(n,:chebyshev_extrema,domain)
 ```
 
-would compute `n` roots of the Chebyshev polynomial and scale those roots to the [3.5,0.5] interval.
+would compute `n` extrema of the Chebyshev polynomial and scale those points to the [3.5,0.5] interval.
+
+Grids
+-----
+
+Once the approximating points have been computed, these points can be collected together in a `Grid` structure:
+
+```julia
+p1 = nodes(11,:chebyshev_nodes)
+p2 = nodes(15,:chebyshev_nodes)
+
+g = Grid((p1,p2))
+```
+
+Approximation Plans
+-------------------
+
+The approximate a function, the package makes use of an approximation plan, which is a stucture containing the information needed to produce an approximating function.
+
+```julia
+A_plan = ApproxPlan(g,order,domain)
+```
+
+where `g` is a Grid, `order` is an integer (complete polynomial approximation) or a tuple (tensor-product approximation), and `domain` is an array containing the upper and lower limits for each variable.  For example,
+
+```julia
+dom_1 = [5.0,3.0]
+dom_2 = [1.5,-0.5]
+dom = [dom_1 dom_2]
+
+p1 = nodes(11,:chebyshev_nodes,dom_1)
+p2 = nodes(15,:chebyshev_nodes,dom_2)
+
+g = Grid((p1,p2))
+order = (6,6)
+A_plan = ApproxPlan(g,order,dom)
+```
+
+Function approximation
+----------------------
+
+To approximate a function, you use the `chebyshev_interp` function, which itself returns a function.  If the data on the function you wish to approximate, sampled on the Grid, `g`, are contained in the Array, `y`, then the approximating function is generated using:
+
+```julia
+f_approx = chebyshev_interp(y,A_plan)
+```
+
+which can then be evaluated at a point, `x`, in the domain according to:
+
+```julia
+x = [2.0,0.1]
+y_hat = f_approx(x)
+```
+
+Functions to approximate gradients and hessians are produced similarly:
+
+```julia
+f_grad = chebyshev_gradient(y,A_plan)
+f_hess = chebyshev_hessian(y,A_plan)
+grad_hat = f_grad(x)
+hess_hat = f_hess(x)
+```
+
+There are multi-threaded versions of these functions: `chebyshev_interp_threaded()`, `chebyshev_gradient_threaded()`, and `chebyshev_hessian_threaded()`.
+
+Under the hood
+--------------
+
+The functions documented above should cover a lot of use cases.  However, the machinery used to produce the chebyshev polynomials, find the polynomial weights, and evaluate polynomials at given points---which took center stage in releases before version 0.3.0---is still there and can be used as before.  As such this 0.3.x release is (mostly) not expected to be code-breaking (some stuctures have gone, but I don't think they were used much anyway).
 
 Polynomials
 -----------
 
-Chebyshev polynomials are constructed using the chebyshev_polynomial() function, which takes two arguments.  The first argument is an integer representing the order of the polynomial.  The second argument is the point in the [1.0,-1.0] interval at which the polynominal is evaluated.  This second argument can be a scalar or a 1D array.  For example,
+Chebyshev polynomials are constructed using the `chebyshev_polynomial()` function, which takes two arguments.  The first argument is an integer representing the order of the polynomial.  The second argument is the point in the [1.0,-1.0] interval at which the polynominal is evaluated.  This second argument can be a scalar or a 1D array.  For example,
 
 ```julia
 order = 5
@@ -67,42 +123,18 @@ x = chebyshev_nodes(11)
 p = chebyshev_polynomial(order,x)
 ```
 
-then `p` will be a 2D array (11*6) containing the Chebyshev polynomials of orders 0---5 evaluated at each element in `x`.
-
-Structures
-----------
-
-ChebyshevApprox contains five structures that can make your life easier.  The first contains the information needed to evaluate a polynomial at a point.  I.e.:
-
-```julia
-chebpoly = ChebPoly(w,order,domain)
-```
-
-where `order` would be an integer (complete polynomial) or a 1d array of integers (tensor-product polynomial).
-
-The remaining four structures are interpolation objects, which are created as follows:
-
-```julia
-cheby = ChebInterpRoots(y,nodes,order,domain)
-cheby = ChebInterpExtrema(y,nodes,order,domain)
-cheby = ChebInterpExtended(y,nodes,order,domain)
-cheby = ChebInterpVertesi(y,nodes,order,domain)
-```
-
-where `y` is an n-D array containing function-values evaluated at the nodes, `nodes` is a tuple, `order` would be an integer or an array of integers, and `nodes` would be Chebyshev-roots in the first, Chebyshev-extrema in the second, Chebyshev-extended-roots in the third, and Vertesi nodes in the fourth.
+then `p` will be a 2D array (11 $\times$ 6) containing the Chebyshev polynomials of orders 0---5 evaluated at each element in `x`.
 
 Weights
 -------
 
-We focus here on the case where the solution nodes are Chebyshev-roots and cover the cases where they are Chebyshev-extrema, Chebyshev-extended-roots, and Vertesi-nodes subsequently.
-
-ChebyshevApprox uses Chebyshev regression to compute the weights in the Chebyshev polynomial.  The central function for computing Chebyshev weights is the following:
+ChebyshevApprox.jl uses Chebyshev regression to compute the weights in the Chebyshev polynomial.  The central function for computing Chebyshev weights is the following:
 
 ```julia
 w = chebyshev_weights(y,nodes,order,domain)
 ```
 
-where `y` is a n-D array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing Chebyshev-roots, 'order' is a 1d array (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
+where `y` is a n-D array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing Chebyshev-roots, `order` is a tuple (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
 
 ```julia
 order_x1  = 5
@@ -113,32 +145,26 @@ order_x2  = 7
 nodes_x2  = chebyshev_nodes(15)
 domain_x2 = [1.7,-0.3]
 
-order  = [order_x1,order_x2]
+order  = (order_x1,order_x2)
 nodes  = (nodes_x1,nodes_x2)
 domain = [domain_x1 domain_x2]
 
 w = chebyshev_weights(y,nodes,order,domain)
 ```
 
-would compute the weights, `w`, (a 2D array in this example) in a tensor-product polynomial.  The domain-argument is optional, needed only if one or more variable does not have domain [1.0,-1.0].  The nodes-argument can be an array-of-arrays (instead of a tuple).  Alternatively, the polynominals can be computed and entered directly into the chebyshev_weights() function:
+would compute the weights, `w`, (a 2D array in this example) in a tensor-product polynomial.  The domain-argument is optional, needed only if one or more variable does not have domain [1.0,-1.0].  The nodes-argument can be an array-of-arrays (instead of a tuple).  Alternatively, the polynominals can be computed and entered directly into the `chebyshev_weights()` function:
 
 ```julia
-p1   = chebyshev_polynomial(order_x1,nodes_x1)
-p2   = chebyshev_polynomial(order_x2,nodes_x2)
-poly = (p1,p2)
+poly_1 = chebyshev_polynomial(order_x1,nodes_x1)
+poly_2 = chebyshev_polynomial(order_x2,nodes_x2)
+poly   = (poly_1,poly_2)
 
 w = chebyshev_weights(y,poly,order)
 ```
 
-The poly-argument can be an array-of-arrays (instead of a tuple).  Further, using the ChebInterp structure:
+The `poly`-argument can be an array-of-arrays (instead of a tuple).  The weights, `w` are returned in a (multi-dimensional) array.
 
-```julia
-w = chebyshev_weights(cheb)
-```
-
-For all of these functions the `weights` are returned in a (multi-dimensional) array.
-
-If the solution nodes are instead the Chebyshev-extrema, then the analogue to the above is the use the chebyshev_weights_extrema() function.  For example,
+If the solution nodes are instead the Chebyshev-extrema, then the analogue to the above is the use the chebyshev_weights_extrema() function.  For example:
 
 ```julia
 order_x1  = 5
@@ -156,164 +182,59 @@ domain = [domain_x1 domain_x2]
 w = chebyshev_weights_extrema(y,nodes,order,domain)
 ```
 
-If the solution nodes are the Chebyshev-extended-roots, then use the chebyshev_weights_extended() function, as per:
-
-```julia
-order_x1  = 5
-nodes_x1  = chebyshev_extended(11)
-domain_x1 = [3.5,0.5]
-
-order_x2  = 7
-nodes_x2  = chebyshev_extended(15)
-domain_x2 = [1.7,-0.3]
-
-order  = [order_x1,order_x2]
-nodes  = (nodes_x1,nodes_x2)
-domain = [domain_x1 domain_x2]
-
-w = chebyshev_weights_extended(y,nodes,order,domain)
-```
-
-Finally, if the solution nodes are the Vertesi-nodes, then use the chebyshev_weights_vertesi() function:
-
-```julia
-order_x1  = 5
-nodes_x1  = vertesi_nodes(11)
-domain_x1 = [3.5,0.5]
-
-order_x2  = 7
-nodes_x2  = vertesi_nodes(15)
-domain_x2 = [1.7,-0.3]
-
-order  = [order_x1,order_x2]
-nodes  = (nodes_x1,nodes_x2)
-domain = [domain_x1 domain_x2]
-
-w = chebyshev_weights_vertesi(y,nodes,order,domain)
-```
+Other possibilities are to use `chebyshev_weights_extended()`, `chebyshev_weights_vertesi()`, or `chebyshev_weights_legendre()`.
 
 Function evaluation
 -------------------
 
-ChebyshevApprox uses the chebyshev_evaluate() function, which accommodates several methods, to evaluate Chebyshev polynomials.  If `x` is a 1D array representing the point at which the polynomial is to be evaluated, then:
+ChebyshevApprox uses the `chebyshev_evaluate()` function, which accommodates several methods, to evaluate Chebyshev polynomials.  If `x` is a 1D array representing the point at which the polynomial is to be evaluated, then:
 
 ```julia
 yhat = chebyshev_evaluate(w,x,order,domain)
 ```
 
-or
-
-```julia
-yhat = chebyshev_evaluate(chebpoly,x)
-```
-
-or
-
-```julia
-yhat = chebyshev_evaluate(cheby,x)
-```
-
-are equivalent.  For the case where a complete polynomial rather than a tensor-product polynomial is to be evaluated, the commands are the same as above, but the `order` variable is now simply an integer rather than a 1d array of integers.
-
-ChebyshevApprox also allows the following:
-
-```julia
-cheb = chebyshev_evaluate(w,order,domain)
-```
-
-or
-
-```julia
-cheb = chebyshev_evaluate(chebpoly)
-```
-
-or
-
-```julia
-cheb = cheb_interp(cheby)
-```
-
-followed by
-
-```julia
-yhat = cheb(x)
-```
-
-allowing polynomials to be easily evaluated at point `x`.
+For the case where a complete polynomial rather than a tensor-product polynomial is to be evaluated, the `order` variable is now simply an integer rather than a tuple of integers.
 
 Derivatives
 -----------
 
-The chebyshev_derivative() function can be used to approximate the partial derivative of a function with respect to a designated variable.  For example, the partial derivative with respect to the 3'rd variable evaluated at point `x` can be computed by:
+The `chebyshev_derivative()` function can be used to approximate the partial derivative of a function with respect to a designated variable.  For example, the partial derivative with respect to the 3'rd variable evaluated at point `x` can be computed by:
 
 ```julia
 deriv = chebyshev_derivative(w,x,3,order,domain)
 ```
 
-or
-
-```julia
-deriv = chebyshev_derivative(chebpoly,x,3)
-```
-
-or
-
-```julia
-deriv = chebyshev_derivative(cheby,x,3)
-```
-
-where `deriv` that is returned is a floating point number.
+where `deriv` is a floating point number.
 
 Gradients
 ---------
 
-Gradients are computed using the chebyshev_gradient() function.
+Gradients are computed using the `chebyshev_gradient()` function.
 
 ```julia
 grad = chebyshev_gradient(w,x,order,domain)
 ```
 
-or
-
-```julia
-grad = chebyshev_gradient(chebpoly,x)
-```
-
-or
-
-```julia
-grad = chebyshev_gradient(cheby,x)
-```
-
-where `grad` that is returned is a 2D array with one row.
+where `grad` is a 2D array with one row.
 
 Multi-threading
 ---------------
 
-Computing the weights in a multivariate Chebyshev polynomial can be time-consuming for functions whose dimensions are large, or where the number of nodes and/or the order of the polynomals is large.  For this reason, multi-threaded functions for computing the weights are provided.  If the nodes are Chebyshev-roots:
+Computing the weights in a multivariate Chebyshev polynomial can be time-consuming for functions whose dimensions are large, or where the number of nodes and/or the order of the polynomals is large.  For this reason, multi-threaded functions for computing the weights are provided.  For example, if the nodes are Chebyshev-roots:
 
 ```julia
 w = chebyshev_weights_threaded(y,nodes,order,domain)
 ```
 
-and
+etc.
 
-```julia
-w = chebyshev_weights_threaded(y,poly,order)
-```
-
-and
-
-```julia
-w = chebyshev_weights_threaded(cheby)
-```
-
-As earlier, these functions can be used to compute weights for either tensor-product polynomials or complete polynomials.  Threaded versions are also provided for the cases where the nodes are Chebyshev-extrema, Chebyshev-extended-roots, and Chebyshev-Vertesi-points, such as:
+For completeness, there are also:
 
 ```julia
 w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
 w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
 w = chebyshev_weights_vertesi_threaded(y,nodes,order,domain)
+w = chebyshev_weights_legendre_threaded(y,nodes,order,domain)
 ```
 
 Related packages
