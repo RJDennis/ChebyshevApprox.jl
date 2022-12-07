@@ -1,5 +1,5 @@
 abstract type Nodes end
-abstract type ApproximationPlan end
+abstract type CApproximationPlan end
 
 struct ChebRoots{T<:AbstractFloat} <: Nodes
 
@@ -49,7 +49,7 @@ struct ChebPoly{T<:AbstractFloat} # Holds polynomials as well as their first- an
 
 end
 
-struct ApproxPlan{G<:Grid,S<:Integer,T<:AbstractFloat} <: ApproximationPlan
+struct CApproxPlan{G<:Grid,S<:Integer,T<:AbstractFloat} <: CApproximationPlan
 
   grid::G
   order::Union{S,Tuple{Vararg{S}}}
@@ -57,7 +57,7 @@ struct ApproxPlan{G<:Grid,S<:Integer,T<:AbstractFloat} <: ApproximationPlan
 
 end
 
-struct ApproxPlanPoly{N,T<:AbstractFloat,S<:Integer,G<:ChebPoly} <: ApproximationPlan
+struct CApproxPlanPoly{N,T<:AbstractFloat,S<:Integer,G<:ChebPoly} <: CApproximationPlan
 
   polys::NTuple{N,G}
   order::Union{S,Tuple{Vararg{S}}}
@@ -467,9 +467,9 @@ function chebyshev_polynomial_sec_deriv(order::S, g::G) where {G<:Nodes,S<:Integ
 
 end
 
-function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
-  if typeof(plan) <: ApproxPlan
+  if typeof(plan) <: CApproxPlan
 
     nodes = Array{Array{T,1},1}(undef, length(plan.grid.grid))
     for i in eachindex(plan.grid.grid)
@@ -484,7 +484,7 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
       return chebyshev_weights_extended(y, tuple(nodes...), plan.order, plan.domain)
     end
 
-  elseif typeof(plan) <: ApproxPlanPoly
+  elseif typeof(plan) <: CApproxPlanPoly
 
     polynomials = Array{Array{T,2},1}(undef, length(plan.polys))
     for i in eachindex(plan.polys)
@@ -503,9 +503,9 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
 
 end
 
-function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
-  if typeof(plan) <: ApproxPlan
+  if typeof(plan) <: CApproxPlan
 
     nodes = Array{Array{T,1},1}(undef, length(plan.grid.grid))
     for i in eachindex(plan.grid.grid)
@@ -520,7 +520,7 @@ function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Ab
       return chebyshev_weights_extended_threaded(y, tuple(nodes...), plan.order, plan.domain)
     end
 
-  elseif typeof(plan) <: ApproxPlanPoly
+  elseif typeof(plan) <: CApproxPlanPoly
 
     polynomials = Array{Array{T,2},1}(undef, length(plan.polys))
     for i in eachindex(plan.polys)
@@ -1648,7 +1648,7 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
 
 end
 
-function chebyshev_interp(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_interp(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
 
@@ -1664,7 +1664,7 @@ function chebyshev_interp(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:App
 
 end
 
-function chebyshev_interp_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_interp_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
 
@@ -1758,7 +1758,7 @@ function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::S
 
 end
 
-function chebyshev_gradient(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_gradient(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
 
@@ -1774,7 +1774,7 @@ function chebyshev_gradient(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:A
 
 end
 
-function chebyshev_gradient_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_gradient_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
 
@@ -1858,7 +1858,7 @@ function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::S,
 
 end
 
-function chebyshev_hessian(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_hessian(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
 
@@ -1874,7 +1874,7 @@ function chebyshev_hessian(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:Ap
 
 end
 
-function chebyshev_hessian_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:ApproximationPlan,N}
+function chebyshev_hessian_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
 

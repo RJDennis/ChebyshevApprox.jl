@@ -25,7 +25,7 @@ n = 11
 points = nodes(n,:chebyshev_nodes)
 ```
 
-where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol indicated the type of nodes to be produced.  Alternatives to `:chebyshev_nodes` are: `chebyshev_extrema`, `:chebyshev_extended`, `:vertesi_nodes`, and `:legendre_nodes`. 
+where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol indicating the type of nodes to be produced.  Alternatives to `:chebyshev_nodes` are: `chebyshev_extrema`, `:chebyshev_extended`, `:vertesi_nodes`, and `:legendre_nodes`. 
 
 To compute nodes over bounded domains other than the [1.0,-1.0] interval, the `nodes` function accepts an optional third argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
 
@@ -115,7 +115,7 @@ x = 0.5
 p = chebyshev_polynomial(order,x)
 ```
 
-will return a 2D array containing the Chebyshev polynomials of orders 0---5 evaluated at the point `x`.  If `x` is a 1D array of points, as in:
+will return a 2D array (1 $\times$ 6) containing the Chebyshev polynomials of orders 0---5 evaluated at the point `x`.  If `x` is a 1D array of points, as in:
 
 ```julia
 order = 5

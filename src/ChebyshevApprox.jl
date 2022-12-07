@@ -12,8 +12,8 @@ export ChebRoots,
        LegendreNodes,
        Grid,
        ChebPoly,
-       ApproxPlan,
-       ApproxPlanPoly
+       CApproxPlan,
+       CApproxPlanPoly
 
 
 export chebyshev_nodes,
