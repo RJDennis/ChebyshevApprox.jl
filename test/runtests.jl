@@ -33,11 +33,11 @@ h = Grid((g, g))
 
 ord = 5
 dom = [1.0 1.0; -1.0 -1.0]
-a = CCApproxPlan(h, ord, dom)
+a = CApproxPlan(h, ord, dom)
 
 p1 = chebyshev_polynomial(ord, g)
 p2 = chebyshev_polynomial(ord, g)
-b = CCApproxPlanPoly((p1, p2), ord, dom)
+b = CApproxPlanPoly((p1, p2), ord, dom)
 
 # Test the 1-variable case
 
