@@ -169,7 +169,7 @@ function legendre_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
   end
 
   if N == 1
-    point[1] = (domain[1] + domain[2]) * 0.5
+    points[1] = (domain[1] + domain[2]) * 0.5
     return points
   else
     points[begin] = -1.0
