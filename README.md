@@ -164,7 +164,7 @@ w = chebyshev_weights(y,poly,order)
 
 The `poly`-argument can be an array-of-arrays (instead of a tuple).  The weights, `w` are returned in a (multi-dimensional) array.
 
-If the solution nodes are instead the Chebyshev-extrema, then the analogue to the above is the use the chebyshev_weights_extrema() function.  For example:
+If the solution nodes are instead the Chebyshev-extrema, then the analogue to the above is the use the `chebyshev_weights_extrema()` function.  For example:
 
 ```julia
 order_x1  = 5
