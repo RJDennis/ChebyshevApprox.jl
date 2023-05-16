@@ -1,7 +1,7 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), the Vertesi nodes, or the Legendre nodes.  In addition to approximating functions the package also uses the approximating polynomial to compute derivatives, gradients, and hessians.
+ChebyshevApprox is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), the Vertesi nodes, or the Legendre nodes.  In addition to approximating functions, the package also uses the approximating polynomial to compute derivatives, gradients, and hessians.
 
 Installation
 ------------
@@ -16,7 +16,7 @@ Pkg.add("ChebyshevApprox")
 Nodes
 -----
 
-The package contains functions for computing servel different types of approximating points.  Which points you use may depend on your application.
+The package contains functions for computing several different types of approximating points.  Which points you use may depend on your application.
 
 To compute the Chebyshev roots within the [1.0, -1.0] interval use:
 
@@ -51,10 +51,10 @@ g = Grid((p1,p2))
 Approximation Plans
 -------------------
 
-The approximate a function, the package makes use of an approximation plan, which is a stucture containing the information needed to produce an approximating function.
+The approximate a function the package makes use of an approximation plan, which is a stucture containing the information needed to produce an approximating function.
 
 ```julia
-A_plan = ApproxPlan(g,order,domain)
+A_plan = CApproxPlan(g,order,domain)
 ```
 
 where `g` is a Grid, `order` is an integer (complete polynomial approximation) or a tuple (tensor-product approximation), and `domain` is an array containing the upper and lower limits for each variable.  For example,
@@ -69,13 +69,13 @@ p2 = nodes(15,:chebyshev_nodes,dom_2)
 
 g = Grid((p1,p2))
 order = (6,6)
-A_plan = ApproxPlan(g,order,dom)
+A_plan = CApproxPlan(g,order,dom)
 ```
 
 Function approximation
 ----------------------
 
-To approximate a function, you use the `chebyshev_interp` function, which itself returns a function.  If the data on the function you wish to approximate, sampled on the Grid, `g`, are contained in the Array, `y`, then the approximating function is generated using:
+To approximate a function, you use the `chebyshev_interp` function, which itself returns a function.  If the data for the function you wish to approximate, sampled on the Grid, `g`, are contained in the Array, `y`, then the approximating function is generated using:
 
 ```julia
 f_approx = chebyshev_interp(y,A_plan)
@@ -134,7 +134,7 @@ ChebyshevApprox.jl uses Chebyshev regression to compute the weights in the Cheby
 w = chebyshev_weights(y,nodes,order,domain)
 ```
 
-where `y` is a n-D array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing Chebyshev-roots, `order` is a tuple (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
+where `y` is a nD array containing the function evaluations at `nodes`, `nodes` is a tuple of 1D arrays containing Chebyshev-roots, `order` is a tuple (tensor-product polynomial) or an integer (complete polynomial) specifying the order of the polynomial in each dimension, and `domain` is a 2D array containing the upper and lower bounds on the approximating interval in each dimension.  So,
 
 ```julia
 order_x1  = 5
