@@ -1,37 +1,23 @@
 abstract type Nodes end
 abstract type CApproximationPlan end
 
-struct ChebRoots{T<:AbstractFloat} <: Nodes
+struct ChebRoots{T<:AbstractFloat,R<:AbstractFloat} <: Nodes
 
-  points::Array{T,1}
+  points::Array{R,1}
   domain::Array{T,1}
 
 end
 
-struct ChebExtrema{T<:AbstractFloat} <: Nodes
+struct ChebExtrema{T<:AbstractFloat,R<:AbstractFloat} <: Nodes
 
-  points::Array{T,1}
+  points::Array{R,1}
   domain::Array{T,1}
 
 end
 
-struct ChebExtended{T<:AbstractFloat} <: Nodes
+struct ChebExtended{T<:AbstractFloat,R<:AbstractFloat} <: Nodes
 
-  points::Array{T,1}
-  domain::Array{T,1}
-
-end
-
-struct VertesiNodes{T<:AbstractFloat} <: Nodes
-
-  points::Array{T,1}
-  domain::Array{T,1}
-
-end
-
-struct LegendreNodes{T<:AbstractFloat} <: Nodes
-
-  points::Array{T,1}
+  points::Array{R,1}
   domain::Array{T,1}
 
 end
@@ -67,16 +53,12 @@ end
 
 function chebyshev_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
-  points = Array{Float64,1}(undef, N)
-
-  if isodd(N)
-    points[div(N - 1, 2)+1] = (domain[1] + domain[2]) * 0.5
-  end
+  points = fill((domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N, 2)
     x = -cos((i - 0.5) * π / N) * (domain[1] - domain[2]) * 0.5
-    points[i] = (domain[1] + domain[2]) * 0.5 + x
-    points[end-i+1] = (domain[1] + domain[2]) * 0.5 - x
+    points[i]     += x
+    points[N-i+1] -= x
   end
 
   return points
@@ -85,16 +67,12 @@ end
 
 function chebyshev_extrema(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
-  points = Array{Float64,1}(undef, N)
-
-  if isodd(N)
-    points[div(N - 1, 2)+1] = (domain[1] + domain[2]) * 0.5
-  end
+  points = fill((domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N, 2)
     x = -cos((i - 1) * π / (N - 1)) * (domain[1] - domain[2]) * 0.5
-    points[i] = (domain[1] + domain[2]) * 0.5 + x
-    points[end-i+1] = (domain[1] + domain[2]) * 0.5 - x
+    points[i]     += x
+    points[N-i+1] -= x
   end
 
   return points
@@ -103,100 +81,15 @@ end
 
 function chebyshev_extended(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
-  points = Array{Float64,1}(undef, N)
-
-  if isodd(N)
-    points[div(N - 1, 2)+1] = 0.0
-  end
+  points = fill((domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N, 2)
-    x = -cos((i - 0.5) * π / N)
-    points[i] = x
-    points[end-i+1] = -x
+    x = -cos((i - 0.5) * π / N) * ((domain[1] - domain[2]) * 0.5) / cos(π / (2N))
+    points[i]     += x
+    points[N-i+1] -= x
   end
-
-  points .= (domain[1] + domain[2]) * 0.5 .+ points * ((domain[1] - domain[2]) * 0.5) / cos(π / (2N))
 
   return points
-
-end
-
-function vertesi_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
-
-  points = Array{Float64,1}(undef, N)
-
-  if isodd(N)
-    points[div(N - 1, 2)+1] = (domain[1] + domain[2]) * 0.5
-  end
-
-  if N == 1
-
-    return points
-
-  elseif N == 2
-
-    points[begin] = domain[2]
-    points[end] = domain[1]
-
-    return points
-
-  else
-
-    points[begin] = domain[2]
-    points[end] = domain[1]
-
-    @inbounds for i = 2:div(N, 2)
-      x = -cos((π * 0.5) * (2i - 1) / N) / cos((π / (2N)) * (1 + 1 / (4 * log(N)))) * (domain[1] - domain[2]) * 0.5
-      points[i] = (domain[1] + domain[2]) * 0.5 + x
-      points[end-i+1] = (domain[1] + domain[2]) * 0.5 - x
-    end
-
-    return points
-
-  end
-
-end
-
-function legendre_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
-
-  points = Array{Float64,1}(undef, N)
-  update = Array{Float64,1}(undef, N)
-
-  p = zeros(N, N)
-
-  if isodd(N)
-    points[div(N - 1, 2)+1] = 0.0
-  end
-
-  if N == 1
-    points[1] = (domain[1] + domain[2]) * 0.5
-    return points
-  else
-    points[begin] = -1.0
-    points[end] = 1.0
-
-    @inbounds for i = 2:div(N, 2)
-      points[i] = -cos(π * (i - 1) / (N - 1))
-      points[end-i+1] = cos(π * (i - 1) / (N - 1))
-    end
-
-    p[:, 1] .= 1.0
-
-    len = Inf
-    @views while len > eps(1.0)
-      p[:, 2] .= points
-      @inbounds for i = 2:(N-1)
-        p[:, i+1] .= ((2i - 1) * points .* p[:, i] .- (i - 1) * p[:, i-1]) / i
-      end
-      update .= (points .* p[:, end] .- p[:, end-1]) ./ (N * p[:, end])
-      points .-= update
-      len = maximum(abs, update)
-    end
-
-    points .= (domain[1] + domain[2]) * 0.5 .+ points * ((domain[1] - domain[2]) * 0.5)
-
-    return points
-  end
 
 end
 
@@ -208,11 +101,8 @@ function nodes(N::S, node_generator::Symbol, domain=[1.0, -1.0],) where {S<:Inte
     return ChebExtrema(chebyshev_extrema(N, domain), domain)
   elseif node_generator == :chebyshev_extended
     return ChebExtended(chebyshev_extended(N, domain), domain)
-  elseif node_generator == :vertesi_nodes
-    return VertesiNodes(vertesi_nodes(N, domain), domain)
-  elseif node_generator == :legendre_nodes
-    return LegendreNodes(legendre_nodes(N, domain), domain)
   end
+
 end
 
 function normalize_node(node::R, domain::Array{T,1}) where {R<:Number,T<:AbstractFloat}
@@ -241,7 +131,9 @@ function normalize_node(node::G) where {G<:Nodes}
 
 end
 
-function chebyshev_polynomial(order::S, x::R) where {R<:Number,S<:Integer}
+function chebyshev_polynomial(order::S, x::R) where {S<:Integer,R<:Number}
+
+  # x must reside in [-1,1]
 
   poly = Array{R}(undef, 1, order + 1)
   poly[1] = one(R)
@@ -258,7 +150,9 @@ function chebyshev_polynomial(order::S, x::R) where {R<:Number,S<:Integer}
 
 end
 
-function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {R<:Number,S<:Integer}
+function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Number}
+
+  # Elements of x must reside in [-1,1]
 
   poly = Array{R}(undef, length(x), order + 1)
   poly[:, 1] .= ones(R, length(x))
@@ -277,7 +171,7 @@ function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {R<:Number,
 
 end
 
-function chebyshev_polynomial(order::S, g::G) where {G<:Nodes,S<:Integer}
+function chebyshev_polynomial(order::S, g::G) where {S<:Integer,G<:Nodes}
 
   T = eltype(g.points)
 
@@ -294,22 +188,22 @@ function chebyshev_polynomial(order::S, g::G) where {G<:Nodes,S<:Integer}
     end
   end
 
-  return ChebPoly(poly, typeof(g))
+  return ChebPoly(poly, G)
 
 end
 
-function chebyshev_polynomial_deriv(order::S, x::T) where {T<:Number,S<:Integer}
+function chebyshev_polynomial_deriv(order::S, x::R) where {S<:Integer,R<:Number}
 
-  poly_deriv = Array{T}(undef, 1, order + 1)
-  poly_deriv[1] = zero(T)
-  p = one(T)
+  poly_deriv = Array{R}(undef, 1, order + 1)
+  poly_deriv[1] = zero(R)
+  p = one(R)
   pl = NaN
   pll = NaN
 
   @inbounds for i = 2:order+1
     if i == 2
       pl, p = p, x
-      poly_deriv[i] = one(T)
+      poly_deriv[i] = one(R)
     else
       pll, pl = pl, p
       p = 2 * x * pl - pll
@@ -321,19 +215,19 @@ function chebyshev_polynomial_deriv(order::S, x::T) where {T<:Number,S<:Integer}
 
 end
 
-function chebyshev_polynomial_deriv(order::S, x::AbstractArray{T,1}) where {S<:Integer,T<:Number}
+function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Number}
 
-  poly_deriv = Array{T}(undef, order + 1, length(x))
-  poly_deriv[1, :] .= zeros(T, length(x))
+  poly_deriv = Array{R}(undef, order + 1, length(x))
+  poly_deriv[1, :] .= zeros(R, length(x))
 
   @inbounds for j in eachindex(x)
-    p = one(T)
+    p = one(R)
     pl = NaN
     pll = NaN
     for i = 2:order+1
       if i == 2
         pl, p = p, x[j]
-        poly_deriv[i, j] = one(T)
+        poly_deriv[i, j] = one(R)
       else
         pll, pl = pl, p
         p = 2 * x[j] * pl - pll
@@ -346,7 +240,7 @@ function chebyshev_polynomial_deriv(order::S, x::AbstractArray{T,1}) where {S<:I
 
 end
 
-function chebyshev_polynomial_deriv(order::S, g::G) where {G<:Nodes,S<:Integer}
+function chebyshev_polynomial_deriv(order::S, g::G) where {S<:Integer,G<:Nodes}
 
   T = eltype(g.points)
 
@@ -369,7 +263,7 @@ function chebyshev_polynomial_deriv(order::S, g::G) where {G<:Nodes,S<:Integer}
     end
   end
 
-  return ChebPoly(transpose(poly_deriv), typeof(g))
+  return ChebPoly(transpose(poly_deriv), G)
 
 end
 
@@ -463,7 +357,7 @@ function chebyshev_polynomial_sec_deriv(order::S, g::G) where {G<:Nodes,S<:Integ
     end
   end
 
-  return ChebPoly(transpose(poly_sec_deriv), typeof(g))
+  return ChebPoly(transpose(poly_sec_deriv), G)
 
 end
 
@@ -477,11 +371,11 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
     end
 
     if eltype(plan.grid.grid) <: ChebRoots
-      return chebyshev_weights(y, tuple(nodes...), plan.order, plan.domain)
+      return chebyshev_weights(y, Tuple(nodes), plan.order, plan.domain)
     elseif eltype(plan.grid.grid) <: ChebExtrema
-      return chebyshev_weights_extrema(y, tuple(nodes...), plan.order, plan.domain)
-    else # Extended_nodes, Vertesi_nodes, Legendre_nodes
-      return chebyshev_weights_extended(y, tuple(nodes...), plan.order, plan.domain)
+      return chebyshev_weights_extrema(y, Tuple(nodes), plan.order, plan.domain)
+    elseif eltype(plan.grid.grid) <: ChebExtended
+      return chebyshev_weights_extended(y, Tuple(nodes), plan.order, plan.domain)
     end
 
   elseif typeof(plan) <: CApproxPlanPoly
@@ -491,12 +385,12 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
       polynomials[i] = plan.polys[i].poly
     end
 
-    if plan.polys[1].nodetype == ChebRoots{T}
-      return chebyshev_weights(y, tuple(polynomials...), plan.order)
-    elseif plan.polys[1].nodetype == ChebExtrema{T}
-      return chebyshev_weights_extrema(y, tuple(polynomials...), plan.order)
-    else # Extended_nodes, Vertesi_nodes, Legendre_nodes
-      return chebyshev_weights_extended(y, tuple(polynomials...), plan.order)
+    if plan.polys[1].nodetype == ChebRoots{T,T}
+      return chebyshev_weights(y, Tuple(polynomials), plan.order)
+    elseif plan.polys[1].nodetype == ChebExtrema{T,T}
+      return chebyshev_weights_extrema(y, Tuple(polynomials), plan.order)
+    elseif plan.polys[1].nodetype == ChebExtended{T,T}
+      return chebyshev_weights_extended(y, Tuple(polynomials), plan.order)
     end
 
   end
@@ -513,11 +407,11 @@ function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Ab
     end
 
     if eltype(plan.grid.grid) <: ChebRoots
-      return chebyshev_weights_threaded(y, tuple(nodes...), plan.order, plan.domain)
+      return chebyshev_weights_threaded(y, Tuple(nodes), plan.order, plan.domain)
     elseif eltype(plan.grid.grid) <: ChebExtrema
-      return chebyshev_weights_extrema_threaded(y, tuple(nodes...), plan.order, plan.domain)
-    else # Extended_nodes, Vertesi_nodes, Legendre_nodes
-      return chebyshev_weights_extended_threaded(y, tuple(nodes...), plan.order, plan.domain)
+      return chebyshev_weights_extrema_threaded(y, Tuple(nodes), plan.order, plan.domain)
+    elseif eltype(plan.grid.grid) <: ChebExtended
+      return chebyshev_weights_extended_threaded(y, Tuple(nodes), plan.order, plan.domain)
     end
 
   elseif typeof(plan) <: CApproxPlanPoly
@@ -527,12 +421,12 @@ function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Ab
       polynomials[i] = plan.polys[i].poly
     end
 
-    if plan.polys[1].nodetype == ChebRoots{T}
-      return chebyshev_weights_threaded(y, tuple(polynomials...), plan.order)
-    elseif plan.polys[1].nodetype == ChebExtrema{T}
-      return chebyshev_weights_extrema_threaded(y, tuple(polynomials...), plan.order)
-    else # Extended_nodes, Vertesi_nodes, Legendre_nodes
-      return chebyshev_weights_extended_threaded(y, tuple(polynomials...), plan.order)
+    if plan.polys[1].nodetype == ChebRoots{T,T}
+      return chebyshev_weights_threaded(y, Tuple(polynomials), plan.order)
+    elseif plan.polys[1].nodetype == ChebExtrema{T,T}
+      return chebyshev_weights_extrema_threaded(y, Tuple(polynomials), plan.order)
+    elseif plan.polys[1].nodetype == ChebExtended{T,T}
+      return chebyshev_weights_extended_threaded(y, Tuple(polynomials), plan.order)
     end
 
   end
@@ -773,10 +667,7 @@ function chebyshev_weights(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S,
     poly[i] = chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i]))
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
@@ -820,10 +711,7 @@ function chebyshev_weights_extrema(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, o
     poly[i] = chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i]))
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
@@ -875,10 +763,7 @@ function chebyshev_weights_extended(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
     complement[i] = pinv(poly[i])'
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
@@ -917,10 +802,7 @@ end
 
 function chebyshev_weights(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
@@ -958,10 +840,7 @@ function chebyshev_weights_extrema(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, or
 
   n = size(f)
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
@@ -1010,10 +889,7 @@ function chebyshev_weights_extended(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
     complement[i] = pinv(poly[i])'
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
@@ -1060,7 +936,7 @@ function chebyshev_weights_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 
   weights = zeros(Tuple(order .+ 1))
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
     denominator = zero(T)
@@ -1097,7 +973,7 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::NTuple{N,Array
 
   weights = zeros(Tuple(order .+ 1))
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
     denominator = zero(T)
@@ -1142,7 +1018,7 @@ function chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::NTuple{N,Arra
 
   weights = zeros(Tuple(order .+ 1))
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
     denominator = zero(T)
@@ -1174,7 +1050,7 @@ function chebyshev_weights_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 
   weights = Array{T,N}(undef, Tuple(order .+ 1))
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
     denominator = zero(T)
@@ -1205,7 +1081,7 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::NTuple{N,Array{
 
   weights = Array{T,N}(undef, Tuple(order .+ 1))
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
     denominator = zero(T)
@@ -1247,7 +1123,7 @@ function chebyshev_weights_extended_threaded(f::Array{T,N}, poly::NTuple{N,Array
 
   weights = Array{T,N}(undef, Tuple(order .+ 1))
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
     denominator = zero(T)
@@ -1283,14 +1159,11 @@ function chebyshev_weights_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
     poly[i] = chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i]))
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order + N
 
       numerator = zero(T)
@@ -1330,14 +1203,11 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::NTuple{N,Array
     poly[i] = chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i]))
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order + N
 
       numerator = zero(T)
@@ -1385,14 +1255,11 @@ function chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::NTuple{N,Arra
     complement[i] = pinv(poly[i])'
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order + N
 
       numerator = zero(T)
@@ -1427,14 +1294,11 @@ end
 
 function chebyshev_weights_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order + N
 
       numerator = zero(T)
@@ -1468,14 +1332,11 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::NTuple{N,Array{
 
   n = size(f)
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order + N
 
       numerator = zero(T)
@@ -1520,14 +1381,11 @@ function chebyshev_weights_extended_threaded(f::Array{T,N}, poly::NTuple{N,Array
     complement[i] = pinv(poly[i])'
   end
 
-  ord = (order,)
-  for i = 2:N
-    ord = (ord..., order)
-  end
+  ord = Tuple([order for _ in 1:N])
 
   weights = Array{T,N}(undef, ord .+ 1)
 
-  @inbounds @sync @qthreads for i in CartesianIndices(weights)
+  @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(Tuple(i)) <= order + N
 
       numerator = zero(T)
@@ -1573,36 +1431,33 @@ chebyshev_weights_extended(f::Array{T,1}, poly::Array{T,2}, order::Union{S,Array
 
 # Serial functions
 
-chebyshev_weights(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, tuple(nodes...), order, domain)
-chebyshev_weights_extrema(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, tuple(nodes...), order, domain)
-chebyshev_weights_extended(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, tuple(nodes...), order, domain)
-chebyshev_weights(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, tuple(poly...), order)
-chebyshev_weights_extrema(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, tuple(poly...), order)
-chebyshev_weights_extended(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, tuple(poly...), order)
-chebyshev_weights(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, tuple(nodes...), order, domain)
-chebyshev_weights_extrema(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, tuple(nodes...), order, domain)
-chebyshev_weights_extended(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, tuple(nodes...), order, domain)
-chebyshev_weights(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, tuple(poly...), order)
-chebyshev_weights_extrema(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, tuple(poly...), order)
-chebyshev_weights_extended(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, tuple(poly...), order)
+chebyshev_weights(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, Tuple(nodes), order, domain)
+chebyshev_weights_extrema(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, Tuple(nodes), order, domain)
+chebyshev_weights_extended(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, Tuple(nodes), order, domain)
+chebyshev_weights(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, Tuple(poly), order)
+chebyshev_weights_extrema(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, Tuple(poly), order)
+chebyshev_weights_extended(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, Tuple(poly), order)
+chebyshev_weights(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, Tuple(nodes), order, domain)
+chebyshev_weights_extrema(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, Tuple(nodes), order, domain)
+chebyshev_weights_extended(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, Tuple(nodes), order, domain)
+chebyshev_weights(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(f, Tuple(poly), order)
+chebyshev_weights_extrema(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(f, Tuple(poly), order)
+chebyshev_weights_extended(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(f, Tuple(poly), order)
 
 # Threaded functions
 
-chebyshev_weights_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, tuple(nodes...), order, domain)
-chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, tuple(nodes...), order, domain)
-chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, tuple(nodes...), order, domain)
-chebyshev_weights_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, tuple(poly...), order)
-chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, tuple(poly...), order)
-chebyshev_weights_extended_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, tuple(poly...), order)
-chebyshev_weights_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, tuple(nodes...), order, domain)
-chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, tuple(nodes...), order, domain)
-chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, tuple(nodes...), order, domain)
-chebyshev_weights_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, tuple(poly...), order)
-chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, tuple(poly...), order)
-chebyshev_weights_extended_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, tuple(poly...), order)
-
-const chebyshev_weights_vertesi = chebyshev_weights_extended
-const chebyshev_weights_legendre = chebyshev_weights_extended
+chebyshev_weights_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, Tuple(nodes), order, domain)
+chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, Tuple(nodes), order, domain)
+chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, Tuple(nodes), order, domain)
+chebyshev_weights_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, Tuple(poly), order)
+chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, Tuple(poly), order)
+chebyshev_weights_extended_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, Tuple(poly), order)
+chebyshev_weights_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, Tuple(nodes), order, domain)
+chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, Tuple(nodes), order, domain)
+chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, Tuple(nodes), order, domain)
+chebyshev_weights_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(f, Tuple(poly), order)
+chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(f, Tuple(poly), order)
+chebyshev_weights_extended_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(f, Tuple(poly), order)
 
 # Functions to evaluate Chebyshev polynominals
 

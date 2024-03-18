@@ -1,7 +1,7 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox.jl is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0), the Vertesi nodes, or the Legendre nodes.  In addition to approximating functions, the package also uses the approximating polynomial to compute derivatives, gradients, and hessians.
+ChebyshevApprox.jl is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), or the Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0).  In addition to approximating functions, the package also uses the approximating polynomial to compute derivatives, gradients, and hessians.
 
 Installation
 ------------
@@ -25,7 +25,7 @@ n = 11
 points = nodes(n,:chebyshev_nodes)
 ```
 
-where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol indicating the type of nodes to be produced.  Alternatives to `:chebyshev_nodes` are: `chebyshev_extrema`, `:chebyshev_extended`, `:vertesi_nodes`, and `:legendre_nodes`. 
+where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol indicating the type of nodes to be produced.  Alternatives to `:chebyshev_nodes` are: `chebyshev_extrema`, and `:chebyshev_extended`. 
 
 To compute nodes over bounded domains other than the [1.0,-1.0] interval, the `nodes` function accepts an optional third argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
 
@@ -98,11 +98,6 @@ hess_hat = f_hess(x)
 ```
 
 There are multi-threaded versions of these functions: `chebyshev_interp_threaded()`, `chebyshev_gradient_threaded()`, and `chebyshev_hessian_threaded()`.
-
-Under the hood
---------------
-
-The functions documented above should cover a lot of use cases.  However, the machinery used to produce the chebyshev polynomials, find the polynomial weights, and evaluate polynomials at given points---which took center stage in releases before version 0.3.0---is still there and can be used as before.  As such this 0.3.x release is (mostly) not expected to be code-breaking (some stuctures have gone, but I don't think they were used much anyway).
 
 Polynomials
 -----------
@@ -182,7 +177,7 @@ domain = [domain_x1 domain_x2]
 w = chebyshev_weights_extrema(y,nodes,order,domain)
 ```
 
-Other possibilities are to use `chebyshev_weights_extended()`, `chebyshev_weights_vertesi()`, or `chebyshev_weights_legendre()`.
+The third possibility is to use `chebyshev_weights_extended()`.
 
 Function evaluation
 -------------------
@@ -233,8 +228,6 @@ For completeness, there are also:
 ```julia
 w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
 w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
-w = chebyshev_weights_vertesi_threaded(y,nodes,order,domain)
-w = chebyshev_weights_legendre_threaded(y,nodes,order,domain)
 ```
 
 Related packages
