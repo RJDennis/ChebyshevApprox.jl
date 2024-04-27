@@ -51,6 +51,13 @@ struct CApproxPlanPoly{N,T<:AbstractFloat,S<:Integer,G<:ChebPoly} <: CApproximat
 
 end
 
+"""
+Compute 'N' roots of the Chebyshev polynomial and scale the roots to the interval given in 'domain'.
+
+N --- an integer specifying the number of Chebyshev roots.
+
+domain --- (with with default [1.0,-1.0]) is a 2-element vector specifying the upper and lower bounds on the domain.
+"""
 function chebyshev_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
   points = fill((domain[1]+domain[2])*0.5,N)
@@ -65,6 +72,13 @@ function chebyshev_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
 end
 
+"""
+Compute 'N' extrema of the Chebyshev polynomial and scale the roots to the interval given in 'domain'.
+
+N --- an integer specifying the number of Chebyshev extrema.
+
+domain --- (with with default [1.0,-1.0]) is a 2-element vector specifying the upper and lower bounds on the domain.
+"""
 function chebyshev_extrema(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
   points = fill((domain[1]+domain[2])*0.5,N)
@@ -79,6 +93,13 @@ function chebyshev_extrema(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
 end
 
+"""
+Compute 'N' extended Chebyshev points and scale the points to the interval given in 'domain'.
+
+N --- an integer specifying the number of extended Chebyshev points.
+
+domain --- (with with default [1.0,-1.0]) is a 2-element vector specifying the upper and lower bounds on the domain.
+"""
 function chebyshev_extended(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
   points = fill((domain[1]+domain[2])*0.5,N)
@@ -93,6 +114,15 @@ function chebyshev_extended(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 
 end
 
+"""
+Computes 'N' points according to 'node_generator' and scales those points to the interval given in 'domain'.
+
+N --- an integer specifying the number of points.
+
+node_generator --- a function that computes the desired points.
+
+domain --- (with with default [1.0,-1.0]) is a 2-element vector specifying the upper and lower bounds on the domain.
+"""
 function nodes(N::S, node_generator::Symbol, domain=[1.0, -1.0],) where {S<:Integer}
 
   if node_generator == :chebyshev_nodes
@@ -105,6 +135,13 @@ function nodes(N::S, node_generator::Symbol, domain=[1.0, -1.0],) where {S<:Inte
 
 end
 
+"""
+Normalizes a point, 'node', in 'domain' to the [1.0,-1.0] interval.
+
+node --- a number.
+
+domain --- (with with default [1.0,-1.0]) is a 2-element vector specifying the upper and lower bounds on the domain.
+""" 
 function normalize_node(node::R, domain::Array{T,1}) where {R<:Number,T<:AbstractFloat}
 
   if domain[1] == domain[2]
@@ -117,6 +154,13 @@ function normalize_node(node::R, domain::Array{T,1}) where {R<:Number,T<:Abstrac
 
 end
 
+"""
+Normalizes a vector of points, 'node', with in element in 'domain' to the [1.0,-1.0] interval.
+
+node --- a vector of numbers.
+
+domain --- (with with default [1.0,-1.0]) is a 2-element vector specifying the upper and lower bounds on the domain.
+""" 
 function normalize_node(node::Array{R,1}, domain::Array{T,1}) where {R<:Number,T<:AbstractFloat}
 
   norm_nodes = map(x -> normalize_node(x, domain), node)
@@ -124,6 +168,11 @@ function normalize_node(node::Array{R,1}, domain::Array{T,1}) where {R<:Number,T
 
 end
 
+"""
+Normalizes the points in 'node' to reside on the [1.0,-1.0] interval.
+
+node --- A Nodes type.
+"""
 function normalize_node(node::G) where {G<:Nodes}
 
   norm_nodes = map(x -> normalize_node(x, node.domain), node.points)
@@ -131,6 +180,13 @@ function normalize_node(node::G) where {G<:Nodes}
 
 end
 
+"""
+Compute a Chebyshev polynomial of order 'order' at point, 'x'.
+
+order --- an integer specifying the order of the polynomial.
+
+x --- a number.
+"""
 function chebyshev_polynomial(order::S, x::R) where {S<:Integer,R<:Number}
 
   # x must reside in [-1,1]
@@ -150,6 +206,13 @@ function chebyshev_polynomial(order::S, x::R) where {S<:Integer,R<:Number}
 
 end
 
+"""
+Compute a Chebyshev polynomial of order 'order' at points, 'x'.
+
+order --- an integer specifying the order of the polynomial.
+
+x --- a vector of numbers.
+"""
 function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Number}
 
   # Elements of x must reside in [-1,1]
@@ -171,6 +234,13 @@ function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {S<:Integer
 
 end
 
+"""
+Compute a Chebyshev polynomial of order 'order' from the structure, 'g'.
+
+order --- an integer specifying the order of the polynomial.
+
+g --- a Nodes structure.
+"""
 function chebyshev_polynomial(order::S, g::G) where {S<:Integer,G<:Nodes}
 
   T = eltype(g.points)
@@ -192,6 +262,13 @@ function chebyshev_polynomial(order::S, g::G) where {S<:Integer,G<:Nodes}
 
 end
 
+"""
+Compute the derivatives of a Chebyshev polynomial of order 'order' at point, 'x'.
+
+order --- an integer specifying the order of the polynomial.
+
+x --- a number.
+"""
 function chebyshev_polynomial_deriv(order::S, x::R) where {S<:Integer,R<:Number}
 
   poly_deriv = Array{R}(undef, 1, order + 1)
@@ -215,6 +292,13 @@ function chebyshev_polynomial_deriv(order::S, x::R) where {S<:Integer,R<:Number}
 
 end
 
+"""
+Compute the derivatives of a Chebyshev polynomial of order 'order' at points, 'x'.
+
+order --- an integer specifying the order of the polynomial.
+
+x --- a vector of numbers.
+"""
 function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Number}
 
   poly_deriv = Array{R}(undef, order + 1, length(x))
@@ -240,6 +324,13 @@ function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:I
 
 end
 
+"""
+Compute the derivatives of a Chebyshev polynomial of order 'order' from the structure, 'g'.
+
+order --- an integer specifying the order of the polynomial.
+
+g --- a Nodes structure.
+"""
 function chebyshev_polynomial_deriv(order::S, g::G) where {S<:Integer,G<:Nodes}
 
   T = eltype(g.points)
@@ -267,6 +358,13 @@ function chebyshev_polynomial_deriv(order::S, g::G) where {S<:Integer,G<:Nodes}
 
 end
 
+"""
+Compute the second derivatives of a Chebyshev polynomial of order 'order' at point, 'x'.
+
+order --- an integer specifying the order of the polynomial.
+
+x --- a number.
+"""
 function chebyshev_polynomial_sec_deriv(order::S, x::T) where {T<:Number,S<:Integer}
 
   poly_sec_deriv = Array{T}(undef, 1, order + 1)
@@ -297,6 +395,13 @@ function chebyshev_polynomial_sec_deriv(order::S, x::T) where {T<:Number,S<:Inte
 
 end
 
+"""
+Compute the second derivatives of a Chebyshev polynomial of order 'order' at points, 'x'.
+
+order --- an integer specifying the order of the polynomial.
+
+x --- a vector of numbers.
+"""
 function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {S<:Integer,T<:Number}
 
   poly_sec_deriv = Array{T}(undef, order + 1, length(x))
@@ -328,6 +433,13 @@ function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {
 
 end
 
+"""
+Compute the second derivatives of a Chebyshev polynomial of order 'order' from the structure, 'g'.
+
+order --- an integer specifying the order of the polynomial.
+
+g --- a Nodes structure.
+"""
 function chebyshev_polynomial_sec_deriv(order::S, g::G) where {G<:Nodes,S<:Integer}
 
   T = eltype(g.points)
@@ -361,6 +473,13 @@ function chebyshev_polynomial_sec_deriv(order::S, g::G) where {G<:Nodes,S<:Integ
 
 end
 
+"""
+Computes the Chebyshev weights given the approximation sample, 'y', and the approximation plan, 'plan'.
+
+y --- a N-dimensional array of data evaluated at the approximation points.
+
+plan --- a structure specifying how the approximation should be undertaken.
+""" 
 function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   if typeof(plan) <: CApproxPlan
@@ -397,6 +516,13 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading given the approximation sample, 'y', and the approximation plan, 'plan'.
+
+y --- a N-dimensional array of data evaluated at the approximation points.
+
+plan --- a structure specifying how the approximation should be undertaken.
+""" 
 function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   if typeof(plan) <: CApproxPlan
@@ -433,6 +559,18 @@ function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Ab
 
 end
 
+"""
+Computes the Chebyshev weights in a tensor-product polynomial given the data sample, 'f', the Chebyshev roots, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the Chebyshev nodes used for approximation along each spacial dimension.
+
+order --- a tuple of a vector specifying the polynomial's order for each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -468,6 +606,18 @@ function chebyshev_weights(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Un
 
 end
 
+"""
+Computes the Chebyshev weights in a tensor-product polynomial given the data sample, 'f', the Chebyshev extrema, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the Chebyshev extrema used for approximation along each spacial dimension.
+
+order --- a tuple of a vector specifying the polynomial's order for each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights_extrema(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -513,6 +663,18 @@ function chebyshev_weights_extrema(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, o
 
 end
 
+"""
+Computes the Chebyshev weights in a tensor-product polynomial given the data sample, 'f', the extended Chebyshev points, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the extended Chebyshev points used for approximation along each spacial dimension.
+
+order --- a tuple of a vector specifying the polynomial's order for each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights_extended(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -553,6 +715,16 @@ function chebyshev_weights_extended(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 
 end
 
+"""
+Computes the Chebyshev weights in a tensor-product polynomial given the data sample, 'f', the Chebyshev polynomials evaluated at the Chebyshev roots, 'poly', and the order of the 
+polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev roots.
+
+order --- a tuple of a vector specifying the polynomial's order for each spacial dimension.
+"""
 function chebyshev_weights(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
   weights = Array{T,N}(undef, Tuple(order .+ 1))
@@ -582,6 +754,16 @@ function chebyshev_weights(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Uni
 
 end
 
+"""
+Computes the Chebyshev weights in a tensor-product polynomial given the data sample, 'f', the Chebyshev polynomials evaluated at the Chebyshev extrema, 'poly', and the order of the 
+polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev extrema.
+
+order --- a tuple of a vector specifying the polynomial's order for each spacial dimension.
+"""
 function chebyshev_weights_extrema(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -621,6 +803,16 @@ function chebyshev_weights_extrema(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, or
 
 end
 
+"""
+Computes the Chebyshev weights in a tensor-product polynomial given the data sample, 'f', the Chebyshev polynomials evaluated at the extended Chebyshev points, 'poly', and the order of the 
+polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the extended Chebyshev points.
+
+order --- a tuple of a vector specifying the polynomial's order for each spacial dimension.
+"""
 function chebyshev_weights_extended(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
   complement = Array{Array{T,2},1}(undef, N)
@@ -659,6 +851,18 @@ function chebyshev_weights_extended(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 
 end
 
+"""
+Computes the Chebyshev weights in a complete polynomial given the data sample, 'f', the Chebyshev roots, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the Chebyshev nodes used for approximation along each spacial dimension.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -701,6 +905,18 @@ function chebyshev_weights(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S,
 
 end
 
+"""
+Computes the Chebyshev weights in a complete polynomial given the data sample, 'f', the Chebyshev extrema, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the Chebyshev extrema used for approximation along each spacial dimension.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights_extrema(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -753,6 +969,18 @@ function chebyshev_weights_extrema(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, o
 
 end
 
+"""
+Computes the Chebyshev weights in a complete polynomial given the data sample, 'f', the extended Chebyshev points, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the extended Chebyshev points used for approximation along each spacial dimension.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights_extended(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -800,6 +1028,16 @@ function chebyshev_weights_extended(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 
 end
 
+"""
+Computes the Chebyshev weights in a complete polynomial given the data sample, 'f', the Chebyshev polynomials evaluated at the Chebyshev roots, 'poly', and the order of the 
+polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev roots.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
   ord = Tuple([order for _ in 1:N])
@@ -836,6 +1074,16 @@ function chebyshev_weights(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) 
 
 end
 
+"""
+Computes the Chebyshev weights in a complete polynomial given the data sample, 'f', the Chebyshev polynomials evaluated at the Chebyshev extrema, 'poly', and the order of the 
+polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev extrema.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extrema(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -882,6 +1130,16 @@ function chebyshev_weights_extrema(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, or
 
 end
 
+"""
+Computes the Chebyshev weights in a complete polynomial given the data sample, 'f', the Chebyshev polynomials evaluated at the extended Chebyshev points, 'poly', and the order of the 
+polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the extended Chebyshev points.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extended(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
   complement = Array{Array{T,2},1}(undef, N)
@@ -926,6 +1184,18 @@ function chebyshev_weights_extended(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 
 end
 
+"""
+Computes the Chebyshev weights using mutli-threading in a complete polynomial given the data sample, 'f', the Chebyshev roots, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the Chebyshev roots used for approximation along each spacial dimension.
+
+order --- a vector of integers specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -961,6 +1231,18 @@ function chebyshev_weights_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 
 end
 
+"""
+Computes the Chebyshev weights using mutli-threading in a complete polynomial given the data sample, 'f', the Chebyshev extrema, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the Chebyshev extrema used for approximation along each spacial dimension.
+
+order --- a vector of integers specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -1006,6 +1288,18 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::NTuple{N,Array
 
 end
 
+"""
+Computes the Chebyshev weights using mutli-threading in a complete polynomial given the data sample, 'f', the extended Chebyshev points, 'nodes', the order of the polynomial, 'order', and the domain for the 
+sampling points, 'domain'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+nodes --- a tuple of vectors containing the extended Chebyshev points used for approximation along each spacial dimension.
+
+order --- a vector of integers specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -1046,6 +1340,16 @@ function chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::NTuple{N,Arra
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a tensor-product polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the Chebyshev roots, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev roots.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
   weights = Array{T,N}(undef, Tuple(order .+ 1))
@@ -1075,6 +1379,16 @@ function chebyshev_weights_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a tensor-product polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the Chebyshev extrema, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev extrema.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -1114,6 +1428,16 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::NTuple{N,Array{
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a tensor-product polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the extended Chebyshev points, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev roots.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extended_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
   complement = Array{Array{T,2},1}(undef, N)
@@ -1151,6 +1475,16 @@ function chebyshev_weights_extended_threaded(f::Array{T,N}, poly::NTuple{N,Array
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a complete polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the Chebyshev roots, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev roots.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -1193,6 +1527,16 @@ function chebyshev_weights_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a complete polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the Chebyshev extrema, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev extrema.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -1245,6 +1589,16 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, nodes::NTuple{N,Array
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a complete polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the extended Chebyshev points, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the extended Chebyshev points.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
   poly = Array{Array{T,2},1}(undef, N)
@@ -1292,6 +1646,16 @@ function chebyshev_weights_extended_threaded(f::Array{T,N}, nodes::NTuple{N,Arra
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a complete polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the Chebyshev roots, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev roots.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
   ord = Tuple([order for _ in 1:N])
@@ -1328,6 +1692,16 @@ function chebyshev_weights_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a complete polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the Chebyshev extrema, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the Chebyshev extrema.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
   n = size(f)
@@ -1374,6 +1748,16 @@ function chebyshev_weights_extrema_threaded(f::Array{T,N}, poly::NTuple{N,Array{
 
 end
 
+"""
+Computes the Chebyshev weights using multi-threading in a complete polynomial given the data sample, 'f', the Chebyshev polynomials 
+evaluated at the extended Chebyshev points, 'poly', and the order of the polynomial, 'order'.
+
+f --- an array containing the function evaluated on the approximation grid.
+
+poly --- a tuple of matrices containing the Chebyshev polynomials evaluated at the extended Chebyshev points.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+"""
 function chebyshev_weights_extended_threaded(f::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
   complement = Array{Array{T,2},1}(undef, N)
@@ -1461,7 +1845,22 @@ chebyshev_weights_extended_threaded(f::Array{T,N}, poly::Array{Array{T,2},1}, or
 
 # Functions to evaluate Chebyshev polynominals
 
+"""
+Evaluate a tensor-product Chebyshev polynomial at point, 'x', given the polynomial weights, 'weights', the order of the polynomial, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containing the polynomial weights.
+
+x --- a vector of Numbers representing the evaluation point.
+
+order --- a tuple or vector specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
 
   poly = Array{Array{R,2},1}(undef, N)
   @inbounds for i = 1:N
@@ -1481,7 +1880,22 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
 
 end
 
+"""
+Evaluate a complete Chebyshev polynomial at point, 'x', given the polynomial weights, 'weights', the order of the polynomial, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containing the polynomial weights.
+
+x --- a vector of Numbers representing the evaluation point.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
 
   poly = Array{Array{R,2},1}(undef, N)
   @inbounds for i = 1:N
@@ -1503,6 +1917,13 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
 
 end
 
+"""
+Creates an interpolating function given an approximation plan, 'plan', that can evaluate the Chebyshev polynomial at any point in the state-space.
+  
+y --- an N-dimensional array containing the function evaluated at each point of the approximation grid.
+
+plan --- a structure specifying how the approximation should be undertaken.
+"""
 function chebyshev_interp(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
@@ -1519,6 +1940,13 @@ function chebyshev_interp(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CAp
 
 end
 
+"""
+Creates an interpolating function given an approximation plan, 'plan', that can evaluate using multi-threading the Chebyshev polynomial at any point in the state-space.
+  
+y --- an N-dimensional array containing the function evaluated at each point of the approximation grid.
+
+plan --- a structure specifying how the approximation should be undertaken.
+"""
 function chebyshev_interp_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
@@ -1537,7 +1965,25 @@ end
 
 # Functions for derivatives
 
+"""
+Computes the first derivative of a tensor-product Chebyshev polynomial with respect to the i'th variable, 'pos', evaluated at 'x', given the 
+polynomial weights, 'weights', the polynomial's order, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containinbg the polynomial weights.
+
+x --- a vector containing the point at which to evaluate the derivative.
+
+pos --- an integer specifying the variable that the function is being differentiated with respect to.
+
+order --- a tuple or vector specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
 
   poly = Array{Array{R,2},1}(undef, N)
   @inbounds for i = 1:N
@@ -1561,7 +2007,25 @@ function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S
 
 end
 
+"""
+Computes the first derivative of a complete Chebyshev polynomial with respect to the i'th variable, 'pos', evaluated at 'x', given the 
+polynomial weights, 'weights', the polynomial's order, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containinbg the polynomial weights.
+
+x --- a vector containing the point at which to evaluate the derivative.
+
+pos --- an integer specifying the variable that the function is being differentiated with respect to.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
 
   poly = Array{Array{R,2},1}(undef, N)
   @inbounds for i = 1:N
@@ -1589,8 +2053,24 @@ end
 
 # Functions for gradients
 
+"""
+Computes the gradient of a tensor-product Chebyshev polynomial evaluated at 'x', given the 
+polynomial weights, 'weights', the polynomial's order, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containinbg the polynomial weights.
+
+x --- a vector containing the point at which to evaluate the derivative.
+
+order --- a tuple or vector specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
+
   gradient = Array{R,2}(undef, 1, N)
 
   @inbounds for i = 1:N
@@ -1601,8 +2081,24 @@ function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::U
 
 end
 
+"""
+Computes the gradient of a complete Chebyshev polynomial evaluated at 'x', given the 
+polynomial weights, 'weights', the polynomial's order, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containinbg the polynomial weights.
+
+x --- a vector containing the point at which to evaluate the derivative.
+
+order --- an integer specifying the polynomial's maximal order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
+
   gradient = Array{R,2}(undef, 1, N)
 
   @inbounds for i = 1:N
@@ -1613,6 +2109,13 @@ function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::S
 
 end
 
+"""
+Creates a function that evaluates the gradient of a Chebyshev polynomial evaluated at 'x', given an approximation plan, 'plan'.
+
+y --- an N-dimensional array containing function evaluated on the approximation grid.
+
+plan --- a structure specifying how the approximation should be undertaken.
+"""
 function chebyshev_gradient(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
@@ -1629,6 +2132,13 @@ function chebyshev_gradient(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:C
 
 end
 
+"""
+Creates a function that evaluates using multi-threading the gradient of a Chebyshev polynomial evaluated at 'x', given an approximation plan, 'plan'.
+
+y --- an N-dimensional array containing function evaluated on the approximation grid.
+
+plan --- a structure specifying how the approximation should be undertaken.
+"""
 function chebyshev_gradient_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
@@ -1647,7 +2157,23 @@ end
 
 # Functions for hessians
 
+"""
+Computes the hessian of a tensor-product Chebyshev polynomial evaluated at 'x', given the 
+polynomial weights, 'weights', the polynomial's order, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containinbg the polynomial weights.
+
+x --- a vector containing the point at which to evaluate the derivative.
+
+order --- a tuple or vector specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
 
   hess = Array{T,2}(undef, N, N)
   poly = Array{Array{R,2},1}(undef, N)
@@ -1680,7 +2206,23 @@ function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::Un
 
 end
 
+"""
+Computes the hessian of a complete Chebyshev polynomial evaluated at 'x', given the 
+polynomial weights, 'weights', the polynomial's order, 'order', and the domain, 'domain'.
+
+weights --- an N-dimensional array containinbg the polynomial weights.
+
+x --- a vector containing the point at which to evaluate the derivative.
+
+order --- a tuple or vector specifying the polynomial's order along each spacial dimension.
+
+domain --- a matrix containing the upper and lower bounds on the domain for each spacial dimension.
+"""
 function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
 
   hess = Array{T,2}(undef, N, N)
   poly = Array{Array{R,2},1}(undef, N)
@@ -1713,6 +2255,13 @@ function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::S,
 
 end
 
+"""
+Creates a function that evaluates the hessian of a Chebyshev polynomial evaluated at 'x', given an approximation plan, 'plan'.
+
+y --- an N-dimensional array containing function evaluated on the approximation grid.
+
+plan --- a structure specifying how the approximation should be undertaken.
+"""
 function chebyshev_hessian(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
@@ -1729,6 +2278,13 @@ function chebyshev_hessian(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CA
 
 end
 
+"""
+Creates a function that uses multi-threading to evaluate the hessian of a Chebyshev polynomial evaluated at 'x', given an approximation plan, 'plan'.
+
+y --- an N-dimensional array containing function evaluated on the approximation grid.
+
+plan --- a structure specifying how the approximation should be undertaken.
+"""
 function chebyshev_hessian_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
