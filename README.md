@@ -140,11 +140,11 @@ order_x2  = 7
 nodes_x2  = chebyshev_nodes(15)
 domain_x2 = [1.7,-0.3]
 
-order  = (order_x1,order_x2)
-nodes  = (nodes_x1,nodes_x2)
+order = (order_x1,order_x2)
+grid_points = (nodes_x1,nodes_x2)
 domain = [domain_x1 domain_x2]
 
-w = chebyshev_weights(y,nodes,order,domain)
+w = chebyshev_weights(y,grid_points,order,domain)
 ```
 
 would compute the weights, `w`, (a 2D array in this example) in a tensor-product polynomial.  The domain-argument is optional, needed only if one or more variable does not have domain [1.0,-1.0].  The nodes-argument can be an array-of-arrays (instead of a tuple).  Alternatively, the polynominals can be computed and entered directly into the `chebyshev_weights()` function:
@@ -170,11 +170,11 @@ order_x2  = 7
 nodes_x2  = chebyshev_extrema(15)
 domain_x2 = [1.7,-0.3]
 
-order  = [order_x1,order_x2]
-nodes  = (nodes_x1,nodes_x2)
+order = [order_x1,order_x2]
+grid_points = (nodes_x1,nodes_x2)
 domain = [domain_x1 domain_x2]
 
-w = chebyshev_weights_extrema(y,nodes,order,domain)
+w = chebyshev_weights_extrema(y,grid_points,order,domain)
 ```
 
 The third possibility is to use `chebyshev_weights_extended()`.
