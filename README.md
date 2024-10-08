@@ -30,6 +30,7 @@ where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol
 To compute nodes over bounded domains other than the [1.0,-1.0] interval, the `nodes` function accepts an optional third argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
 
 ```julia
+n = 11
 domain = [3.5,0.5]
 points = nodes(n,:chebyshev_extrema,domain)
 ```
@@ -60,8 +61,8 @@ A_plan = CApproxPlan(g,order,domain)
 where `g` is a Grid, `order` is an integer (complete polynomial approximation) or a tuple (tensor-product approximation), and `domain` is an array containing the upper and lower limits for each variable.  For example,
 
 ```julia
-dom_1 = [5.0,3.0]
-dom_2 = [1.5,-0.5]
+dom_1 = [25.0,5.0]
+dom_2 = [3.0,0.1]
 dom = [dom_1 dom_2]
 
 p1 = nodes(11,:chebyshev_nodes,dom_1)
@@ -78,13 +79,14 @@ Function approximation
 To approximate a function, you use the `chebyshev_interp` function, which itself returns a function.  If the data for the function you wish to approximate, sampled on the Grid, `g`, are contained in the Array, `y`, then the approximating function is generated using:
 
 ```julia
+y = [k^0.35*l^0.65 for k in p1.points, l in p2.points]
 f_approx = chebyshev_interp(y,A_plan)
 ```
 
 which can then be evaluated at a point, `x`, in the domain according to:
 
 ```julia
-x = [2.0,0.1]
+x = [9.0,0.7]
 y_hat = f_approx(x)
 ```
 
@@ -133,16 +135,18 @@ where `y` is a nD array containing the function evaluations at `nodes`, `nodes` 
 
 ```julia
 order_x1  = 5
-nodes_x1  = chebyshev_nodes(11)
-domain_x1 = [3.5,0.5]
+domain_x1 = [25.0,5.0]
+nodes_x1  = chebyshev_nodes(11,domain_x1)
 
 order_x2  = 7
-nodes_x2  = chebyshev_nodes(15)
-domain_x2 = [1.7,-0.3]
+domain_x2 = [3.0,0.1]
+nodes_x2  = chebyshev_nodes(15,domain_x2)
 
 order = (order_x1,order_x2)
 grid_points = (nodes_x1,nodes_x2)
 domain = [domain_x1 domain_x2]
+
+y = [k^0.35*l^0.65 for k in nodes_x1, l in nodes_x2]
 
 w = chebyshev_weights(y,grid_points,order,domain)
 ```
@@ -163,16 +167,18 @@ If the solution nodes are instead the Chebyshev-extrema, then the analogue to th
 
 ```julia
 order_x1  = 5
-nodes_x1  = chebyshev_extrema(11)
-domain_x1 = [3.5,0.5]
+domain_x1 = [25.0,5.0]
+nodes_x1  = chebyshev_extrema(11,domain_x1)
 
 order_x2  = 7
-nodes_x2  = chebyshev_extrema(15)
-domain_x2 = [1.7,-0.3]
+domain_x2 = [3.0,0.1]
+nodes_x2  = chebyshev_extrema(15,domain_x2)
 
 order = [order_x1,order_x2]
 grid_points = (nodes_x1,nodes_x2)
 domain = [domain_x1 domain_x2]
+
+y = [k^0.35*l^0.65 for k in nodes_x1, l in nodes_x2]
 
 w = chebyshev_weights_extrema(y,grid_points,order,domain)
 ```
