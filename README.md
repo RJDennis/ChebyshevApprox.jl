@@ -1,7 +1,7 @@
 ChebyshevApprox
 ===============
 
-ChebyshevApprox.jl is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), or the Chebyshev extended points (Chebyshev roots normalized so that the boundry nodes equal -1.0 and 1.0).  In addition to approximating functions, the package also uses the approximating polynomial to compute derivatives, gradients, and hessians.
+ChebyshevApprox.jl is a Julia package for approximating continuous functions using Chebyshev polynomials.  The package's focus is on multivariate functions that depend on an arbitrary number of variables.  Both tensor-product polynomials and complete polynomials are implemented.  Working with complete polynomials often leads to a considerable decrease in computation time with little loss of accuracy.  The package allows the nodes to be either the roots of the Chebyshev polynomial (points of the first kind), the extrema of the Chebyshev polynomial (points of the second kind), or the Chebyshev extended points (Chebyshev roots scaled so that the boundry nodes equal -1.0 and 1.0).  In addition to approximating functions, the package also uses the approximating polynomial to compute derivatives, gradients, and hessians.  The package allows you to work with high precision floating point numbers, such as BigFloats, and is compatable with packages such at DoubleFloats.jl.
 
 Installation
 ------------
@@ -25,7 +25,19 @@ n = 11
 points = nodes(n,:chebyshev_nodes)
 ```
 
-where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol indicating the type of nodes to be produced.  Alternatives to `:chebyshev_nodes` are: `chebyshev_extrema`, and `:chebyshev_extended`. 
+where `n`, an integer, is the number of nodes and `:chebyshev_nodes` is a symbol indicating the type of nodes to be produced.  Alternatives to `:chebyshev_nodes` are: `chebyshev_extrema`, and `:chebyshev_extended`.  If you want these roots to be computed to high precision, then:
+
+```julia
+n = 11
+points = nodes(BigFloat,n,:chebyshev_nodes)
+```
+or
+```julia
+using DoubleFloats
+n = 11
+points = nodes(Double64,n,:chebyshev_nodes)
+```
+analogously for the Chebyshev extrema and the extended Chebyshev points.
 
 To compute nodes over bounded domains other than the [1.0,-1.0] interval, the `nodes` function accepts an optional third argument containing the domain in the form of a 1D array (a vector) containing two elements, where the first element is the upper bound on the interval and the second is the lower bound.  For example,
 
@@ -33,9 +45,10 @@ To compute nodes over bounded domains other than the [1.0,-1.0] interval, the `n
 n = 11
 domain = [3.5,0.5]
 points = nodes(n,:chebyshev_extrema,domain)
+points = nodes(Double64,n,:chebyshev_extrema,domain)
 ```
 
-would compute `n` extrema of the Chebyshev polynomial and scale those points to the [3.5,0.5] interval.
+would compute `n` extrema of the Chebyshev polynomial and scale those points to the [3.5,0.5] interval, using Double64 floating points number is the second case.
 
 Grids
 -----

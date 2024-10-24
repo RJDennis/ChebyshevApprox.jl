@@ -1,11 +1,15 @@
 name = "ChebyshevApprox"
 uuid = "17a596ad-87cd-578c-9b6d-01108c31dc04"
 authors = ["Richard Dennis <richard.dennis@glasgow.ac.uk>"]
-version = "0.4.2"
+version = "0.4.3"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+GenericLinearAlgebra = "14197337-ba66-59df-a3e3-ca00e7dcff7a"
 
 [compat]
 julia = "^1.6"
+LinearAlgebra = "^1.11"
+GenericLinearAlgebra = "^0.3"
+
 
