@@ -1,6 +1,10 @@
 abstract type Nodes end
 abstract type CApproximationPlan end
 
+"""
+ChebRoots is an immutable struct that contains two fields: the roots of the Chebyshev polynomial and the domain over 
+which they are located.
+"""  
 struct ChebRoots{R<:AbstractFloat,T<:AbstractFloat} <: Nodes
 
   points::Array{R,1}
@@ -8,6 +12,10 @@ struct ChebRoots{R<:AbstractFloat,T<:AbstractFloat} <: Nodes
 
 end
 
+"""
+ChebExtrema is an immutable struct that contains two fields: the extrema of the Chebyshev polynomial and the domain 
+over which they are located.
+"""  
 struct ChebExtrema{R<:AbstractFloat,T<:AbstractFloat} <: Nodes
 
   points::Array{R,1}
@@ -15,6 +23,11 @@ struct ChebExtrema{R<:AbstractFloat,T<:AbstractFloat} <: Nodes
 
 end
 
+"""
+ChebExtended is an immutable struct that contains two fields: the extended oints of the Chebyshev polynomial and the
+domain over which they are located.  The extended points are the Chebyshev roots scaled so that the first and last
+points equal -1.0 and 1.0, respectively.
+"""
 struct ChebExtended{R<:AbstractFloat,T<:AbstractFloat} <: Nodes
 
   points::Array{R,1}
@@ -22,12 +35,21 @@ struct ChebExtended{R<:AbstractFloat,T<:AbstractFloat} <: Nodes
 
 end
 
+"""
+Grid is an immutable struct that contains a single field: a tuple of Nodes subtypes (ChebRoots, ChebExtrema, 
+ChebExtended).
+"""
 struct Grid{G<:Nodes}
 
   grid::Tuple{Vararg{G}}
 
 end
 
+"""
+ChebPoly is an immutable struct that contains two fields: an array that contains a Chebyshev polynomial of degree
+```n```` evaluated over ```N``` points and a DataType that describes how the points were generated.  First- and 
+second-derivatives of Chebyshev polynomials are also represented using the ChebPoly type.
+"""
 struct ChebPoly{T<:AbstractFloat} # Holds polynomials as well as their first- and second-derivatives
 
   poly::Union{Array{T,2},Transpose{T,Array{T,2}}}
@@ -35,6 +57,11 @@ struct ChebPoly{T<:AbstractFloat} # Holds polynomials as well as their first- an
 
 end
 
+"""
+CApproxPlan is an immutable struct that contains the information used to approximate a multi-dimensional function.
+CApproxPlan has three fileds: A Grid type that summarizes the approximating points, the degree of the 
+approximating polynomials, and the approximation domain.
+""" 
 struct CApproxPlan{G<:Grid,S<:Integer,T<:AbstractFloat} <: CApproximationPlan
 
   grid::G
@@ -43,6 +70,11 @@ struct CApproxPlan{G<:Grid,S<:Integer,T<:AbstractFloat} <: CApproximationPlan
 
 end
 
+"""
+CApproxPoly is an immutable struct that contains the information used to approximate a multi-dimensional function.
+CApproxPlan has three fileds: A Tuple that contains the univariate Chebyshev polynomials, the degree of the 
+approximating polynomials, and the approximation domain.
+"""
 struct CApproxPlanPoly{N,P<:ChebPoly,S<:Integer,T<:AbstractFloat} <: CApproximationPlan
 
   polys::NTuple{N,P}
@@ -52,7 +84,8 @@ struct CApproxPlanPoly{N,P<:ChebPoly,S<:Integer,T<:AbstractFloat} <: CApproximat
 end
 
 """
-Computes ```N``` roots of the Chebyshev polynomial and scales the roots to the interval given in ```domain``` (defaults to [1.0,-1.0]).
+Computes ```N``` roots of the Chebyshev polynomial and scales the roots to the interval given in ```domain```
+(defaults to [1.0,-1.0]).  Returns a vector containing the ```N``` Chebyshev roots located over the specified domain.
 
 Signature
 =========
@@ -86,7 +119,9 @@ function chebyshev_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 end
 
 """
-Computes ```N``` roots of floating point type ```T``` of the Chebyshev polynomial and scales the roots to the interval given in ```domain``` (defaults to [1.0,-1.0]).
+Computes ```N``` roots with floating point type ```T``` of the Chebyshev polynomial and scales the roots to the 
+interval given in ```domain``` (defaults to [1.0,-1.0]).  Returns a vector containing the ```N``` Chebyshev roots
+with type ```T``` located over the specified domain.
 
 Signature
 =========
@@ -104,6 +139,10 @@ julia> points = chebyshev_nodes(Float64,2)
 julia> points = chebyshev_nodes(Double64,2,[3.0,-1.0])
 [-4.1421356237309504880168872420969394e-01
   2.41421356237309504880168872420969394]
+
+julia> points = chebyshev_nodes(BigFloat,2,[3.0,-1.0])
+[-0.4142135623730950488016887242096980785696718753769480731766797379907324784621193
+  2.414213562373095048801688724209698078569671875376948073176679737990732478462119]
 ```
 """
 function chebyshev_nodes(T::DataType,N::S, domain=[1.0, -1.0]) where {S<:Integer}
@@ -121,7 +160,9 @@ function chebyshev_nodes(T::DataType,N::S, domain=[1.0, -1.0]) where {S<:Integer
 end
 
 """
-Computes ```N``` extrema of the Chebyshev polynomial and scales the extrema to the interval given in ```domain``` (defaults to [1.0,-1.0]).
+Computes ```N``` extrema of the Chebyshev polynomial and scales the extrema to the interval given in ```domain``` 
+(defaults to [1.0,-1.0]).  Returns a vector containing the ```N``` Chebyshev extrema located over the specified 
+domain.
 
 Signature
 =========
@@ -131,13 +172,13 @@ points = chebyshev_extrema(N,domain)
 Examples
 ========
 ```
-julia> points = chebyshev_nodes(4)
+julia> points = chebyshev_extrema(4)
 [-1.0
  -0.5000000000000001
   0.5000000000000001
   1.0]
 
-julia> points = chebyshev_nodes(4,[3.0,-1.0])
+julia> points = chebyshev_extrema(4,[3.0,-1.0])
 [-1.0
  -2.220446049250313e-16
   2.0
@@ -159,7 +200,9 @@ function chebyshev_extrema(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 end
 
 """
-Computes ```N``` extrema of floating point type ```T``` of the Chebyshev polynomial and scales the extrema to the interval given in ```domain``` (defaults to [1.0,-1.0]).
+Computes ```N``` extrema with floating point type ```T``` of the Chebyshev polynomial and scales the extrema to the
+interval given in ```domain``` (defaults to [1.0,-1.0]).  Returns a vector containing the ```N``` Chebyshev extrema
+with type ```T``` located over the specified domain.
 
 Signature
 =========
@@ -170,16 +213,22 @@ Examples
 ========
 ```
 julia> using DoubleFloats
-julia> points = chebyshev_nodes(Float64,4)
+julia> points = chebyshev_extrema(Float64,4)
 [-1.0
  -5.00000000000000000000000000000002311e-01
   5.00000000000000000000000000000002311e-01
   1.0]
 
-julia> points = chebyshev_nodes(Double64,4,[3.0,-1.0])
+julia> points = chebyshev_extrema(Double64,4,[3.0,-1.0])
 [-1.0
  -4.622231866529366e-33
   2.00000000000000000000000000000000462
+  3.0]
+
+  julia> points = chebyshev_extrema(BigFloat,4,[3.0,-1.0])
+[-1.0
+ -1.727233711018888925077270372560079914223200072887256277004740694033718360632485e-77
+  2.0
   3.0]
 ```
 """
@@ -198,7 +247,8 @@ function chebyshev_extrema(T::DataType, N::S, domain=[1.0, -1.0]) where {S<:Inte
 end
 
 """
-Computes ```N``` extended Chebyshev points of the Chebyshev polynomial and scales the points to the interval given in ```domain``` (defaults to [1.0,-1.0]).
+Computes ```N``` Chebyshev extended points and scales the points to the interval given in ```domain``` (defaults to
+[1.0,-1.0]).  Returns a vector containing the ```N``` Chebyshev extended points located over the specified domain.
 
 Signature
 =========
@@ -208,13 +258,13 @@ points = chebyshev_extended(N,domain)
 Examples
 ========
 ```
-julia> points = chebyshev_nodes(4)
+julia> points = chebyshev_extended(4)
 [-1.0
  -0.41421356237309515
   0.41421356237309515
   1.0]
 
-julia> points = chebyshev_nodes(4,[3.0,-1.0])
+julia> points = chebyshev_extended(4,[3.0,-1.0])
 [-1.0
   0.1715728752538097
   1.8284271247461903
@@ -236,7 +286,9 @@ function chebyshev_extended(N::S, domain=[1.0, -1.0]) where {S<:Integer}
 end
 
 """
-Computes ```N``` extended Chebyshev points of floating point type ```T``` of the Chebyshev polynomial and scales the points to the interval given in ```domain``` (defaults to [1.0,-1.0]).
+Computes ```N``` Chebyshev extended points with floating point type ```T``` and scales the points to the interval
+given in ```domain``` (defaults to [1.0,-1.0]).  Returns a vector containing the ```N``` Chebyshev extended points
+of type ```T``` located over the specified domain.
 
 Signature
 =========
@@ -247,17 +299,23 @@ Examples
 ========
 ```
 julia> using DoubleFloats
-julia> points = chebyshev_nodes(Float64,4)
+julia> points = chebyshev_extended(Float64,4)
 [-1.00000000000000001909886133787806654
  -4.1421356237309505671269611624194948e-01
   4.1421356237309505671269611624194948e-01
   1.00000000000000001909886133787806654]
 
-julia> points = chebyshev_nodes(Double64,4,[3.0,-1.0])
+julia> points = chebyshev_extended(Double64,4,[3.0,-1.0])
 [-1.00000000000000003819772267575613308
   1.71572875253809886574607767516101039e-01
   1.82842712474619011342539223248389896
   3.00000000000000003819772267575613308]
+
+  julia> points = chebyshev_extended(BigFloat,4,[3.0,-1.0])
+[-1.000000000000000038197722675756133178078150949228553435907665016103921602647826
+  0.1715728752538098865746077675161036699979185261802141131475309447067879422084131
+  1.828427124746190113425392232483896330002081473819785886852469055293212057791578
+  3.000000000000000038197722675756133178078150949228553435907665016103921602647826]
 ```
 """
 function chebyshev_extended(T::DataType, N::S, domain=[1.0, -1.0]) where {S<:Integer}
@@ -275,7 +333,9 @@ function chebyshev_extended(T::DataType, N::S, domain=[1.0, -1.0]) where {S<:Int
 end
 
 """
-Computes ```N``` points according to ```node_generator``` and scales the points to the interval given in ```domain```.
+Computes ```N``` points according to ```node_generator``` and scales the points to the interval given in 
+```domain``` (defaults to [1.0,-1.0]).  Return the points in a struct (ChebRoots, ChebExtrema, ChebExtended)
+according to the ```node_generator```.
 
 Signature
 =========
@@ -307,7 +367,9 @@ function nodes(N::S, node_generator::Symbol, domain=[1.0, -1.0],) where {S<:Inte
 end
 
 """
-Computes ```N``` points of type ```T``` according to ```node_generator``` and scales the points to the interval given in ```domain```.
+Computes ```N``` points of type ```T``` according to ```node_generator``` and scales the points to the interval
+given in ```domain``` (defaults to [1.0,-1.0]).  Return the points in a struct (ChebRoots, ChebExtrema, 
+ChebExtended) according to the ```node_generator```.
 
 Signature
 =========
@@ -368,7 +430,8 @@ function normalize_node(nodes::G) where {G<:Nodes} # Internal function, not expo
 end
 
 """
-Computes the Chebyshev polynomial of ```order``` at ```x```, which must lie in [1.0,-1.0].
+Computes the Chebyshev polynomial of degree ```order``` at the scalar point ```x```, which must lie in [1.0,-1.0].
+Returns a 2d array.  The element-type of the polynomial is given by the element-type of ```x```.
 
 Signature
 =========
@@ -402,7 +465,9 @@ function chebyshev_polynomial(order::S, x::R) where {S<:Integer,R<:Number}
 end
 
 """
-Computes the Chebyshev polynomial of ```order``` at ```x```. The elements of ```x``` must lie in [1.0,-1.0].
+Computes the Chebyshev polynomial of degree ```order``` at end point in the vector ```x```. The elements of ```x```
+must lie in [1.0,-1.0].  Returns a 2d array.  The element-type of the polynomial is given by the element-type of 
+```x```.
 
 Signature
 =========
@@ -438,7 +503,9 @@ function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {S<:Integer
 end
 
 """
-Computes the Chebyshev polynomial of ```order``` at ```nodes```.  The elements of ```nodes.points``` must lie in [1.0,-1.0].
+Computes the Chebyshev polynomial of degree ```order``` at each point specified in the ```nodes``` struct.  The 
+elements of ```nodes.points``` must lie in [1.0,-1.0].  Returns a ChebPoly type.  The element-type of the polynomial
+is given by the element-type of ```x```.
 
 Signature
 =========
@@ -477,7 +544,8 @@ function chebyshev_polynomial(order::S, nodes::G) where {S<:Integer,G<:Nodes}
 end
 
 """
-Computes the first derivative of the Chebyshev polynomial of ```order``` at ```x```, which must lie in [1.0,-1.0].
+Computes the first derivative of the Chebyshev polynomial of ```order``` at the scalar ```x```, which must lie in 
+[1.0,-1.0].  Returns a 2d array.  The element-type of the polynomial is given by the element-type of ```x```.
 
 Signature
 =========
@@ -516,7 +584,9 @@ function chebyshev_polynomial_deriv(order::S, x::R) where {S<:Integer,R<:Number}
 end
 
 """
-Computes the first derivative of the Chebyshev polynomial of ```order``` at ```x```. The elements of ```x``` must lie in [1.0,-1.0].
+Computes the first derivative of the Chebyshev polynomial of ```order``` at each point in the vector ```x```.  The
+elements of ```x``` must lie in [1.0,-1.0].  Returns a 2d array.  The element-type of the polynomial is given by 
+the element-type of ```x```.
 
 Signature
 =========
@@ -557,7 +627,9 @@ function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:I
 end
 
 """
-Computes the first derivative of the Chebyshev polynomial of ```order``` at ```nodes```.  The elements of ```nodes.points``` must lie in [1.0,-1.0].
+Computes the first derivative of the Chebyshev polynomial of ```order``` at each point specified in the ```nodes```
+struct.  The elements of ```nodes.points``` must lie in [1.0,-1.0].  Returns a ChebPoly type.  The element-type of
+the polynomial is given by the element-type of ```x```.
 
 Signature
 =========
@@ -602,7 +674,8 @@ function chebyshev_polynomial_deriv(order::S, nodes::G) where {S<:Integer,G<:Nod
 end
 
 """
-Computes the second derivative of the Chebyshev polynomial of ```order``` at ```x```, which must lie in [1.0,-1.0].
+Computes the second derivative of the Chebyshev polynomial of ```order``` at the scalar ```x```, which must lie in
+[1.0,-1.0].  Returns a 2d array.  The element-type of the polynomial is given by the element-type of ```x```.
 
 Signature
 =========
@@ -647,7 +720,9 @@ function chebyshev_polynomial_sec_deriv(order::S, x::T) where {T<:Number,S<:Inte
 end
 
 """
-Computes the second derivative of the Chebyshev polynomial of ```order``` at ```x```. The elements of ```x``` must lie in [1.0,-1.0].
+Computes the second derivative of the Chebyshev polynomial of ```order``` at each poiunt in the vector ```x```. The
+elements of ```x``` must lie in [1.0,-1.0].  Returns a 2d array.  The element-type of the polynomial is given by the
+element-type of ```x```.
 
 Signature
 =========
@@ -694,7 +769,9 @@ function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {
 end
 
 """
-Computes the second derivative of the Chebyshev polynomial of ```order``` at ```nodes```.  The elements of ```nodes.points``` must lie in [1.0,-1.0].
+Computes the second derivative of the Chebyshev polynomial of ```order``` at each point specified in the ```nodes```
+struct.  The elements of ```nodes.points``` must lie in [1.0,-1.0].  Returns a ChebPoly type.  The element-type of 
+the polynomial is given by the element-type of ```x```.
 
 Signature
 =========
@@ -745,12 +822,46 @@ function chebyshev_polynomial_sec_deriv(order::S,nodes::G) where {G<:Nodes,S<:In
 end
 
 """
-Computes weights in a Chebyshev polynomial given the approximation sample, ```y```, and the approximation plan, ```plan```.
+Computes the weights in a Chebyshev polynomial given the approximation sample, ```y```, and the approximation plan,
+```plan```.  Returns a multi-dimensional array containing the weights in the specified ```plan```.  The 
+element-type of the Chebyshev weights is given by the element-type of the approximating points specified in the 
+approximation ```plan```.
 
 Signature
 =========
 
 w = chebyshev_weights(y,plan)
+
+Examples
+========
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> weights = chebyshev_weights(y,plan)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+
+julia> nodes1 = nodes(9,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(9,:chebyshev_nodes,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:9, j in 1:9]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlanPoly((poly1,poly2),ord,dom)
+julia> weights = chebyshev_weights(y,plan)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+```
 """ 
 function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
@@ -759,6 +870,7 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
     nodes = Tuple(plan.grid.grid[i].points for i in eachindex(plan.grid.grid))
 
     if eltype(plan.grid.grid) <: ChebRoots
+      println("hello")
       return chebyshev_weights(y, nodes, plan.order, plan.domain)
     elseif eltype(plan.grid.grid) <: ChebExtrema
       return chebyshev_weights_extrema(y, nodes, plan.order, plan.domain)
@@ -783,12 +895,28 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a multi-dimensional array
+containing the weights.  The element-type of the Chebyshev weights is given by the element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_nodes(5,[9.0,3.0])
+julia> nodes2 = chebyshev_nodes(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
 """
 function chebyshev_weights(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -821,12 +949,28 @@ function chebyshev_weights(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Un
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a multi-dimensional array
+containing the weights.  The element-type of the Chebyshev weights is given by the element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_extrema(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extrema(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extrema(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extrema(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598461   -0.02372       0.00280618
+  0.263786     0.0948622  -0.00375987    0.000444808
+ -0.024647    -0.0088635   0.000351305  -4.15608e-5
+  0.00386243   0.001389   -5.5053e-5     6.513e-6]
 """
 function chebyshev_weights_extrema(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -869,12 +1013,29 @@ function chebyshev_weights_extrema(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, o
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev extended points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+extended points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a multi-dimensional
+array containing the weights.  The element-type of the Chebyshev weights is given by the element-type of the
+```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extended(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extended(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extended(y,(nodes1,nodes2),ord,dom)
+[1.66393      0.598444    -0.0238922     0.00277041
+  0.263837     0.0948909   -0.00378841    0.000439284
+ -0.0249247   -0.00896435   0.000357891  -4.14991e-5
+  0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
 """
 function chebyshev_weights_extended(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -917,12 +1078,30 @@ function chebyshev_weights_extended(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev roots, and the ```order``` of the polynomial.
+Computes the weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+polynomials, ```poly``` evaluated at the Chebyshev roots, and the ```order``` of the polynomial.  Returns a 
+multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> weights = chebyshev_weights(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
 """
 function chebyshev_weights(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -954,12 +1133,30 @@ function chebyshev_weights(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Uni
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev extrema, and the ```order``` of the polynomial.
+Computes the weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+polynomials, ```poly``` evaluated at the Chebyshev extrema, and the ```order``` of the polynomial.  Returns a 
+multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extrema(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extrema,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extrema,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> weights = chebyshev_weights_extrema(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598461   -0.02372       0.00280618
+  0.263786     0.0948622  -0.00375987    0.000444808
+ -0.024647    -0.0088635   0.000351305  -4.15608e-5
+  0.00386243   0.001389   -5.5053e-5     6.513e-6]
 """
 function chebyshev_weights_extrema(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1001,12 +1198,30 @@ function chebyshev_weights_extrema(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, or
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev extended points, and the ```order``` of the polynomial.
+Computes the weights in a tensor-product Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+polynomials, ```poly``` evaluated at the extended Chebyshev points, and the ```order``` of the polynomial.  Returns a 
+multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extended,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extended,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> weights = chebyshev_weights_extended(y,(poly1.poly,poly2.poly),ord)
+[1.66393      0.598444    -0.0238922     0.00277041
+  0.263837     0.0948909   -0.00378841    0.000439284
+ -0.0249247   -0.00896435   0.000357891  -4.14991e-5
+  0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
 """
 function chebyshev_weights_extended(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1047,12 +1262,28 @@ function chebyshev_weights_extended(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 end
 
 """
-Computes weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a multi-dimensional array
+containing the weights.  The element-type of the Chebyshev weights is given by the element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_nodes(5,[9.0,3.0])
+julia> nodes2 = chebyshev_nodes(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
 """
 function chebyshev_weights(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1093,12 +1324,28 @@ function chebyshev_weights(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S,
 end
 
 """
-Computes weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a multi-dimensional array
+containing the weights.  The element-type of the Chebyshev weights is given by the element-type of the ```nodes```.
 
 Signature
 =========
 
-w = chebyshev_weights_extrema(y,nodes,order,domain)
+w = chebyshev_weights(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extrema(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extrema(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extrema(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598461   -0.02372     0.00280618
+  0.263786     0.0948622  -0.00375987  0.0
+ -0.024647    -0.0088635   0.0         0.0
+  0.00386243   0.0         0.0         0.0]
 """
 function chebyshev_weights_extrema(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1149,12 +1396,28 @@ function chebyshev_weights_extrema(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, o
 end
 
 """
-Computes weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev extended points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the extended 
+Chebyshev points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a multi-dimensional
+array containing the weights.  The element-type of the Chebyshev weights is given by the element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extended(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extended(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extended(y,(nodes1,nodes2),ord,dom)
+[1.66393      0.598444    -0.0238922   0.00277041
+  0.263837     0.0948909   -0.00378841  0.0
+ -0.0249247   -0.00896435   0.0         0.0
+  0.00379791   0.0          0.0         0.0]
 """
 function chebyshev_weights_extended(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1204,12 +1467,30 @@ function chebyshev_weights_extended(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 end
 
 """
-Computes weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev roots, and the ```order``` of the polynomial.
+Computes the weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+polynomials, ```poly``` evaluated at the Chebyshev roots, and the ```order``` of the polynomial.  Returns a 
+multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> weights = chebyshev_weights(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
 """
 function chebyshev_weights(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1248,12 +1529,30 @@ function chebyshev_weights(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) 
 end
 
 """
-Computes weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev extrema, and the ```order``` of the polynomial.
+Computes the weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+polynomials, ```poly``` evaluated at the Chebyshev extrema, and the ```order``` of the polynomial.  Returns a 
+multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extrema(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extrema,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extrema,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> weights = chebyshev_weights_extrema(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598461   -0.02372     0.00280618
+  0.263786     0.0948622  -0.00375987  0.0
+ -0.024647    -0.0088635   0.0         0.0
+  0.00386243   0.0         0.0         0.0]
 """
 function chebyshev_weights_extrema(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1302,12 +1601,30 @@ function chebyshev_weights_extrema(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, or
 end
 
 """
-Computes weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev extended points, and the ```order``` of the polynomial.
+Computes the weights in a complete Chebyshev polynomial given the approximation sample, ```y```, the Chebyshev
+polynomials, ```poly``` evaluated at the extended Chebyshev points, and the ```order``` of the polynomial.  
+Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given
+by the element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extended,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extended,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> weights = chebyshev_weights_extended(y,(poly1.poly,poly2.poly),ord)
+[1.66393      0.598444    -0.0238922   0.00277041
+  0.263837     0.0948909   -0.00378841  0.0
+ -0.0249247   -0.00896435   0.0         0.0
+  0.00379791   0.0          0.0         0.0]
 """
 function chebyshev_weights_extended(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1354,12 +1671,46 @@ function chebyshev_weights_extended(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 end
 
 """
-Computes weights in a Chebyshev polynomial using multi-threading given the approximation sample, ```y```, and the approximation plan, ```plan```.
+Computes the weights in a Chebyshev polynomial using multi-threading given the approximation sample, ```y```, and
+the approximation plan, ```plan```.  Returns a multi-dimensional array containing the weights in the specified 
+```plan```.  The element-type of the Chebyshev weights is given by the element-type of the approximating points 
+specified in the  approximation ```plan```.
 
 Signature
 =========
 
 w = chebyshev_weights_threaded(y,plan)
+
+Examples
+========
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> weights = chebyshev_weights_threaded(y,plan)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+
+julia> nodes1 = nodes(9,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(9,:chebyshev_nodes,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:9, j in 1:9]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlanPoly((poly1,poly2),ord,dom)
+julia> weights = chebyshev_weights_threaded(y,plan)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+```
 """
 function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
@@ -1392,12 +1743,29 @@ function chebyshev_weights_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Ab
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample, 
+```y```, the Chebyshev roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a 
+multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_nodes(5,[9.0,3.0])
+julia> nodes2 = chebyshev_nodes(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_threaded(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
 """
 function chebyshev_weights_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1431,12 +1799,29 @@ function chebyshev_weights_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample,
+```y```, the Chebyshev extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns a 
+multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extrema(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extrema(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extrema_threaded(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598461   -0.02372       0.00280618
+  0.263786     0.0948622  -0.00375987    0.000444808
+ -0.024647    -0.0088635   0.000351305  -4.15608e-5
+  0.00386243   0.001389   -5.5053e-5     6.513e-6]
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1480,12 +1865,29 @@ function chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::NTuple{N,Array
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev extended points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample,
+```y```, the Chebyshev extended points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  
+Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the
+element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extended(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extended(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extended_threaded(y,(nodes1,nodes2),ord,dom)
+[1.66393      0.598444    -0.0238922     0.00277041
+  0.263837     0.0948909   -0.00378841    0.000439284
+ -0.0249247   -0.00896435   0.000357891  -4.14991e-5
+  0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1528,12 +1930,30 @@ function chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::NTuple{N,Arra
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev polynomials, ```poly```, evaluated at the Chebyshev roots, and the ```order``` of the polynomial.
+Computes the weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample,
+```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev roots, and the ```order``` of the
+polynomial.  Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev weights
+is given by the element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> weights = chebyshev_weights_threaded(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
 """
 function chebyshev_weights_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1565,12 +1985,30 @@ function chebyshev_weights_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev polynomials, ```poly```, evaluated at the Chebyshev extrema, and the ```order``` of the polynomial.
+Computes the weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample,
+```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev extrema, and the ```order``` of the 
+polynomial.  Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev weights 
+is given by the element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extrema,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extrema,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> weights = chebyshev_weights_extrema_threaded(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598461   -0.02372       0.00280618
+  0.263786     0.0948622  -0.00375987    0.000444808
+ -0.024647    -0.0088635   0.000351305  -4.15608e-5
+  0.00386243   0.001389   -5.5053e-5     6.513e-6]
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1612,12 +2050,30 @@ function chebyshev_weights_extrema_threaded(y::Array{T,N}, poly::NTuple{N,Array{
 end
 
 """
-Computes weights in a tensor-product Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev polynomials, ```poly```, evaluated at the Chebyshev extended points, and the ```order``` of the polynomial.
+Computes the weights in a tensor-product Chebyshev polynomial using multi-threadinggiven the approximation sample,
+```y```, the Chebyshev polynomials, ```poly``` evaluated at the extended Chebyshev points, and the ```order``` of
+the polynomial.  Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev 
+weights is given by the element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extended,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extended,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> weights = chebyshev_weights_extended_threaded(y,(poly1.poly,poly2.poly),ord)
+[1.66393      0.598444    -0.0238922     0.00277041
+  0.263837     0.0948909   -0.00378841    0.000439284
+ -0.0249247   -0.00896435   0.000357891  -4.14991e-5
+  0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1657,12 +2113,29 @@ function chebyshev_weights_extended_threaded(y::Array{T,N}, poly::NTuple{N,Array
 end
 
 """
-Computes weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, 
+```y```, the Chebyshev roots, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns 
+a multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_nodes(5,[9.0,3.0])
+julia> nodes2 = chebyshev_nodes(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_threaded(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
 """
 function chebyshev_weights_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1703,12 +2176,29 @@ function chebyshev_weights_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, 
 end
 
 """
-Computes weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, 
+```y```, the Chebyshev extrema, ```nodes```, the ```order``` of the polynomial, and the ```domain```.  Returns
+a multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given by the 
+element-type of the ```nodes```.
 
 Signature
 =========
 
-w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+w = chebyshev_weights_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extrema(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extrema(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extrema_threaded(y,(nodes1,nodes2),ord,dom)
+[1.66416      0.598461   -0.02372     0.00280618
+  0.263786     0.0948622  -0.00375987  0.0
+ -0.024647    -0.0088635   0.0         0.0
+  0.00386243   0.0         0.0         0.0]
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1759,12 +2249,29 @@ function chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::NTuple{N,Array
 end
 
 """
-Computes weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev extended points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Computes the weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, 
+```y```, the extended Chebyshev points, ```nodes```, the ```order``` of the polynomial, and the ```domain```.
+Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev weights is given
+by the element-type of the ```nodes```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = chebyshev_extended(5,[9.0,3.0])
+julia> nodes2 = chebyshev_extended(5,[1.5,0.5])
+julia> y = [nodes1[i]^0.3*nodes2[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> weights = chebyshev_weights_extended_threaded(y,(nodes1,nodes2),ord,dom)
+[1.66393      0.598444    -0.0238922   0.00277041
+  0.263837     0.0948909   -0.00378841  0.0
+ -0.0249247   -0.00896435   0.0         0.0
+  0.00379791   0.0          0.0         0.0]
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1814,12 +2321,30 @@ function chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::NTuple{N,Arra
 end
 
 """
-Computes weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev polynomials, ```poly```, evaluated at the Chebyshev roots, and the ```order``` of the polynomial.
+Computes the weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, 
+```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev roots, and the ```order``` of the 
+polynomial.  Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev 
+weights is given by the element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> weights = chebyshev_weights_threaded(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
 """
 function chebyshev_weights_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1858,12 +2383,30 @@ function chebyshev_weights_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, o
 end
 
 """
-Computes weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev polynomials, ```poly```, evaluated at the Chebyshev extrema, and the ```order``` of the polynomial.
+Computes the weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, 
+```y```, the Chebyshev polynomials, ```poly``` evaluated at the Chebyshev extrema, and the ```order``` of the
+polynomial.  Returns a multi-dimensional array containing the weights.  The element-type of the Chebyshev 
+weights is given by the element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extrema,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extrema,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> weights = chebyshev_weights_extrema_threaded(y,(poly1.poly,poly2.poly),ord)
+[1.66416      0.598461   -0.02372     0.00280618
+  0.263786     0.0948622  -0.00375987  0.0
+ -0.024647    -0.0088635   0.0         0.0
+  0.00386243   0.0         0.0         0.0]
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1912,12 +2455,30 @@ function chebyshev_weights_extrema_threaded(y::Array{T,N}, poly::NTuple{N,Array{
 end
 
 """
-Computes weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, ```y```, the Chebyshev polynomials, ```poly```, evaluated at the Chebyshev extended points, and the ```order``` of the polynomial.
+Computes the weights in a complete Chebyshev polynomial using multi-threading given the approximation sample, 
+```y```, the Chebyshev polynomials, ```poly``` evaluated at the extended Chebyshev points, and the ```order``` 
+of the polynomial.  Returns a multi-dimensional array containing the weights.  The element-type of the 
+Chebyshev weights is given by the element-type of ```poly```.
 
 Signature
 =========
 
 w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_extended,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_extended,[1.5,0.5])
+julia> poly1 = chebyshev_polynomial(3,nodes1)
+julia> poly2 = chebyshev_polynomial(3,nodes2)
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = 3
+julia> weights = chebyshev_weights_extended_threaded(y,(poly1.poly,poly2.poly),ord)
+[1.66393      0.598444    -0.0238922   0.00277041
+  0.263837     0.0948909   -0.00378841  0.0
+ -0.0249247   -0.00896435   0.0         0.0
+  0.00379791   0.0          0.0         0.0]
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2020,6 +2581,20 @@ Signature
 =========
 
 yhat = chebyshev_evaluate(weights,x,order,domain)
+
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+julia> x = [5.5,0.9]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> yhat = chebyshev_evaluate(weights,x,ord,dom)
+1.5500018804115083
+```
 """
 function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2049,6 +2624,19 @@ Signature
 =========
 
 yhat = chebyshev_evaluate(weights,x,order,domain)
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
+julia> x = [5.5,0.9]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> yhat = chebyshev_evaluate(weights,x,ord,dom)
+1.5498202486133335
+```
 """
 function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2056,7 +2644,7 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
     error("A value for 'x' is needed for each spacial dimension.")
   end
 
-  poly = [chebyshev_polynomial(order[i], normalize_node(x[i], domain[:, i])) for i in 1:N] # allocates
+  poly = [chebyshev_polynomial(order, normalize_node(x[i], domain[:, i])) for i in 1:N] # allocates
 
   yhat = zero(T)
   @inbounds for i in CartesianIndices(weights)
@@ -2080,6 +2668,21 @@ Signature
 =========
 
 f = chebyshev_interp(y,plan)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> f = chebyshev_interp(y,plan)
+julia> f([5.5,0.9])
+1.550003750285832
+```
 """
 function chebyshev_interp(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
@@ -2103,6 +2706,21 @@ Signature
 =========
 
 f = chebyshev_interp_threaded(y,plan)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> f = chebyshev_interp_threaded(y,plan)
+julia> f([5.5,0.9])
+1.550003750285832
+```
 """
 function chebyshev_interp_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
@@ -2120,8 +2738,6 @@ function chebyshev_interp_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFlo
 
 end
 
-# Doctrings have been worked on until here.
-
 # Functions for derivatives
 
 """
@@ -2131,6 +2747,21 @@ Signature
 =========
 
 d = chebyshev_derivative(weights,x,pos,order,domain)
+
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+julia> x = [5.5,0.9]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> pos = 1
+julia> d = chebyshev_derivative(weights,x,pos,ord,dom)
+0.08487312307427555
+```
 """
 function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2167,6 +2798,21 @@ Signature
 =========
 
 d = chebyshev_derivative(weights,x,pos,order,domain)
+
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
+julia> x = [5.5,0.9]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> pos = 1
+julia> d = chebyshev_derivative(weights,x,pos,ord,dom)
+0.08452286208888889
+```
 """
 function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2206,7 +2852,21 @@ Computes the gradient of a tensor-product Chebyshev polynomial evaluated at ```x
 Signature
 =========
 
-g = chebyshev_gradient(weights,x,pos,order,domain)
+g = chebyshev_gradient(weights,x,order,domain)
+
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+julia> x = [5.5,0.9]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> g = chebyshev_gradient(weights,x,ord,dom)
+[0.0848731  1.2072]
+```
 """
 function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2230,7 +2890,21 @@ Computes the gradient of a complete Chebyshev polynomial evaluated at ```x````, 
 Signature
 =========
 
-g = chebyshev_gradient(weights,x,pos,order,domain)
+g = chebyshev_gradient(weights,x,order,domain)
+
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
+julia> x = [5.5,0.9]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> g = chebyshev_gradient(weights,x,ord,dom)
+[0.0845229  1.20519]
+```
 """
 function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2255,6 +2929,21 @@ Signature
 =========
 
 g = chebyshev_gradient(y,plan)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> grad = chebyshev_gradient(y,plan)
+julia> grad([5.5,0.9])
+[0.0848731  1.2072]
+```
 """
 function chebyshev_gradient(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
@@ -2279,6 +2968,21 @@ Signature
 =========
 
 g = chebyshev_gradient_threaded(y,plan)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> grad = chebyshev_gradient_threaded(y,plan)
+julia> grad([5.5,0.9])
+[0.0848731  1.2072]
+```
 """
 function chebyshev_gradient_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
@@ -2304,7 +3008,22 @@ Computes the hessian of a tensor-product Chebyshev polynomial evaluated at ```x`
 Signature
 =========
 
-h = chebyshev_hessian(weights,x,pos,order,domain)
+h = chebyshev_hessian(weights,x,order,domain)
+
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052     0.00272941
+  0.26378      0.0948592   -0.00375743    0.000432628
+ -0.0246176   -0.00885287   0.000350667  -4.03756e-5
+  0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+julia> x = [5.5,0.9]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> h = chebyshev_hessian(weights,x,ord,dom)
+[-0.0118667   0.0661025
+  0.0661025  -0.42678]
+```
 """
 function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2349,7 +3068,22 @@ Computes the hessian of a complete Chebyshev polynomial evaluated at ```x````, g
 Signature
 =========
 
-h = chebyshev_hessian(weights,x,pos,order,domain)
+h = chebyshev_hessian(weights,x,order,domain)
+
+Example
+=======
+```
+julia> weights = [1.66416      0.598458    -0.0237052   0.00272941
+  0.26378      0.0948592   -0.00375743  0.0
+ -0.0246176   -0.00885287   0.0         0.0
+  0.00372291   0.0          0.0         0.0]
+julia> x = [5.5,0.9]
+julia> ord = 3
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> h = chebyshev_hessian(weights,x,ord,dom)
+[-0.0118089   0.069178
+  0.069178   -0.421668]
+```
 """
 function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,R<:Number,N,S<:Integer}
 
@@ -2395,6 +3129,22 @@ Signature
 =========
 
 h = chebyshev_hessian(y,plan)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> h = chebyshev_hessian(y,plan)
+julia> h([5.5,0.9])
+[-0.0118667   0.0661025
+  0.0661025  -0.42678]
+```
 """
 function chebyshev_hessian(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
@@ -2418,6 +3168,22 @@ Signature
 =========
 
 h = chebyshev_hessian_threaded(y,plan)
+
+Example
+=======
+```
+julia> nodes1 = nodes(5,:chebyshev_nodes,[9.0,3.0])
+julia> nodes2 = nodes(5,:chebyshev_nodes,[1.5,0.5])
+julia> g = Grid((nodes1,nodes2))
+julia> y = [nodes1.points[i]^0.3*nodes2.points[j]^0.7 for i in 1:5, j in 1:5]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> plan = CApproxPlan(g,ord,dom)
+julia> h = chebyshev_hessian_threaded(y,plan)
+julia> h([5.5,0.9])
+[-0.0118667   0.0661025
+  0.0661025  -0.42678]
+```
 """
 function chebyshev_hessian_threaded(y::Array{T,N}, plan::P) where {T<:AbstractFloat,P<:CApproximationPlan,N}
 
