@@ -1,4 +1,6 @@
 using ChebyshevApprox
+using LinearAlgebra
+using GenericLinearAlgebra
 
 #######################
 ### Testing on Float64
