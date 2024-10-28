@@ -50,9 +50,9 @@ ChebPoly is an immutable struct that contains two fields: an array that contains
 ```n```` evaluated over ```N``` points and a DataType that describes how the points were generated.  First- and 
 second-derivatives of Chebyshev polynomials are also represented using the ChebPoly type.
 """
-struct ChebPoly{T<:AbstractFloat} # Holds polynomials as well as their first- and second-derivatives
+struct ChebPoly{T<:AbstractFloat} # Holds polynomials as well as their first- and second-derivative
 
-  poly::Union{Array{T,2},Transpose{T,Array{T,2}}}
+  poly::Array{T,2}
   nodetype::DataType
 
 end
@@ -603,8 +603,8 @@ julia> P = chebyshev_polynomial_deriv(3,[0.6,0.4])
 """
 function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Number}
 
-  poly_deriv = Array{R}(undef, order + 1, length(x))
-  poly_deriv[1, :] .= zero(R)
+  poly_deriv = Array{R}(undef, length(x), order + 1)
+  poly_deriv[:, 1] .= zero(R)
 
   @inbounds for j in eachindex(x)
     p = one(R)
@@ -613,16 +613,16 @@ function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:I
     for i = 2:order+1
       if i == 2
         pl, p = p, x[j]
-        poly_deriv[i,j] = one(R)
+        poly_deriv[j,i] = one(R)
       else
         pll, pl = pl, p
         p = 2*x[j]*pl - pll
-        poly_deriv[i,j] = 2*pl + 2*x[j]*poly_deriv[i-1,j] - poly_deriv[i-2,j]
+        poly_deriv[j,i] = 2*pl + 2*x[j]*poly_deriv[j,i-1] - poly_deriv[j,i-2]
       end
     end
   end
 
-  return transpose(poly_deriv)# <: AbstractArray
+  return poly_deriv
 
 end
 
@@ -650,8 +650,8 @@ function chebyshev_polynomial_deriv(order::S, nodes::G) where {S<:Integer,G<:Nod
 
   T = eltype(nodes.points)
 
-  poly_deriv = Array{T}(undef, order + 1,length(nodes.points))
-  poly_deriv[1,:] .= zero(T)
+  poly_deriv = Array{T}(undef,length(nodes.points), order + 1)
+  poly_deriv[:,1] .= zero(T)
 
   @inbounds for j in eachindex(nodes.points)
     p = one(T)
@@ -660,16 +660,16 @@ function chebyshev_polynomial_deriv(order::S, nodes::G) where {S<:Integer,G<:Nod
     for i = 2:order+1
       if i == 2
         pl, p = p, normalize_node(nodes.points[j],nodes.domain)
-        poly_deriv[i,j] = one(T)
+        poly_deriv[j,i] = one(T)
       else
         pll, pl = pl, p
         p = 2*normalize_node(nodes.points[j],nodes.domain)*pl - pll
-        poly_deriv[i,j] = 2*pl + 2*normalize_node(nodes.points[j],nodes.domain)*poly_deriv[i-1,j] - poly_deriv[i-2,j]
+        poly_deriv[j,i] = 2*pl + 2*normalize_node(nodes.points[j],nodes.domain)*poly_deriv[j,i-1] - poly_deriv[j,i-2]
       end
     end
   end
 
-  return ChebPoly(transpose(poly_deriv), G)
+  return ChebPoly(poly_deriv, G)
 
 end
 
@@ -739,8 +739,8 @@ julia> P = chebyshev_polynomial_sec_deriv(3,[0.6,0.4])
 """
 function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {S<:Integer,T<:Number}
 
-  poly_sec_deriv = Array{T}(undef, order + 1, length(x))
-  poly_sec_deriv[1,:] .= zero(T)
+  poly_sec_deriv = Array{T}(undef, length(x), order + 1)
+  poly_sec_deriv[:,1] .= zero(T)
 
   @inbounds for j in eachindex(x)
     p = one(T)
@@ -753,18 +753,18 @@ function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {
       if i == 2
         pl, p = p, x[j]
         pdl, pd = pd, one(T)
-        poly_sec_deriv[i,j] = zero(T)
+        poly_sec_deriv[j,i] = zero(T)
       else
         pll, pl = pl, p
         p = 2*x[j]*pl - pll
         pdll, pdl = pdl, pd
         pd = 2*pl + 2*x[j]*pdl - pdll
-        poly_sec_deriv[i,j] = 2*x[j]*poly_sec_deriv[i-1,j] + 4*pdl - poly_sec_deriv[i-2,j]
+        poly_sec_deriv[j,i] = 2*x[j]*poly_sec_deriv[j,i-1] + 4*pdl - poly_sec_deriv[j,i-2]
       end
     end
   end
 
-  return transpose(poly_sec_deriv)
+  return poly_sec_deriv
 
 end
 
@@ -792,8 +792,8 @@ function chebyshev_polynomial_sec_deriv(order::S,nodes::G) where {G<:Nodes,S<:In
 
   T = eltype(nodes.points)
 
-  poly_sec_deriv = Array{T}(undef, order + 1, length(nodes.points))
-  poly_sec_deriv[1,:] .= zero(T)
+  poly_sec_deriv = Array{T}(undef, length(nodes.points), order + 1)
+  poly_sec_deriv[:,1] .= zero(T)
 
   @inbounds for j in eachindex(nodes.points)
     p = one(T)
@@ -806,18 +806,18 @@ function chebyshev_polynomial_sec_deriv(order::S,nodes::G) where {G<:Nodes,S<:In
       if i == 2
         pl, p = p, normalize_node(nodes.points[j], nodes.domain)
         pdl, pd = pd, one(T)
-        poly_sec_deriv[i,j] = zero(T)
+        poly_sec_deriv[j,i] = zero(T)
       else
         pll, pl = pl, p
         p = 2*normalize_node(nodes.points[j],nodes.domain)*pl - pll
         pdll, pdl = pdl, pd
         pd = 2 * pl + 2 * normalize_node(nodes.points[j], nodes.domain) * pdl - pdll
-        poly_sec_deriv[i,j] = 2*normalize_node(nodes.points[j],nodes.domain)*poly_sec_deriv[i-1,j] + 4*pdl - poly_sec_deriv[i-2,j]
+        poly_sec_deriv[j,i] = 2*normalize_node(nodes.points[j],nodes.domain)*poly_sec_deriv[j,i-1] + 4*pdl - poly_sec_deriv[j,i-2]
       end
     end
   end
 
-  return ChebPoly(transpose(poly_sec_deriv), G)
+  return ChebPoly(poly_sec_deriv, G)
 
 end
 
@@ -870,7 +870,6 @@ function chebyshev_weights(y::AbstractArray{T,N}, plan::P) where {T<:AbstractFlo
     nodes = Tuple(plan.grid.grid[i].points for i in eachindex(plan.grid.grid))
 
     if eltype(plan.grid.grid) <: ChebRoots
-      println("hello")
       return chebyshev_weights(y, nodes, plan.order, plan.domain)
     elseif eltype(plan.grid.grid) <: ChebExtrema
       return chebyshev_weights_extrema(y, nodes, plan.order, plan.domain)
@@ -2526,6 +2525,8 @@ end
 
 # Functions for the one-variable case where the nodes are a vector
 
+# Serial functions
+
 # Tensor-product case
 chebyshev_weights(y::Array{T,1}, nodes::Array{T,1}, order::Array{S,1}, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights(y, (nodes,), order, domain)
 chebyshev_weights_extrema(y::Array{T,1}, nodes::Array{T,1}, order::Array{S,1}, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extrema(y, (nodes,), order, domain)
@@ -2542,15 +2543,37 @@ chebyshev_weights(y::Array{T,1}, poly::Array{T,2}, order::S) where {T<:AbstractF
 chebyshev_weights_extrema(y::Array{T,1}, poly::Array{T,2}, order::S) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extrema(y, (poly,), [order])
 chebyshev_weights_extended(y::Array{T,1}, poly::Array{T,2}, order::S) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extended(y, (poly,), [order])
 
+# Threaded functions
+
+# Tensor-product case
+chebyshev_weights_threaded(y::Array{T,1}, nodes::Array{T,1}, order::Array{S,1}, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_threaded(y, (nodes,), order, domain)
+chebyshev_weights_extrema_threaded(y::Array{T,1}, nodes::Array{T,1}, order::Array{S,1}, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extrema_threaded(y, (nodes,), order, domain)
+chebyshev_weights_extended_threaded(y::Array{T,1}, nodes::Array{T,1}, order::Array{S,1}, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extended_threaded(y, (nodes,), order, domain)
+chebyshev_weights_threaded(y::Array{T,1}, poly::Array{T,2}, order::Array{S,1}) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_threaded(y, (poly,), order)
+chebyshev_weights_extrema_threaded(y::Array{T,1}, poly::Array{T,2}, order::Array{S,1}) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extrema_threaded(y, (poly,), order)
+chebyshev_weights_extended_threaded(y::Array{T,1}, poly::Array{T,2}, order::Array{S,1}) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extended_threaded(y, (poly,), order)
+
+# Complete polynomial case defaults to tensor-product case
+chebyshev_weights_threaded(y::Array{T,1}, nodes::Array{T,1}, order::S, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_threaded(y, (nodes,), [order], domain)
+chebyshev_weights_extrema_threaded(y::Array{T,1}, nodes::Array{T,1}, order::S, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extrema_threaded(y, (nodes,), [order], domain)
+chebyshev_weights_extended_threaded(y::Array{T,1}, nodes::Array{T,1}, order::S, domain=[one(T); -one(T)]) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extended_threaded(y, (nodes,), [order], domain)
+chebyshev_weights_threaded(y::Array{T,1}, poly::Array{T,2}, order::S) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_threaded(y, (poly,), order)
+chebyshev_weights_extrema_threaded(y::Array{T,1}, poly::Array{T,2}, order::S) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extrema_threaded(y, (poly,), [order])
+chebyshev_weights_extended_threaded(y::Array{T,1}, poly::Array{T,2}, order::S) where {T<:AbstractFloat,S<:Integer} = chebyshev_weights_extended_threaded(y, (poly,), [order])
+
 # Functions that allow the nodes to be in an array of arrays
 
 # Serial functions
+
+# Tensor-product case
 chebyshev_weights(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(y, Tuple(nodes), order, domain)
 chebyshev_weights_extrema(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(y, Tuple(nodes), order, domain)
 chebyshev_weights_extended(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(y, Tuple(nodes), order, domain)
 chebyshev_weights(y::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(y, Tuple(poly), order)
 chebyshev_weights_extrema(y::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(y, Tuple(poly), order)
 chebyshev_weights_extended(y::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(y, Tuple(poly), order)
+
+# Complete polynomial case
 chebyshev_weights(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights(y, Tuple(nodes), order, domain)
 chebyshev_weights_extrema(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema(y, Tuple(nodes), order, domain)
 chebyshev_weights_extended(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(y, Tuple(nodes), order, domain)
@@ -2559,12 +2582,16 @@ chebyshev_weights_extrema(y::Array{T,N}, poly::Array{Array{T,2},1}, order::S) wh
 chebyshev_weights_extended(y::Array{T,N}, poly::Array{Array{T,2},1}, order::S) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended(y, Tuple(poly), order)
 
 # Threaded functions
+
+# Tensor-product case
 chebyshev_weights_threaded(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(y, Tuple(nodes), order, domain)
 chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(y, Tuple(nodes), order, domain)
 chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(y, Tuple(nodes), order, domain)
 chebyshev_weights_threaded(y::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(y, Tuple(poly), order)
 chebyshev_weights_extrema_threaded(y::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(y, Tuple(poly), order)
 chebyshev_weights_extended_threaded(y::Array{T,N}, poly::Array{Array{T,2},1}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(y, Tuple(poly), order)
+
+# Complete polynomial case
 chebyshev_weights_threaded(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_threaded(y, Tuple(nodes), order, domain)
 chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extrema_threaded(y, Tuple(nodes), order, domain)
 chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::Array{Array{T,1},1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer} = chebyshev_weights_extended_threaded(y, Tuple(nodes), order, domain)
