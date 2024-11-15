@@ -503,6 +503,83 @@ function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {S<:Integer
 end
 
 """
+Computes the Chebyshev polynomial of degree ```order``` at the scalar point ```x```, which must lie in ```dom```.
+Returns a 2d array.  The element-type of the polynomial is given by the element-type of ```x```.
+
+Signature
+=========
+
+P = chebyshev_polynomial(order,x,dom)
+
+Example
+=======
+```
+julia> P = chebyshev_polynomial(3,0.6,[1.0,-1.0])
+[1.0  0.6  -0.28  -0.936]
+```
+"""
+function chebyshev_polynomial(order::S, x::R, dom::Array{T,1}) where {S<:Integer,R<:Number,T<:AbstractFloat}
+
+  # x must reside in [-1,1]
+
+  point = normalize_node(x,dom)
+
+  poly = Array{R}(undef, 1, order + 1)
+  poly[1] = one(R)
+
+  @inbounds for i = 2:order+1
+    if i == 2
+      poly[i] = point
+    else
+      poly[i] = 2*point*poly[i-1] - poly[i-2]
+    end
+  end
+
+  return poly
+
+end
+
+"""
+Computes the Chebyshev polynomial of degree ```order``` at end point in the vector ```x```. The elements of ```x```
+must lie in ```dom```.  Returns a 2d array.  The element-type of the polynomial is given by the element-type of 
+```x```.
+
+Signature
+=========
+
+P = chebyshev_polynomial(order,x,dom)
+
+Example
+=======
+```
+julia> P = chebyshev_polynomial(3,[0.6,0.4],[1.0,-1.0])
+[1.0  0.6  -0.28  -0.936
+ 1.0  0.4  -0.68  -0.944]
+```
+"""
+function chebyshev_polynomial(order::S, x::AbstractArray{R,1}, dom::Array{T,1}) where {S<:Integer,R<:Number,T<:AbstractFloat}
+
+  points = normalize_node(x,dom
+  )
+  # Elements of x must reside in [-1,1]
+  poly = Array{R}(undef, length(x), order + 1)
+  poly[:, 1] .= one(R)
+  
+  @inbounds for i = 2:order+1
+    for j in eachindex(x)
+      if i == 2
+          poly[j, i] = points[j]
+      else
+        poly[j, i] = 2*points[j]*poly[j,i-1] - poly[j,i-2]
+      end
+    end
+  end
+
+  return poly
+
+end
+
+"""
 Computes the Chebyshev polynomial of degree ```order``` at each point specified in the ```nodes``` struct.  The 
 elements of ```nodes.points``` must lie in [1.0,-1.0].  Returns a ChebPoly type.  The element-type of the polynomial
 is given by the element-type of ```x```.
@@ -916,6 +993,7 @@ julia> weights = chebyshev_weights(y,(nodes1,nodes2),ord,dom)
   0.26378      0.0948592   -0.00375743    0.000432628
  -0.0246176   -0.00885287   0.000350667  -4.03756e-5
   0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+```
 """
 function chebyshev_weights(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -970,6 +1048,7 @@ julia> weights = chebyshev_weights_extrema(y,(nodes1,nodes2),ord,dom)
   0.263786     0.0948622  -0.00375987    0.000444808
  -0.024647    -0.0088635   0.000351305  -4.15608e-5
   0.00386243   0.001389   -5.5053e-5     6.513e-6]
+```
 """
 function chebyshev_weights_extrema(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1035,6 +1114,7 @@ julia> weights = chebyshev_weights_extended(y,(nodes1,nodes2),ord,dom)
   0.263837     0.0948909   -0.00378841    0.000439284
  -0.0249247   -0.00896435   0.000357891  -4.14991e-5
   0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
+```
 """
 function chebyshev_weights_extended(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1085,7 +1165,7 @@ element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights(y,nodes,order,domain)
+w = chebyshev_weights(y,poly,order)
 
 Example
 =======
@@ -1101,6 +1181,7 @@ julia> weights = chebyshev_weights(y,(poly1.poly,poly2.poly),ord)
   0.26378      0.0948592   -0.00375743    0.000432628
  -0.0246176   -0.00885287   0.000350667  -4.03756e-5
   0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+```
 """
 function chebyshev_weights(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1140,7 +1221,7 @@ element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extrema(y,nodes,order,domain)
+w = chebyshev_weights_extrema(y,poly,order)
 
 Example
 =======
@@ -1156,6 +1237,7 @@ julia> weights = chebyshev_weights_extrema(y,(poly1.poly,poly2.poly),ord)
   0.263786     0.0948622  -0.00375987    0.000444808
  -0.024647    -0.0088635   0.000351305  -4.15608e-5
   0.00386243   0.001389   -5.5053e-5     6.513e-6]
+```
 """
 function chebyshev_weights_extrema(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1205,7 +1287,7 @@ element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extended(y,nodes,order,domain)
+w = chebyshev_weights_extended(y,poly,order)
 
 Example
 =======
@@ -1221,6 +1303,7 @@ julia> weights = chebyshev_weights_extended(y,(poly1.poly,poly2.poly),ord)
   0.263837     0.0948909   -0.00378841    0.000439284
  -0.0249247   -0.00896435   0.000357891  -4.14991e-5
   0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
+```
 """
 function chebyshev_weights_extended(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1283,6 +1366,7 @@ julia> weights = chebyshev_weights(y,(nodes1,nodes2),ord,dom)
   0.26378      0.0948592   -0.00375743  0.0
  -0.0246176   -0.00885287   0.0         0.0
   0.00372291   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1345,6 +1429,7 @@ julia> weights = chebyshev_weights_extrema(y,(nodes1,nodes2),ord,dom)
   0.263786     0.0948622  -0.00375987  0.0
  -0.024647    -0.0088635   0.0         0.0
   0.00386243   0.0         0.0         0.0]
+```
 """
 function chebyshev_weights_extrema(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1417,6 +1502,7 @@ julia> weights = chebyshev_weights_extended(y,(nodes1,nodes2),ord,dom)
   0.263837     0.0948909   -0.00378841  0.0
  -0.0249247   -0.00896435   0.0         0.0
   0.00379791   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights_extended(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1474,7 +1560,7 @@ element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights(y,nodes,order,domain)
+w = chebyshev_weights(y,poly,order)
 
 Example
 =======
@@ -1490,6 +1576,7 @@ julia> weights = chebyshev_weights(y,(poly1.poly,poly2.poly),ord)
   0.26378      0.0948592   -0.00375743  0.0
  -0.0246176   -0.00885287   0.0         0.0
   0.00372291   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1536,7 +1623,7 @@ element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extrema(y,nodes,order,domain)
+w = chebyshev_weights_extrema(y,poly,order)
 
 Example
 =======
@@ -1552,6 +1639,7 @@ julia> weights = chebyshev_weights_extrema(y,(poly1.poly,poly2.poly),ord)
   0.263786     0.0948622  -0.00375987  0.0
  -0.024647    -0.0088635   0.0         0.0
   0.00386243   0.0         0.0         0.0]
+```
 """
 function chebyshev_weights_extrema(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1608,7 +1696,7 @@ by the element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extended(y,nodes,order,domain)
+w = chebyshev_weights_extended(y,poly,order)
 
 Example
 =======
@@ -1624,6 +1712,7 @@ julia> weights = chebyshev_weights_extended(y,(poly1.poly,poly2.poly),ord)
   0.263837     0.0948909   -0.00378841  0.0
  -0.0249247   -0.00896435   0.0         0.0
   0.00379791   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights_extended(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1765,6 +1854,7 @@ julia> weights = chebyshev_weights_threaded(y,(nodes1,nodes2),ord,dom)
   0.26378      0.0948592   -0.00375743    0.000432628
  -0.0246176   -0.00885287   0.000350667  -4.03756e-5
   0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+```
 """
 function chebyshev_weights_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1821,6 +1911,7 @@ julia> weights = chebyshev_weights_extrema_threaded(y,(nodes1,nodes2),ord,dom)
   0.263786     0.0948622  -0.00375987    0.000444808
  -0.024647    -0.0088635   0.000351305  -4.15608e-5
   0.00386243   0.001389   -5.5053e-5     6.513e-6]
+```
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1887,6 +1978,7 @@ julia> weights = chebyshev_weights_extended_threaded(y,(nodes1,nodes2),ord,dom)
   0.263837     0.0948909   -0.00378841    0.000439284
  -0.0249247   -0.00896435   0.000357891  -4.14991e-5
   0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
+```
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1937,7 +2029,7 @@ is given by the element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_threaded(y,nodes,order,domain)
+w = chebyshev_weights_threaded(y,poly,order)
 
 Example
 =======
@@ -1953,6 +2045,7 @@ julia> weights = chebyshev_weights_threaded(y,(poly1.poly,poly2.poly),ord)
   0.26378      0.0948592   -0.00375743    0.000432628
  -0.0246176   -0.00885287   0.000350667  -4.03756e-5
   0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+```
 """
 function chebyshev_weights_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -1992,7 +2085,7 @@ is given by the element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+w = chebyshev_weights_extrema_threaded(y,poly,order)
 
 Example
 =======
@@ -2008,6 +2101,7 @@ julia> weights = chebyshev_weights_extrema_threaded(y,(poly1.poly,poly2.poly),or
   0.263786     0.0948622  -0.00375987    0.000444808
  -0.024647    -0.0088635   0.000351305  -4.15608e-5
   0.00386243   0.001389   -5.5053e-5     6.513e-6]
+```
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2057,7 +2151,7 @@ weights is given by the element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
+w = chebyshev_weights_extended_threaded(y,poly,order)
 
 Example
 =======
@@ -2073,6 +2167,7 @@ julia> weights = chebyshev_weights_extended_threaded(y,(poly1.poly,poly2.poly),o
   0.263837     0.0948909   -0.00378841    0.000439284
  -0.0249247   -0.00896435   0.000357891  -4.14991e-5
   0.00379791   0.00136595  -5.45338e-5    6.32345e-6]
+```
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::Union{NTuple{N,S},Array{S,1}}) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2135,6 +2230,7 @@ julia> weights = chebyshev_weights_threaded(y,(nodes1,nodes2),ord,dom)
   0.26378      0.0948592   -0.00375743  0.0
  -0.0246176   -0.00885287   0.0         0.0
   0.00372291   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2198,6 +2294,7 @@ julia> weights = chebyshev_weights_extrema_threaded(y,(nodes1,nodes2),ord,dom)
   0.263786     0.0948622  -0.00375987  0.0
  -0.024647    -0.0088635   0.0         0.0
   0.00386243   0.0         0.0         0.0]
+```
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2271,6 +2368,7 @@ julia> weights = chebyshev_weights_extended_threaded(y,(nodes1,nodes2),ord,dom)
   0.263837     0.0948909   -0.00378841  0.0
  -0.0249247   -0.00896435   0.0         0.0
   0.00379791   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, nodes::NTuple{N,Array{T,1}}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2328,7 +2426,7 @@ weights is given by the element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_threaded(y,nodes,order,domain)
+w = chebyshev_weights_threaded(y,poly,order)
 
 Example
 =======
@@ -2344,6 +2442,7 @@ julia> weights = chebyshev_weights_threaded(y,(poly1.poly,poly2.poly),ord)
   0.26378      0.0948592   -0.00375743  0.0
  -0.0246176   -0.00885287   0.0         0.0
   0.00372291   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2390,7 +2489,7 @@ weights is given by the element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extrema_threaded(y,nodes,order,domain)
+w = chebyshev_weights_extrema_threaded(y,poly,order)
 
 Example
 =======
@@ -2406,6 +2505,7 @@ julia> weights = chebyshev_weights_extrema_threaded(y,(poly1.poly,poly2.poly),or
   0.263786     0.0948622  -0.00375987  0.0
  -0.024647    -0.0088635   0.0         0.0
   0.00386243   0.0         0.0         0.0]
+```
 """
 function chebyshev_weights_extrema_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 
@@ -2462,7 +2562,7 @@ Chebyshev weights is given by the element-type of ```poly```.
 Signature
 =========
 
-w = chebyshev_weights_extended_threaded(y,nodes,order,domain)
+w = chebyshev_weights_extended_threaded(y,poly,order)
 
 Example
 =======
@@ -2478,6 +2578,7 @@ julia> weights = chebyshev_weights_extended_threaded(y,(poly1.poly,poly2.poly),o
   0.263837     0.0948909   -0.00378841  0.0
  -0.0249247   -0.00896435   0.0         0.0
   0.00379791   0.0          0.0         0.0]
+```
 """
 function chebyshev_weights_extended_threaded(y::Array{T,N}, poly::NTuple{N,Array{T,2}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
 

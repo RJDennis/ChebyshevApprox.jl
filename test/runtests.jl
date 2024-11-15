@@ -51,16 +51,20 @@ ex8 = nodes(BigFloat,3,:chebyshev_extended,[2.0,0.0])
 ########################################################
 
 r1 = chebyshev_nodes(11)
+r2 = chebyshev_nodes(11,[6.5,3.4])
 r3 = nodes(11,:chebyshev_nodes)
 
 r5 = chebyshev_nodes(BigFloat,11)
+r6 = chebyshev_nodes(BigFloat,11,[6.5,3.4])
 r7 = nodes(BigFloat,11,:chebyshev_nodes)
 
 # Chebyshev polynomials
 
 chebyshev_polynomial(6, r1)
+chebyshev_polynomial(6, r2, [6.5,3.4])
 chebyshev_polynomial(6, r3)
 chebyshev_polynomial(6, r5)
+chebyshev_polynomial(6, r6, [6.5, 3.4])
 chebyshev_polynomial(6, r7)
 
 # Derivative of Chebyshev polynomials
