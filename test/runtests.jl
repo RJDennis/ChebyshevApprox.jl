@@ -1,5 +1,4 @@
 using ChebyshevApprox
-using LinearAlgebra
 using GenericLinearAlgebra
 
 #######################
@@ -190,6 +189,11 @@ yr_hat = chebyshev_evaluate(wr_tensor, point, order, dom)
 ye_hat = chebyshev_evaluate(we_tensor, point, order, dom)
 yex_hat = chebyshev_evaluate(wex_tensor, point, order, dom)
 
+poly_tuple = Tuple(chebyshev_polynomial(order, ChebyshevApprox.normalize_node(point[i], dom[:, i])) for i in 1:ndims(wr_tensor))
+yr_hat_tuple = chebyshev_evaluate(wr_tensor, poly_tuple)
+ye_hat_tuple = chebyshev_evaluate(we_tensor, poly_tuple)
+yex_hat_tuple = chebyshev_evaluate(wex_tensor, poly_tuple)
+
 yr_fn = chebyshev_interp(yr, ar)
 ye_fn = chebyshev_interp(ye, ae)
 yex_fn = chebyshev_interp(yex, aex)
@@ -356,6 +360,16 @@ point = [1.748, 0.753]
 yr_hat = chebyshev_evaluate(wr_tensor, point, order, dom)
 ye_hat = chebyshev_evaluate(we_tensor, point, order, dom)
 yex_hat = chebyshev_evaluate(wex_tensor, point, order, dom)
+
+poly_tuple = Tuple(chebyshev_polynomial(order[i], ChebyshevApprox.normalize_node(point[i], dom[:, i])) for i in 1:ndims(wr_tensor))
+yr_hat_tuple = chebyshev_evaluate(wr_tensor, poly_tuple)
+ye_hat_tuple = chebyshev_evaluate(we_tensor, poly_tuple)
+yex_hat_tuple = chebyshev_evaluate(wex_tensor, poly_tuple)
+
+poly_tuple = Tuple(chebyshev_polynomial(order_complete, ChebyshevApprox.normalize_node(point[i], dom[:, i])) for i in 1:ndims(wr_tensor))
+yr_hat_tuple_complete = chebyshev_evaluate(wr_complete, poly_tuple, order_complete)
+ye_hat_tuple_complete = chebyshev_evaluate(we_complete, poly_tuple, order_complete)
+yex_hat_tuple_complete = chebyshev_evaluate(wex_complete, poly_tuple, order_complete)
 
 yr_fn = chebyshev_interp(yr, ar)
 ye_fn = chebyshev_interp(ye, ae)
@@ -531,6 +545,11 @@ yr_hat = chebyshev_evaluate(wr_tensor, point, order, dom)
 ye_hat = chebyshev_evaluate(we_tensor, point, order, dom)
 yex_hat = chebyshev_evaluate(wex_tensor, point, order, dom)
 
+poly_tuple = Tuple(chebyshev_polynomial(order, ChebyshevApprox.normalize_node(point[i], dom[:, i])) for i in 1:ndims(wr_tensor))
+yr_hat_tuple = chebyshev_evaluate(wr_tensor, poly_tuple)
+ye_hat_tuple = chebyshev_evaluate(we_tensor, poly_tuple)
+yex_hat_tuple = chebyshev_evaluate(wex_tensor, poly_tuple)
+
 yr_fn = chebyshev_interp(yr, ar)
 ye_fn = chebyshev_interp(ye, ae)
 yex_fn = chebyshev_interp(yex, aex)
@@ -697,6 +716,11 @@ point = BigFloat.([1.748, 0.753])
 yr_hat = chebyshev_evaluate(wr_tensor, point, order, dom)
 ye_hat = chebyshev_evaluate(we_tensor, point, order, dom)
 yex_hat = chebyshev_evaluate(wex_tensor, point, order, dom)
+
+poly_tuple = Tuple(chebyshev_polynomial(order[i], ChebyshevApprox.normalize_node(point[i], dom[:, i])) for i in 1:ndims(wr_tensor))
+yr_hat_tuple = chebyshev_evaluate(wr_tensor, poly_tuple)
+ye_hat_tuple = chebyshev_evaluate(we_tensor, poly_tuple)
+yex_hat_tuple = chebyshev_evaluate(wex_tensor, poly_tuple)
 
 yr_fn = chebyshev_interp(yr, ar)
 ye_fn = chebyshev_interp(ye, ae)
