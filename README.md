@@ -198,6 +198,28 @@ w = chebyshev_weights_extrema(y,grid_points,order,domain)
 
 The third possibility is to use `chebyshev_weights_extended()`.
 
+Each on the functions to compute the Chebyshev weights has an in-place version that can be used to reuse memory, with the name suffixed with a bang.  So you can do the following:
+
+```julia
+order_x1  = 5
+domain_x1 = [25.0,5.0]
+nodes_x1  = chebyshev_extrema(11,domain_x1)
+
+order_x2  = 7
+domain_x2 = [3.0,0.1]
+nodes_x2  = chebyshev_extrema(15,domain_x2)
+
+order = [order_x1,order_x2]
+grid_points = (nodes_x1,nodes_x2)
+domain = [domain_x1 domain_x2]
+
+y = [k^0.35*l^0.65 for k in nodes_x1, l in nodes_x2]
+
+w = zeros(order_x1+1,order_x2+1)
+
+chebyshev_weights_extrema!(w,y,grid_points,order,domain)
+```
+
 Function evaluation
 -------------------
 
