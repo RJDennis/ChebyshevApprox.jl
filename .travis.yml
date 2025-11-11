@@ -4,6 +4,7 @@ os:
   - windows
 julia:
   - 1.6
+  - lts
   - nightly
   
 #script:
