@@ -3052,9 +3052,9 @@ julia> yhat = chebyshev_evaluate(weights,poly)
 1.5500018804115083
 ```
 """
-function chebyshev_evaluate(weights::AbstractArray{T,N}, poly::Union{NTuple{N,<:AbstractArray{T,2}},AbstractArray{<:AbstractArray{T,2},1}}) where {T<:AbstractFloat,N}
+function chebyshev_evaluate(weights::AbstractArray{T1,N}, poly::Union{NTuple{N,<:AbstractArray{T2,2}},AbstractArray{<:AbstractArray{T2,2},1}}) where {T1<:AbstractFloat,T2<:Number,N}
 
-  yhat = zero(T)
+  yhat = zero(T1)
   @inbounds for i in CartesianIndices(weights)
     poly_product = poly[1][i[1]]
     @inbounds for j = 2:N
@@ -3089,9 +3089,9 @@ julia> yhat = chebyshev_evaluate(weights,poly,ord)
 1.5498202486133335
 ```
 """
-function chebyshev_evaluate(weights::AbstractArray{T,N}, poly::Union{NTuple{N,<:AbstractArray{T,2}},AbstractArray{<:AbstractArray{T,2},1}}, order::S) where {T<:AbstractFloat,N,S<:Integer}
+function chebyshev_evaluate(weights::AbstractArray{T1,N}, poly::Union{NTuple{N,<:AbstractArray{T2,2}},AbstractArray{<:AbstractArray{T2,2},1}}, order::S) where {T1<:AbstractFloat,T2<:Number,N,S<:Integer}
 
-  yhat = zero(T)
+  yhat = zero(T1)
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
       poly_product = poly[1][i[1]]

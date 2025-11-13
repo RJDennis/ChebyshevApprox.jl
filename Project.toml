@@ -1,7 +1,7 @@
 name = "ChebyshevApprox"
 uuid = "17a596ad-87cd-578c-9b6d-01108c31dc04"
 authors = ["Richard Dennis <richard.dennis@glasgow.ac.uk>"]
-version = "0.4.7"
+version = "0.4.8"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
