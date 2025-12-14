@@ -2952,7 +2952,7 @@ julia> yhat = chebyshev_evaluate(weights,x,ord,dom)
 1.5500018804115083
 ```
 """
-function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -2965,6 +2965,7 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
   return yhat
 
 end
+
 
 """
 Evaluate a complete Chebyshev polynomial at point, ```x````, given the ```weights``` the ```order``` of the polynomial, and the ```domain```.
@@ -2987,7 +2988,7 @@ julia> yhat = chebyshev_evaluate(weights,x,ord,dom)
 1.5498202486133335
 ```
 """
-function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -3024,9 +3025,9 @@ julia> yhat = chebyshev_evaluate(weights,poly)
 1.5500018804115083
 ```
 """
-function chebyshev_evaluate(weights::AbstractArray{T1,N}, poly::Union{NTuple{N,<:AbstractArray{T2,2}},AbstractArray{<:AbstractArray{T2,2},1}}) where {T1<:Real,T2<:Number,N}
+function chebyshev_evaluate(weights::AbstractArray{T,N}, poly::Union{NTuple{N,<:AbstractArray{R,2}},AbstractArray{<:AbstractArray{R,2},1}}) where {T<:Real,R<:Real,N}
 
-  yhat = zero(T1)
+  yhat = zero(R)
   @inbounds for i in CartesianIndices(weights)
     poly_product = poly[1][i[1]]
     @inbounds for j = 2:N
@@ -3061,9 +3062,9 @@ julia> yhat = chebyshev_evaluate(weights,poly,ord)
 1.5498202486133335
 ```
 """
-function chebyshev_evaluate(weights::AbstractArray{T1,N}, poly::Union{NTuple{N,<:AbstractArray{T2,2}},AbstractArray{<:AbstractArray{T2,2},1}}, order::S) where {T1<:Real,T2<:Number,N,S<:Integer}
+function chebyshev_evaluate(weights::AbstractArray{T,N}, poly::Union{NTuple{N,<:AbstractArray{R,2}},AbstractArray{<:AbstractArray{R,2},1}}, order::S) where {T<:Real,N,S<:Integer,R<:Real}
 
-  yhat = zero(T1)
+  yhat = zero(R)
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
       poly_product = poly[1][i[1]]
@@ -3100,11 +3101,11 @@ julia> f([5.5,0.9])
 1.550003750285832
 ```
 """
-function chebyshev_interp(y::Array{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
+function chebyshev_interp(y::AbstractArray{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
 
-  function interp(x::AbstractArray{R,1}) where {R<:Number}
+  function interp(x::AbstractArray{R,1}) where {R<:Real}
 
     yhat = chebyshev_evaluate(w, x, plan.order, plan.domain)
 
@@ -3138,11 +3139,11 @@ julia> f([5.5,0.9])
 1.550003750285832
 ```
 """
-function chebyshev_interp_threaded(y::Array{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
+function chebyshev_interp_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
 
-  function interp(x::AbstractArray{R,1}) where {R<:Number}
+  function interp(x::AbstractArray{R,1}) where {R<:Real}
 
     yhat = chebyshev_evaluate(w, x, plan.order, plan.domain)
 
@@ -3179,7 +3180,7 @@ julia> d = chebyshev_derivative(weights,x,pos,ord,dom)
 0.08487312307427555
 ```
 """
-function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_derivative(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, pos::S, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -3194,7 +3195,7 @@ function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S
     end
   end
 
-  derivative = zero(T)
+  derivative = zero(R)
   @inbounds for i in CartesianIndices(weights)
     poly_product = poly[1][i[1]]
     @inbounds for j = 2:N
@@ -3230,7 +3231,7 @@ julia> d = chebyshev_derivative(weights,x,pos,ord,dom)
 0.08452286208888889
 ```
 """
-function chebyshev_derivative(weights::Array{T,N}, x::AbstractArray{R,1}, pos::S, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_derivative(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, pos::S, order::S, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -3284,7 +3285,7 @@ julia> g = chebyshev_gradient(weights,x,ord,dom)
 [0.0848731  1.2072]
 ```
 """
-function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_gradient(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -3322,7 +3323,7 @@ julia> g = chebyshev_gradient(weights,x,ord,dom)
 [0.0845229  1.20519]
 ```
 """
-function chebyshev_gradient(weights::Array{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_gradient(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -3361,11 +3362,11 @@ julia> grad([5.5,0.9])
 [0.0848731  1.2072]
 ```
 """
-function chebyshev_gradient(y::Array{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
+function chebyshev_gradient(y::AbstractArray{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
 
-  function cheb_grad(x::AbstractArray{R,1}) where {R<:Number}
+  function cheb_grad(x::AbstractArray{R,1}) where {R<:Real}
 
     grad = chebyshev_gradient(w, x, plan.order, plan.domain)
 
@@ -3400,11 +3401,11 @@ julia> grad([5.5,0.9])
 [0.0848731  1.2072]
 ```
 """
-function chebyshev_gradient_threaded(y::Array{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
+function chebyshev_gradient_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
 
-  function cheb_grad(x::AbstractArray{R,1}) where {R<:Number}
+  function cheb_grad(x::AbstractArray{R,1}) where {R<:Real}
 
     grad = chebyshev_gradient(w, x, plan.order, plan.domain)
 
@@ -3441,7 +3442,7 @@ julia> h = chebyshev_hessian(weights,x,ord,dom)
   0.0661025  -0.42678]
 ```
 """
-function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},Array{S,1}}, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_hessian(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -3501,7 +3502,7 @@ julia> h = chebyshev_hessian(weights,x,ord,dom)
   0.069178   -0.421668]
 ```
 """
-function chebyshev_hessian(weights::Array{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(T, 1, N); -ones(T, 1, N)]) where {T<:Real,R<:Number,N,S<:Integer}
+function chebyshev_hessian(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, order::S, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
 
   if length(x) != N
     error("A value for 'x' is needed for each spacial dimension.")
@@ -3562,11 +3563,11 @@ julia> h([5.5,0.9])
   0.0661025  -0.42678]
 ```
 """
-function chebyshev_hessian(y::Array{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
+function chebyshev_hessian(y::AbstractArray{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
 
   w = chebyshev_weights(y, plan)
 
-  function cheb_hess(x::AbstractArray{R,1}) where {R<:Number}
+  function cheb_hess(x::AbstractArray{R,1}) where {R<:Real}
 
     hess = chebyshev_hessian(w, x, plan.order, plan.domain)
 
@@ -3601,11 +3602,11 @@ julia> h([5.5,0.9])
   0.0661025  -0.42678]
 ```
 """
-function chebyshev_hessian_threaded(y::Array{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
+function chebyshev_hessian_threaded(y::AbstractArray{T,N}, plan::P) where {T<:Real,P<:CApproximationPlan,N}
 
   w = chebyshev_weights_threaded(y, plan)
 
-  function cheb_hess(x::AbstractArray{R,1}) where {R<:Number}
+  function cheb_hess(x::AbstractArray{R,1}) where {R<:Real}
 
     hess = chebyshev_hessian(w, x, plan.order, plan.domain)
 
