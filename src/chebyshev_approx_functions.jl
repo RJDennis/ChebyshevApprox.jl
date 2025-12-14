@@ -401,7 +401,7 @@ function nodes(T::DataType, N::S, node_generator::Symbol, domain=[1.0, -1.0],) w
 
 end
 
-function normalize_node(node::R, domain::Array{T,1}) where {R<:Number,T<:Real} # Internal function, not exported
+function normalize_node(node::R, domain::AbstractArray{T,1}) where {R<:Number,T<:Real} # Internal function, not exported
 
   if domain[1] == domain[2]
     norm_node = zero(T)
@@ -413,7 +413,7 @@ function normalize_node(node::R, domain::Array{T,1}) where {R<:Number,T<:Real} #
 
 end
 
-function normalize_node(nodes::Array{R,1}, domain::Array{T,1}) where {R<:Number,T<:Real} # Internal function, not exported
+function normalize_node(nodes::AbstractArray{R,1}, domain::AbstractArray{T,1}) where {R<:Number,T<:Real} # Internal function, not exported
 
   norm_nodes = map(x -> normalize_node(x, domain), nodes)
 
@@ -445,7 +445,7 @@ julia> P = chebyshev_polynomial(3,0.6)
 [1.0  0.6  -0.28  -0.936]
 ```
 """
-function chebyshev_polynomial(order::S, x::R) where {S<:Integer,R<:Number}
+function chebyshev_polynomial(order::S, x::R) where {S<:Integer,R<:Real}
 
   # x must reside in [-1,1]
 
@@ -482,7 +482,7 @@ julia> P = chebyshev_polynomial(3,[0.6,0.4])
  1.0  0.4  -0.68  -0.944]
 ```
 """
-function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Number}
+function chebyshev_polynomial(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Real}
 
   # Elements of x must reside in [-1,1]
   poly = Array{R}(undef, length(x), order + 1)
@@ -518,7 +518,7 @@ julia> P = chebyshev_polynomial(3,0.6,[1.0,-1.0])
 [1.0  0.6  -0.28  -0.936]
 ```
 """
-function chebyshev_polynomial(order::S, x::R, dom::Array{T,1}) where {S<:Integer,R<:Number,T<:Real}
+function chebyshev_polynomial(order::S, x::R, dom::AbstractArray{T,1}) where {S<:Integer,R<:Number,T<:Real}
 
   # x must reside in [-1,1]
 
@@ -557,10 +557,9 @@ julia> P = chebyshev_polynomial(3,[0.6,0.4],[1.0,-1.0])
  1.0  0.4  -0.68  -0.944]
 ```
 """
-function chebyshev_polynomial(order::S, x::AbstractArray{R,1}, dom::Array{T,1}) where {S<:Integer,R<:Number,T<:Real}
+function chebyshev_polynomial(order::S, x::AbstractArray{R,1}, dom::AbstractArray{T,1}) where {S<:Integer,R<:Number,T<:Real}
 
-  points = normalize_node(x,dom
-  )
+  points = normalize_node(x,dom)
   # Elements of x must reside in [-1,1]
   poly = Array{R}(undef, length(x), order + 1)
   poly[:, 1] .= one(R)
@@ -636,7 +635,7 @@ julia> P = chebyshev_polynomial_deriv(3,0.6)
 [0.0  1.0  2.4  1.32]
 ```
 """
-function chebyshev_polynomial_deriv(order::S, x::R) where {S<:Integer,R<:Number}
+function chebyshev_polynomial_deriv(order::S, x::R) where {S<:Integer,R<:Real}
 
   poly_deriv = Array{R}(undef, 1, order + 1)
   poly_deriv[1] = zero(R)
@@ -678,7 +677,7 @@ julia> P = chebyshev_polynomial_deriv(3,[0.6,0.4])
  0.0  1.0  1.6  -1.08]
 ```
 """
-function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Number}
+function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:Integer,R<:Real}
 
   poly_deriv = Array{R}(undef, length(x), order + 1)
   poly_deriv[:, 1] .= zero(R)
@@ -766,7 +765,7 @@ julia> P = chebyshev_polynomial_sec_deriv(3,0.6)
 [0.0  0.0  4.0  14.4]
 ```
 """
-function chebyshev_polynomial_sec_deriv(order::S, x::T) where {T<:Number,S<:Integer}
+function chebyshev_polynomial_sec_deriv(order::S, x::T) where {T<:Real,S<:Integer}
 
   poly_sec_deriv = Array{T}(undef, 1, order + 1)
   poly_sec_deriv[1] = zero(T)
@@ -814,7 +813,7 @@ julia> P = chebyshev_polynomial_sec_deriv(3,[0.6,0.4])
  0.0  0.0  4.0   9.6]
 ```
 """
-function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {S<:Integer,T<:Number}
+function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {S<:Integer,T<:Real}
 
   poly_sec_deriv = Array{T}(undef, length(x), order + 1)
   poly_sec_deriv[:,1] .= zero(T)
