@@ -323,7 +323,7 @@ function chebyshev_extended(T::DataType, N::S, domain=[1.0, -1.0]) where {S<:Int
   points = fill(T(domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N,2)
-    x = -pi(T(i - 0.5)/N)*((domain[1] - domain[2])*0.5)/cospi(1/(2N))
+    x = -cospi(T(i - 0.5)/N)*((domain[1] - domain[2])*0.5)/cospi(1/(2N))
     points[i]     += x
     points[N-i+1] -= x
   end
