@@ -109,7 +109,7 @@ function chebyshev_nodes(N::S, domain=[1.0, -1.0]) where {S<:Integer}
   points = fill((domain[1]+domain[2])*0.5,N)
 
   for i = 1:div(N,2)
-    x = -cos((i - 0.5)*π/N)*(domain[1] - domain[2])*0.5
+    x = -cospi((i - 0.5)/N)*(domain[1] - domain[2])*0.5
     points[i]     += x
     points[N-i+1] -= x
   end
@@ -150,7 +150,7 @@ function chebyshev_nodes(T::DataType,N::S, domain=[1.0, -1.0]) where {S<:Integer
   points = fill(T(domain[1]+domain[2])*0.5,N)
 
   for i = 1:div(N,2)
-    x = -cos(T(i - 0.5)*π/N)*(domain[1] - domain[2])*0.5
+    x = -(cospiT(i - 0.5)/N)*(domain[1] - domain[2])*0.5
     points[i]     += x
     points[N-i+1] -= x
   end
@@ -190,7 +190,7 @@ function chebyshev_extrema(N::S, domain=[1.0, -1.0]) where {S<:Integer}
   points = fill((domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N,2)
-    x = -cos((i - 1)*π/(N - 1))*(domain[1] - domain[2])*0.5
+    x = -cospi((i - 1)/(N - 1))*(domain[1] - domain[2])*0.5
     points[i]     += x
     points[N-i+1] -= x
   end
@@ -237,7 +237,7 @@ function chebyshev_extrema(T::DataType, N::S, domain=[1.0, -1.0]) where {S<:Inte
   points = fill(T(domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N,2)
-    x = -cos(T(i - 1)*π/(N - 1))*(domain[1] - domain[2])*0.5
+    x = -cospi(T(i - 1)/(N - 1))*(domain[1] - domain[2])*0.5
     points[i]     += x
     points[N-i+1] -= x
   end
@@ -276,7 +276,7 @@ function chebyshev_extended(N::S, domain=[1.0, -1.0]) where {S<:Integer}
   points = fill((domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N,2)
-    x = -cos((i - 0.5)*π/N)*((domain[1] - domain[2])*0.5)/cos(π/(2N))
+    x = -cospi((i - 0.5)/N)*((domain[1] - domain[2])*0.5)/cospi(1/(2N))
     points[i]     += x
     points[N-i+1] -= x
   end
@@ -323,7 +323,7 @@ function chebyshev_extended(T::DataType, N::S, domain=[1.0, -1.0]) where {S<:Int
   points = fill(T(domain[1]+domain[2])*0.5,N)
 
   @inbounds for i = 1:div(N,2)
-    x = -cos(T(i - 0.5)*π/N)*((domain[1] - domain[2])*0.5)/cos(π/(2N))
+    x = -pi(T(i - 0.5)/N)*((domain[1] - domain[2])*0.5)/cospi(1/(2N))
     points[i]     += x
     points[N-i+1] -= x
   end
