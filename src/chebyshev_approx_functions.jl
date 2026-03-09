@@ -641,8 +641,8 @@ function chebyshev_polynomial_deriv(order::S, x::R) where {S<:Integer,R<:Real}
   poly_deriv[1] = zero(R)
 
   p   = one(R)
-  pl  = NaN
-  pll = NaN
+  pl  = zero(R)
+  pll = zero(R)
 
   @inbounds for i = 2:order+1
     if i == 2
@@ -683,9 +683,9 @@ function chebyshev_polynomial_deriv(order::S, x::AbstractArray{R,1}) where {S<:I
   poly_deriv[:, 1] .= zero(R)
 
   @inbounds for j in eachindex(x)
-    p = one(R)
-    pl = NaN
-    pll = NaN
+    p   = one(R)
+    pl  = zero(R)
+    pll = zero(R)
     for i = 2:order+1
       if i == 2
         pl, p = p, x[j]
@@ -730,17 +730,18 @@ function chebyshev_polynomial_deriv(order::S, nodes::G) where {S<:Integer,G<:Nod
   poly_deriv[:,1] .= zero(T)
 
   @inbounds for j in eachindex(nodes.points)
-    p = one(T)
-    pl = NaN
-    pll = NaN
+    p   = one(T)
+    pl  = zero(T)
+    pll = zero(T)
+    xj = normalize_node(nodes.points[j],nodes.domain)
     for i = 2:order+1
       if i == 2
-        pl, p = p, normalize_node(nodes.points[j],nodes.domain)
+        pl, p = p, xj
         poly_deriv[j,i] = one(T)
       else
         pll, pl = pl, p
-        p = 2*normalize_node(nodes.points[j],nodes.domain)*pl - pll
-        poly_deriv[j,i] = 2*pl + 2*normalize_node(nodes.points[j],nodes.domain)*poly_deriv[j,i-1] - poly_deriv[j,i-2]
+        p = 2*xj*pl - pll
+        poly_deriv[j,i] = 2*pl + 2*xj*poly_deriv[j,i-1] - poly_deriv[j,i-2]
       end
     end
   end
@@ -770,12 +771,12 @@ function chebyshev_polynomial_sec_deriv(order::S, x::T) where {T<:Real,S<:Intege
   poly_sec_deriv = Array{T}(undef, 1, order + 1)
   poly_sec_deriv[1] = zero(T)
 
-  p = one(T)
-  pl = NaN
-  pll = NaN
-  pd = zero(T)
-  pdl = NaN
-  pdll = NaN
+  p    = one(T)
+  pl   = zero(T)
+  pll  = zero(T)
+  pd   = zero(T)
+  pdl  = zero(T)
+  pdll = zero(T)
 
   @inbounds for i = 2:order+1
     if i == 2
@@ -819,12 +820,12 @@ function chebyshev_polynomial_sec_deriv(order::S, x::AbstractArray{T,1}) where {
   poly_sec_deriv[:,1] .= zero(T)
 
   @inbounds for j in eachindex(x)
-    p = one(T)
-    pl = NaN
-    pll = NaN
-    pd = zero(T)
-    pdl = NaN
-    pdll = NaN
+    p    = one(T)
+    pl   = zero(T)
+    pll  = zero(T)
+    pd   = zero(T)
+    pdl  = zero(T)
+    pdll = zero(T)
     for i = 2:order+1
       if i == 2
         pl, p = p, x[j]
@@ -872,23 +873,24 @@ function chebyshev_polynomial_sec_deriv(order::S,nodes::G) where {G<:Nodes,S<:In
   poly_sec_deriv[:,1] .= zero(T)
 
   @inbounds for j in eachindex(nodes.points)
-    p = one(T)
-    pl = NaN
-    pll = NaN
-    pd = zero(T)
-    pdl = NaN
-    pdll = NaN
+    p    = one(T)
+    pl   = zero(T)
+    pll  = zero(T)
+    pd   = zero(T)
+    pdl  = zero(T)
+    pdll = zero(T)
+    xj = normalize_node(nodes.points[j], nodes.domain)
     for i = 2:order+1
       if i == 2
-        pl, p = p, normalize_node(nodes.points[j], nodes.domain)
+        pl, p = p, xj
         pdl, pd = pd, one(T)
         poly_sec_deriv[j,i] = zero(T)
       else
         pll, pl = pl, p
-        p = 2*normalize_node(nodes.points[j],nodes.domain)*pl - pll
+        p = 2*xj*pl - pll
         pdll, pdl = pdl, pd
-        pd = 2 * pl + 2 * normalize_node(nodes.points[j], nodes.domain) * pdl - pdll
-        poly_sec_deriv[j,i] = 2*normalize_node(nodes.points[j],nodes.domain)*poly_sec_deriv[j,i-1] + 4*pdl - poly_sec_deriv[j,i-2]
+        pd = 2 * pl + 2 * xj * pdl - pdll
+        poly_sec_deriv[j,i] = 2*xj*poly_sec_deriv[j,i-1] + 4*pdl - poly_sec_deriv[j,i-2]
       end
     end
   end
@@ -1007,14 +1009,23 @@ See the documentation for the out-of-place version. **Warning**: for performance
 """
 function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, nodes::NTuple{N,AbstractArray{U,1}}, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(U, 1, N); -ones(U, 1, N)]) where {T<:Real,N,S<:Integer,U<:Real}
 
+  n = size(y)
+
   poly = [chebyshev_polynomial(order[i], normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
 
-  @inbounds for i in CartesianIndices(weights) # loop does not allocate
+  @inbounds for i in CartesianIndices(weights)
+
+    denominator = one(T)
+    @inbounds for j = 1:N
+      if i[j] == 1
+        denominator *= n[j]
+      else
+        denominator *= n[j]/2
+      end
+    end
 
     numerator = zero(T)
-    denominator = zero(T)
-
-    @inbounds for s in CartesianIndices(y)
+    @inbounds @simd for s in CartesianIndices(y)
 
       product = one(T)
       @inbounds for j = 1:N
@@ -1022,13 +1033,13 @@ function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, 
       end
 
       numerator += y[s] * product
-      denominator += product^2
 
     end
 
     weights[i] = numerator / denominator
 
   end
+
   return weights
 
 end
@@ -1071,35 +1082,33 @@ See the documentation for the out-of-place version. **Warning**: for performance
 """
 function chebyshev_weights_extrema!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, nodes::NTuple{N,AbstractArray{U,1}}, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(U, 1, N); -ones(U, 1, N)]) where {T<:Real,N,S<:Integer,U<:Real}
 
-  n = size(y) # allocates
+  n = size(y)
 
-  poly = [chebyshev_polynomial(order[i], normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
+  poly = [chebyshev_polynomial(order[i], normalize_node(nodes[i], domain[:, i])) for i in 1:N]
+
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order[j]+1], Val(N))
 
   @inbounds for i in CartesianIndices(weights)
 
-  numerator = zero(T)
-  denominator = zero(T)
-
-  @inbounds for s in CartesianIndices(y)
-
-    num = y[s]
-    den = one(T)
+    denominator = one(T)
     @inbounds for j = 1:N
-      scale = 1.0
-      if s[j] == 1 || s[j] == n[j] # allocates
-        scale = 0.5
-      end
-      temp = poly[j][s[j], i[j]]
-      num *= temp * scale
-      den *= (temp^2) * scale
+      denominator *= denom_factors[j][i[j]]
     end
 
-    numerator += num
-    denominator += den
+    numerator = zero(T)
+    @inbounds @simd for s in CartesianIndices(y)
 
-  end
+      num = y[s]
+      @inbounds for j = 1:N
+        num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
+      end
 
-  weights[i] = numerator / denominator
+      numerator += num
+
+    end
+
+    weights[i] = numerator / denominator
 
   end
 
@@ -1157,24 +1166,19 @@ function chebyshev_weights_extended!(weights::AbstractArray{T,N}, y::AbstractArr
   @inbounds for i in CartesianIndices(weights)
 
     numerator = zero(T)
-    denominator = zero(T)
 
-    @inbounds for s in CartesianIndices(y)
+    @inbounds @simd for s in CartesianIndices(y)
 
       num = y[s]
-      den = one(T)
       @inbounds for j = 1:N
-        temp = complement[j][s[j], i[j]]
-        num *= temp
-        den *= temp * poly[j][s[j], i[j]]
+        num *= complement[j][s[j], i[j]]
       end
 
       numerator += num
-      denominator += den
 
     end
 
-    weights[i] = numerator / denominator
+    weights[i] = numerator
 
   end
 
@@ -1222,12 +1226,22 @@ See the documentation for the out-of-place version. **Warning**: for performance
 """
 function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, poly::NTuple{N,AbstractArray{U,2}}, order::Union{NTuple{N,S},AbstractArray{S,1}}) where {T<:Real,N,S<:Integer,U<:Real}
 
+  n = size(y)
+
   @inbounds for i in CartesianIndices(weights)
 
-    numerator = zero(T)
-    denominator = zero(T)
+    denominator = one(T)
+    @inbounds for j = 1:N
+      if i[j] == 1
+        denominator *= n[j]
+      else
+        denominator *= n[j]/2
+      end
+    end
 
-    @inbounds for s in CartesianIndices(y)
+    numerator = zero(T)
+
+    @inbounds @simd for s in CartesianIndices(y)
 
       product = one(T)
       @inbounds for j = 1:N
@@ -1235,7 +1249,6 @@ function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, 
       end
 
       numerator += y[s] * product
-      denominator += product^2
 
     end
 
@@ -1289,28 +1302,26 @@ function chebyshev_weights_extrema!(weights::AbstractArray{T,N}, y::AbstractArra
 
   n = size(y)
 
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order[j]+1], Val(N))
+
   @inbounds for i in CartesianIndices(weights)
 
-    numerator = zero(T)
-    denominator = zero(T)
+    denominator = one(T)
+    @inbounds for j = 1:N
+      denominator *= denom_factors[j][i[j]]
+    end
 
-    @inbounds for s in CartesianIndices(y)
+    numerator = zero(T)
+
+    @inbounds @simd for s in CartesianIndices(y)
 
       num = y[s]
-      den = one(T)
       @inbounds for j = 1:N
-        if s[j] == 1 || s[j] == n[j]
-          scale = 0.5
-        else
-          scale = 1.0
-        end
-        temp = poly[j][s[j], i[j]]
-        num *= temp * scale
-        den *= (temp^2) * scale
+        num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
       end
 
       numerator += num
-      denominator += den
 
     end
 
@@ -1371,24 +1382,19 @@ function chebyshev_weights_extended!(weights::AbstractArray{T,N}, y::AbstractArr
   @inbounds for i in CartesianIndices(weights)
 
     numerator = zero(T)
-    denominator = zero(T)
 
-    @inbounds for s in CartesianIndices(y)
+    @inbounds @simd for s in CartesianIndices(y)
 
       num = y[s]
-      den = one(T)
       @inbounds for j = 1:N
-        temp = complement[j][s[j], i[j]]
-        num *= temp
-        den *= temp * poly[j][s[j], i[j]]
+        num *= complement[j][s[j], i[j]]
       end
 
       numerator += num
-      denominator += den
 
     end
 
-    weights[i] = numerator / denominator
+    weights[i] = numerator
 
   end
 
@@ -1435,17 +1441,25 @@ In-place variant for scalar-order complete Chebyshev weights (roots):
 """
 function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, nodes::NTuple{N,AbstractArray{U,1}}, order::S, domain=[ones(U, 1, N); -ones(U, 1, N)]) where {T<:Real,N,S<:Integer,U<:Real}
 
-  poly = [chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
+  n = size(y)
 
-  ord = Tuple(order for _ in 1:N)
+  poly = [chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i])) for i in 1:N]
 
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        if i[j] == 1
+          denominator *= n[j]
+        else
+          denominator *= n[j]/2
+        end
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         product = one(T)
         @inbounds for j = 1:N
@@ -1453,14 +1467,15 @@ function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, 
         end
 
         numerator += y[s] * product
-        denominator += product^2
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -1512,38 +1527,36 @@ function chebyshev_weights_extrema!(weights::AbstractArray{T,N}, y::AbstractArra
 
   poly = [chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
 
-  ord = Tuple(order for _ in 1:N)
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order+1], Val(N))
 
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        denominator *= denom_factors[j][i[j]]
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          if s[j] == 1 || s[j] == n[j]
-            scale = 0.5
-          else
-            scale = 1.0
-          end
-          temp = poly[j][s[j], i[j]]
-          num *= temp * scale
-          den *= (temp^2) * scale
+          num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -1599,33 +1612,28 @@ function chebyshev_weights_extended!(weights::AbstractArray{T,N}, y::AbstractArr
     complement[i] = pinv(poly[i])'
   end
 
-  ord = Tuple(order for _ in 1:N)
-
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
       numerator = zero(T)
-      denominator = zero(T)
 
-      @inbounds for s in CartesianIndices(y)
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          temp = complement[j][s[j], i[j]]
-          num *= temp
-          den *= temp * poly[j][s[j], i[j]]
+          num *= complement[j][s[j], i[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
-      weights[i] = numerator / denominator
+      weights[i] = numerator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -1675,15 +1683,23 @@ In-place variant for scalar-order complete Chebyshev weights (roots, pre-compute
 """
 function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, poly::NTuple{N,AbstractArray{U,2}}, order::S) where {T<:Real,N,S<:Integer,U<:Real}
 
-  ord = Tuple(order for _ in 1:N)
+  n = size(y)
 
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        if i[j] == 1
+          denominator *= n[j]
+        else
+          denominator *= n[j]/2
+        end
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         product = one(T)
         @inbounds for j = 1:N
@@ -1691,14 +1707,15 @@ function chebyshev_weights!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, 
         end
 
         numerator += y[s] * product
-        denominator += product^2
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -1750,38 +1767,36 @@ function chebyshev_weights_extrema!(weights::AbstractArray{T,N}, y::AbstractArra
 
   n = size(y)
 
-  ord = Tuple(order for _ in 1:N)
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order+1], Val(N))
 
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        denominator *= denom_factors[j][i[j]]
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          if s[j] == 1 || s[j] == n[j]
-            scale = 0.5
-          else
-            scale = 1.0
-          end
-          temp = poly[j][s[j], i[j]]
-          num *= temp * scale
-          den *= (temp^2) * scale
+          num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -1836,33 +1851,28 @@ function chebyshev_weights_extended!(weights::AbstractArray{T,N}, y::AbstractArr
     complement[i] = pinv(poly[i])'
   end
 
-  ord = Tuple(order for _ in 1:N)
-
   @inbounds for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
       numerator = zero(T)
-      denominator = zero(T)
 
-      @inbounds for s in CartesianIndices(y)
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          temp = complement[j][s[j], i[j]]
-          num *= temp
-          den *= temp * poly[j][s[j], i[j]]
+          num *= complement[j][s[j], i[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
-      weights[i] = numerator / denominator
+      weights[i] = numerator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -1982,14 +1992,24 @@ In-place variant for tensor-product Chebyshev weights (roots, threaded):
 """
 function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, nodes::NTuple{N,AbstractArray{U,1}}, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(U, 1, N); -ones(U, 1, N)]) where {T<:Real,N,S<:Integer,U<:Real}
 
+  n = size(y)
+
   poly = [chebyshev_polynomial(order[i], normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
 
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
-    numerator = zero(T)
-    denominator = zero(T)
+    denominator = one(T)
+    @inbounds for j = 1:N
+      if i[j] == 1
+        denominator *= n[j]
+      else
+        denominator *= n[j]/2
+      end
+    end
 
-    @inbounds for s in CartesianIndices(y)
+    numerator = zero(T)
+
+    @inbounds @simd for s in CartesianIndices(y)
 
       product = one(T)
       @inbounds for j = 1:N
@@ -1997,7 +2017,6 @@ function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArr
       end
 
       numerator += y[s] * product
-      denominator += product^2
 
     end
 
@@ -2052,32 +2071,30 @@ function chebyshev_weights_extrema_threaded!(weights::AbstractArray{T,N}, y::Abs
 
   poly = [chebyshev_polynomial(order[i], normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
 
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order[j]+1], Val(N))
+
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
-    numerator = zero(T)
-    denominator = zero(T)
-
-    @inbounds for s in CartesianIndices(y)
-
-      num = y[s]
-      den = one(T)
+      denominator = one(T)
       @inbounds for j = 1:N
-        if s[j] == 1 || s[j] == n[j]
-          scale = 0.5
-        else
-          scale = 1.0
-        end
-        temp = poly[j][s[j], i[j]]
-        num *= temp * scale
-        den *= (temp^2) * scale
+        denominator *= denom_factors[j][i[j]]
       end
 
-      numerator += num
-      denominator += den
+      numerator = zero(T)
 
-    end
+      @inbounds @simd for s in CartesianIndices(y)
 
-    weights[i] = numerator / denominator
+        num = y[s]
+        @inbounds for j = 1:N
+          num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
+        end
+
+        numerator += num
+
+      end
+
+      weights[i] = numerator / denominator
 
   end
 
@@ -2135,24 +2152,19 @@ function chebyshev_weights_extended_threaded!(weights::AbstractArray{T,N}, y::Ab
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
-    denominator = zero(T)
 
-    @inbounds for s in CartesianIndices(y)
+    @inbounds @simd for s in CartesianIndices(y)
 
       num = y[s]
-      den = one(T)
       @inbounds for j = 1:N
-        temp = complement[j][s[j], i[j]]
-        num *= temp
-        den *= temp * poly[j][s[j], i[j]]
+        num *= complement[j][s[j], i[j]]
       end
 
       numerator += num
-      denominator += den
 
     end
 
-    weights[i] = numerator / denominator
+    weights[i] = numerator
 
   end
 
@@ -2200,12 +2212,22 @@ In-place variant for tensor-product Chebyshev weights (pre-computed poly, thread
 """
 function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, poly::NTuple{N,AbstractArray{U,2}}, order::Union{NTuple{N,S},AbstractArray{S,1}}) where {T<:Real,N,S<:Integer,U<:Real}
 
+  n = size(y)
+
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
-    numerator = zero(T)
-    denominator = zero(T)
+    denominator = one(T)
+    @inbounds for j = 1:N
+      if i[j] == 1
+        denominator *= n[j]
+      else
+        denominator *= n[j]/2
+      end
+    end
 
-    @inbounds for s in CartesianIndices(y)
+    numerator = zero(T)
+
+    @inbounds @simd for s in CartesianIndices(y)
 
       product = one(T)
       @inbounds for j = 1:N
@@ -2213,7 +2235,6 @@ function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArr
       end
 
       numerator += y[s] * product
-      denominator += product^2
 
     end
 
@@ -2267,32 +2288,30 @@ function chebyshev_weights_extrema_threaded!(weights::AbstractArray{T,N}, y::Abs
 
   n = size(y)
 
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order[j]+1], Val(N))
+
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
-    numerator = zero(T)
-    denominator = zero(T)
-
-    @inbounds for s in CartesianIndices(y)
-
-      num = y[s]
-      den = one(T)
+      denominator = one(T)
       @inbounds for j = 1:N
-        if s[j] == 1 || s[j] == n[j]
-          scale = 0.5
-        else
-          scale = 1.0
-        end
-        temp = poly[j][s[j], i[j]]
-        num *= temp * scale
-        den *= (temp^2) * scale
+        denominator *= denom_factors[j][i[j]]
       end
 
-      numerator += num
-      denominator += den
+      numerator = zero(T)
 
-    end
+      @inbounds @simd for s in CartesianIndices(y)
 
-    weights[i] = numerator / denominator
+        num = y[s]
+        @inbounds for j = 1:N
+          num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
+        end
+
+        numerator += num
+
+      end
+
+      weights[i] = numerator / denominator
 
   end
 
@@ -2348,24 +2367,19 @@ function chebyshev_weights_extended_threaded!(weights::AbstractArray{T,N}, y::Ab
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
 
     numerator = zero(T)
-    denominator = zero(T)
 
-    @inbounds for s in CartesianIndices(y)
+    @inbounds @simd for s in CartesianIndices(y)
 
       num = y[s]
-      den = one(T)
       @inbounds for j = 1:N
-        temp = complement[j][s[j], i[j]]
-        num *= temp
-        den *= temp * poly[j][s[j], i[j]]
+        num *= complement[j][s[j], i[j]]
       end
 
       numerator += num
-      denominator += den
 
     end
 
-    weights[i] = numerator / denominator
+    weights[i] = numerator
 
   end
 
@@ -2413,17 +2427,25 @@ In-place variant for scalar-order complete Chebyshev weights (roots, threaded):
 """
 function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, nodes::NTuple{N,AbstractArray{U,1}}, order::S, domain=[ones(U, 1, N); -ones(U, 1, N)]) where {T<:Real,N,S<:Integer,U<:Real}
 
-  poly = [chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
+  n = size(y)
 
-  ord = Tuple(order for _ in 1:N)
+  poly = [chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
 
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        if i[j] == 1
+          denominator *= n[j]
+        else
+          denominator *= n[j]/2
+        end
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         product = one(T)
         @inbounds for j = 1:N
@@ -2431,14 +2453,15 @@ function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArr
         end
 
         numerator += y[s] * product
-        denominator += product^2
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -2489,40 +2512,38 @@ function chebyshev_weights_extrema_threaded!(weights::AbstractArray{T,N}, y::Abs
 
   n = size(y)
 
-  poly = [chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order+1], Val(N))
 
-  ord = Tuple(order for _ in 1:N)
+  poly = [chebyshev_polynomial(order, normalize_node(nodes[i], domain[:, i])) for i in 1:N] # allocates
 
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        denominator *= denom_factors[j][i[j]]
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          if s[j] == 1 || s[j] == n[j]
-            scale = 0.5
-          else
-            scale = 1.0
-          end
-          temp = poly[j][s[j], i[j]]
-          num *= temp * scale
-          den *= (temp^2) * scale
+          num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -2579,34 +2600,29 @@ function chebyshev_weights_extended_threaded!(weights::AbstractArray{T,N}, y::Ab
     complement[i] = pinv(poly[i])'
   end
 
-  ord = Tuple(order for _ in 1:N)
-
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
       numerator = zero(T)
-      denominator = zero(T)
 
-      @inbounds for s in CartesianIndices(y)
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          temp = complement[j][s[j], i[j]]
-          num *= temp
-          den *= temp * poly[j][s[j], i[j]]
+          num *= complement[j][s[j], i[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
-      weights[i] = numerator / denominator
+      weights[i] = numerator
 
     else
+    
       weights[i] = zero(T)
-    end
+    
+  end
 
   end
 
@@ -2655,15 +2671,23 @@ In-place variant for scalar-order complete Chebyshev weights (roots, pre-compute
 """
 function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, poly::NTuple{N,AbstractArray{U,2}}, order::S) where {T<:Real,N,S<:Integer,U<:Real}
 
-  ord = Tuple(order for _ in 1:N)
+  n = size(y)
 
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        if i[j] == 1
+          denominator *= n[j]
+        else
+          denominator *= n[j]/2
+        end
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         product = one(T)
         @inbounds for j = 1:N
@@ -2671,14 +2695,15 @@ function chebyshev_weights_threaded!(weights::AbstractArray{T,N}, y::AbstractArr
         end
 
         numerator += y[s] * product
-        denominator += product^2
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -2730,38 +2755,36 @@ function chebyshev_weights_extrema_threaded!(weights::AbstractArray{T,N}, y::Abs
 
   n = size(y)
 
-  ord = Tuple(order for _ in 1:N)
+  scale_vecs    = ntuple(j -> T[k == 1 || k == n[j] ? T(0.5) : one(T) for k in 1:n[j]], Val(N))
+  denom_factors = ntuple(j -> T[i == 1 || i == n[j] ? T(n[j] - 1) : T(n[j] - 1) / 2 for i in 1:order+1], Val(N))
 
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
-      numerator = zero(T)
-      denominator = zero(T)
+      denominator = one(T)
+      @inbounds for j = 1:N
+        denominator *= denom_factors[j][i[j]]
+      end
 
-      @inbounds for s in CartesianIndices(y)
+      numerator = zero(T)
+
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          if s[j] == 1 || s[j] == n[j]
-            scale = 0.5
-          else
-            scale = 1.0
-          end
-          temp = poly[j][s[j], i[j]]
-          num *= temp * scale
-          den *= (temp^2) * scale
+          num *= poly[j][s[j], i[j]] * scale_vecs[j][s[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
       weights[i] = numerator / denominator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -2816,33 +2839,28 @@ function chebyshev_weights_extended_threaded!(weights::AbstractArray{T,N}, y::Ab
     complement[i] = pinv(poly[i])'
   end
 
-  ord = Tuple(order for _ in 1:N)
-
   @inbounds @sync Threads.@threads for i in CartesianIndices(weights)
     if sum(i.I) <= order + N
 
       numerator = zero(T)
-      denominator = zero(T)
 
-      @inbounds for s in CartesianIndices(y)
+      @inbounds @simd for s in CartesianIndices(y)
 
         num = y[s]
-        den = one(T)
         @inbounds for j = 1:N
-          temp = complement[j][s[j], i[j]]
-          num *= temp
-          den *= temp * poly[j][s[j], i[j]]
+          num *= complement[j][s[j], i[j]]
         end
 
         numerator += num
-        denominator += den
 
       end
 
-      weights[i] = numerator / denominator
+      weights[i] = numerator
 
     else
+
       weights[i] = zero(T)
+
     end
 
   end
@@ -2985,14 +3003,13 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
     error("A value for 'x' is needed for each spacial dimension.")
   end
 
-  poly = [chebyshev_polynomial(order[i], normalize_node(x[i], domain[:, i])) for i in 1:N] # allocates
+  poly = ntuple(i -> chebyshev_polynomial(order[i], normalize_node(x[i], domain[:, i])), Val(N))
 
   yhat = chebyshev_evaluate(weights, poly)
 
   return yhat
 
 end
-
 
 """
 Evaluate a complete Chebyshev polynomial at point, ```x````, given the ```weights``` the ```order``` of the polynomial, and the ```domain```.
@@ -3021,7 +3038,7 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
     error("A value for 'x' is needed for each spacial dimension.")
   end
 
-  poly = [chebyshev_polynomial(order, normalize_node(x[i], domain[:, i])) for i in 1:N] # allocates
+  poly = ntuple(i -> chebyshev_polynomial(order, normalize_node(x[i], domain[:, i])), Val(N))
 
   yhat = chebyshev_evaluate(weights, poly, order)
 
@@ -3213,25 +3230,12 @@ function chebyshev_derivative(weights::AbstractArray{T,N}, x::AbstractArray{R,1}
     error("A value for 'x' is needed for each spacial dimension.")
   end
 
-  poly = Array{Array{R,2},1}(undef, N)
-  @inbounds for i = 1:N
-    if i === pos
-      poly[i] = chebyshev_polynomial_deriv(order[i], normalize_node(x[i], domain[:, i]))
-    else
-      poly[i] = chebyshev_polynomial(order[i], normalize_node(x[i], domain[:, i]))
-    end
-  end
+  poly = ntuple(i -> i === pos ? chebyshev_polynomial_deriv(order[i], normalize_node(x[i], domain[:, i])) :
+                                 chebyshev_polynomial(order[i], normalize_node(x[i], domain[:, i])), Val(N))
 
-  derivative = zero(R)
-  @inbounds for i in CartesianIndices(weights)
-    poly_product = poly[1][i[1]]
-    @inbounds for j = 2:N
-      poly_product *= poly[j][i[j]]
-    end
-    derivative += weights[i] * poly_product
-  end
+  derivative = chebyshev_evaluate(weights, poly)
 
-  return derivative * (2.0 / (domain[1, pos] - domain[2, pos]))
+  return derivative * (2 / (domain[1, pos] - domain[2, pos]))
 
 end
 
@@ -3264,27 +3268,12 @@ function chebyshev_derivative(weights::AbstractArray{T,N}, x::AbstractArray{R,1}
     error("A value for 'x' is needed for each spacial dimension.")
   end
 
-  poly = Array{Array{R,2},1}(undef, N)
-  @inbounds for i = 1:N
-    if i === pos
-      poly[i] = chebyshev_polynomial_deriv(order, normalize_node(x[i], domain[:, i]))
-    else
-      poly[i] = chebyshev_polynomial(order, normalize_node(x[i], domain[:, i]))
-    end
-  end
+  poly = ntuple(i -> i === pos ? chebyshev_polynomial_deriv(order, normalize_node(x[i], domain[:, i])) :
+                                 chebyshev_polynomial(order, normalize_node(x[i], domain[:, i])), Val(N))
 
-  derivative = zero(R)
-  @inbounds for i in CartesianIndices(weights)
-    if sum(i.I) <= order + N
-      poly_product = poly[1][i[1]]
-      @inbounds for j = 2:N
-        poly_product *= poly[j][i[j]]
-      end
-      derivative += weights[i] * poly_product
-    end
-  end
+  derivative = chebyshev_evaluate(weights, poly)
 
-  return derivative * (2.0 / (domain[1, pos] - domain[2, pos]))
+  return derivative * (2 / (domain[1, pos] - domain[2, pos]))
 
 end
 
@@ -3475,31 +3464,19 @@ function chebyshev_hessian(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, o
     error("A value for 'x' is needed for each spacial dimension.")
   end
 
+  poly_base      = ntuple(i -> chebyshev_polynomial(order[i],           normalize_node(x[i], domain[:, i])), Val(N))
+  poly_deriv     = ntuple(i -> chebyshev_polynomial_deriv(order[i],     normalize_node(x[i], domain[:, i])), Val(N))
+  poly_sec_deriv = ntuple(i -> chebyshev_polynomial_sec_deriv(order[i], normalize_node(x[i], domain[:, i])), Val(N))
+  scale          = ntuple(i -> 2 / (domain[1, i] - domain[2, i]), Val(N))
+
   hess = Array{T,2}(undef, N, N)
-  poly = Array{Array{R,2},1}(undef, N)
 
-  @inbounds for j in CartesianIndices(hess)
-    @inbounds for i = 1:N
-      if i == j[1] == j[2]
-        poly[i] = chebyshev_polynomial_sec_deriv(order[i], normalize_node(x[i], domain[:, i]))
-      elseif i == j[1] || i == j[2]
-        poly[i] = chebyshev_polynomial_deriv(order[i], normalize_node(x[i], domain[:, i]))
-      else
-        poly[i] = chebyshev_polynomial(order[i], normalize_node(x[i], domain[:, i]))
-      end
-    end
-
-    deriv = zero(T)
-    @inbounds for i in CartesianIndices(weights)
-      poly_product = poly[1][i[1]]
-      @inbounds for j = 2:N
-        poly_product *= poly[j][i[j]]
-      end
-      deriv += weights[i] * poly_product
-    end
-
-    hess[j] = deriv * (2.0 / (domain[1, j[1]] - domain[2, j[1]])) * (2.0 / (domain[1, j[2]] - domain[2, j[2]]))
-
+  @inbounds for j2 = 1:N, j1 = 1:j2
+    poly = ntuple(i -> i == j1 == j2 ? poly_sec_deriv[i] :
+                       (i == j1 || i == j2 ? poly_deriv[i] : poly_base[i]), Val(N))
+    deriv = chebyshev_evaluate(weights, poly) * scale[j1] * scale[j2]
+    hess[j1, j2] = deriv
+    hess[j2, j1] = deriv
   end
 
   return hess
@@ -3535,31 +3512,19 @@ function chebyshev_hessian(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, o
     error("A value for 'x' is needed for each spacial dimension.")
   end
 
+  poly_base      = ntuple(i -> chebyshev_polynomial(order,           normalize_node(x[i], domain[:, i])), Val(N))
+  poly_deriv     = ntuple(i -> chebyshev_polynomial_deriv(order,     normalize_node(x[i], domain[:, i])), Val(N))
+  poly_sec_deriv = ntuple(i -> chebyshev_polynomial_sec_deriv(order, normalize_node(x[i], domain[:, i])), Val(N))
+  scale          = ntuple(i -> 2 / (domain[1, i] - domain[2, i]), Val(N))
+
   hess = Array{T,2}(undef, N, N)
-  poly = Array{Array{R,2},1}(undef, N)
 
-  @inbounds for j in CartesianIndices(hess)
-    @inbounds for i = 1:N
-      if i == j[1] == j[2]
-        poly[i] = chebyshev_polynomial_sec_deriv(order, normalize_node(x[i], domain[:, i]))
-      elseif i == j[1] || i == j[2]
-        poly[i] = chebyshev_polynomial_deriv(order, normalize_node(x[i], domain[:, i]))
-      else
-        poly[i] = chebyshev_polynomial(order, normalize_node(x[i], domain[:, i]))
-      end
-    end
-
-    deriv = zero(T)
-    @inbounds for i in CartesianIndices(weights)
-      poly_product = poly[1][i[1]]
-      @inbounds for j = 2:N
-        poly_product *= poly[j][i[j]]
-      end
-      deriv += weights[i] * poly_product
-    end
-
-    hess[j] = deriv * (2.0 / (domain[1, j[1]] - domain[2, j[1]])) * (2.0 / (domain[1, j[2]] - domain[2, j[2]]))
-
+  @inbounds for j2 = 1:N, j1 = 1:j2
+    poly = ntuple(i -> i == j1 == j2 ? poly_sec_deriv[i] :
+                       (i == j1 || i == j2 ? poly_deriv[i] : poly_base[i]), Val(N))
+    deriv = chebyshev_evaluate(weights, poly) * scale[j1] * scale[j2]
+    hess[j1, j2] = deriv
+    hess[j2, j1] = deriv
   end
 
   return hess
