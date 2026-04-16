@@ -3433,7 +3433,58 @@ function chebyshev_gradient_threaded(y::AbstractArray{T,N}, plan::P) where {T<:R
 
 end
 
-# Functions for hessians
+# Functions for Hessians
+
+"""
+Computes the second derivative of a tensor-product Chebyshev polynomial with respect to
+variables in positions `pos1` and `pos2`, at point `x`, given the `weights`, the
+polynomial `order`, and the `domain`.
+
+Signature
+=========
+
+d2 = chebyshev_second_derivative(weights,x,pos1,pos2,order,domain)
+
+Example
+=======
+
+julia> weights = [1.66416      0.598458    -0.0237052     0.00272941
+0.26378      0.0948592   -0.00375743    0.000432628
+-0.0246176   -0.00885287   0.000350667  -4.03756e-5
+0.00372291   0.00133882  -5.30312e-5    6.10598e-6]
+julia> x = [5.5,0.9]
+julia> ord = (3,3)
+julia> dom = [9.0 1.5; 3.0 0.5]
+julia> chebyshev_second_derivative(weights,x,1,2,ord,dom)  # 0.06610249230506665
+julia> chebyshev_second_derivative(weights,x,1,1,ord,dom)  # -0.011866655947306664
+"""
+function chebyshev_second_derivative(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, pos1::S, pos2::S, order::Union{NTuple{N,S},AbstractArray{S,1}}, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
+
+  poly = ntuple(i -> i == pos1 == pos2 ? chebyshev_polynomial_sec_deriv(order[i], normalize_node(x[i], domain[:, i])) :
+                     (i == pos1 || i == pos2 ? chebyshev_polynomial_deriv(order[i], normalize_node(x[i], domain[:, i])) :
+                                               chebyshev_polynomial(order[i],       normalize_node(x[i], domain[:, i]))), Val(N))
+
+  return chebyshev_evaluate(weights, poly) * (2 / (domain[1, pos1] - domain[2, pos1])) * (2 / (domain[1, pos2] - domain[2, pos2]))
+
+end
+
+function chebyshev_second_derivative(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, pos1::S, pos2::S, order::S, domain=[ones(R, 1, N); -ones(R, 1, N)]) where {T<:Real,R<:Real,N,S<:Integer}
+
+  if length(x) != N
+    error("A value for 'x' is needed for each spacial dimension.")
+  end
+
+  poly = ntuple(i -> i == pos1 == pos2 ? chebyshev_polynomial_sec_deriv(order, normalize_node(x[i], domain[:, i])) :
+                     (i == pos1 || i == pos2 ? chebyshev_polynomial_deriv(order, normalize_node(x[i], domain[:, i])) :
+                                               chebyshev_polynomial(order,       normalize_node(x[i], domain[:, i]))), Val(N))
+
+  return chebyshev_evaluate(weights, poly) * (2 / (domain[1, pos1] - domain[2, pos1])) * (2 / (domain[1, pos2] - domain[2, pos2]))
+
+end
 
 """
 Computes the hessian of a tensor-product Chebyshev polynomial evaluated at ```x```, given the ```weights```, the polynomial ```order```, and the ```domain```.
