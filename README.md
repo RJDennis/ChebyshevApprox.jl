@@ -252,6 +252,17 @@ grad = chebyshev_gradient(w,x,order,domain)
 
 where `grad` is a 2D array with one row.
 
+Hessians
+--------
+
+Hessians are computed using the `chebyshev_hessian()` function.
+
+```julia
+hess = chebyshev_hessian(w,x,order,domain)
+```
+
+where `hess` is a 2D array.
+
 Multi-threading
 ---------------
 

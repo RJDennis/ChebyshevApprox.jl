@@ -47,7 +47,7 @@ end
 
 """
 ChebPoly is an immutable struct that contains two fields: an array that contains a Chebyshev polynomial of degree
-```n```` evaluated over ```N``` points and a DataType that describes how the points were generated.  First- and
+```n``` evaluated over ```N``` points and a DataType that describes how the points were generated.  First- and
 second-derivatives of Chebyshev polynomials are also represented using the ChebPoly type.
 """
 struct ChebPoly{T<:Real} # Holds polynomials as well as their first- and second-derivative
@@ -1368,7 +1368,7 @@ function chebyshev_weights_extended(y::AbstractArray{T,N}, poly::NTuple{N,Abstra
 end
 
 """
-In-place variant of ```chebyshev_weights_extended(y, poly, order)````.
+In-place variant of ```chebyshev_weights_extended(y, poly, order)```.
 See the documentation for the out-of-place version. **Warning**: for performance, no bounds checking is done, so be sure that ```weights```, ```poly```, and ```order``` are consistent with each other.
 """
 function chebyshev_weights_extended!(weights::AbstractArray{T,N}, y::AbstractArray{T,N}, poly::NTuple{N,AbstractArray{U,2}}, order::Union{NTuple{N,S},AbstractArray{S,1}}) where {T<:Real,N,S<:Integer,U<:Real}
@@ -2976,7 +2976,7 @@ chebyshev_weights_extended_threaded!(w::AbstractArray{T,N}, y::AbstractArray{T,N
 # Functions to evaluate Chebyshev polynominals
 
 """
-Evaluate a tensor-product Chebyshev polynomial at point, ```x````, given the ```weights``` the ```order``` of the polynomial, and the ```domain```.
+Evaluate a tensor-product Chebyshev polynomial at point, ```x```, given the ```weights``` the ```order``` of the polynomial, and the ```domain```.
 
 Signature
 =========
@@ -3012,7 +3012,7 @@ function chebyshev_evaluate(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
 end
 
 """
-Evaluate a complete Chebyshev polynomial at point, ```x````, given the ```weights``` the ```order``` of the polynomial, and the ```domain```.
+Evaluate a complete Chebyshev polynomial at point, ```x```, given the ```weights``` the ```order``` of the polynomial, and the ```domain```.
 
 Signature
 =========
@@ -3280,7 +3280,7 @@ end
 # Functions for gradients
 
 """
-Computes the gradient of a tensor-product Chebyshev polynomial evaluated at ```x````, given the ```weights```, the polynomial ```order```, and the ```domain```.
+Computes the gradient of a tensor-product Chebyshev polynomial evaluated at ```x```, given the ```weights```, the polynomial ```order```, and the ```domain```.
 
 Signature
 =========
@@ -3318,7 +3318,7 @@ function chebyshev_gradient(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, 
 end
 
 """
-Computes the gradient of a complete Chebyshev polynomial evaluated at ```x````, given the ```weights```, the polynomial ```order```, and the ```domain```.
+Computes the gradient of a complete Chebyshev polynomial evaluated at ```x```, given the ```weights```, the polynomial ```order```, and the ```domain```.
 
 Signature
 =========
@@ -3436,7 +3436,7 @@ end
 # Functions for hessians
 
 """
-Computes the hessian of a tensor-product Chebyshev polynomial evaluated at ```x````, given the ```weights```, the polynomial ```order```, and the ```domain```.
+Computes the hessian of a tensor-product Chebyshev polynomial evaluated at ```x```, given the ```weights```, the polynomial ```order```, and the ```domain```.
 
 Signature
 =========
@@ -3484,7 +3484,7 @@ function chebyshev_hessian(weights::AbstractArray{T,N}, x::AbstractArray{R,1}, o
 end
 
 """"
-Computes the hessian of a complete Chebyshev polynomial evaluated at ```x````, given the ```weights```, the polynomial ```order```, and the ```domain```.
+Computes the hessian of a complete Chebyshev polynomial evaluated at ```x```, given the ```weights```, the polynomial ```order```, and the ```domain```.
 
 Signature
 =========
